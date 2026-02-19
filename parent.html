@@ -118,11 +118,13 @@
             })
             .catch(error => {
                 document.getElementById('loading').style.display = 'none';
-                alert("ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาตรวจสอบอินเทอร์เน็ตครับ");
+                alert("สาเหตุที่แท้จริงคือ: " + error.message);
+                console.log(error);
             });
     }
 </script>
 
 </body>
 </html>
+
 
