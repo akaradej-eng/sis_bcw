@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>พอร์ทัลผู้ปกครอง - โรงเรียนบ้านเชียงวิทยา</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #212529; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #1e56a0; margin: 0; font-size: 24px; }
+        .header p { color: #6c757d; margin: 5px 0 0 0; font-size: 14px; }
+        
+        .search-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; }
+        input[type="text"] { width: 90%; padding: 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 18px; text-align: center; font-family: 'Prompt'; margin-bottom: 15px; outline: none; transition: 0.3s; }
+        input[type="text"]:focus { border-color: #1e56a0; }
+        button { background-color: #1e56a0; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: 'Prompt'; width: 100%; transition: 0.3s; }
+        button:hover { background-color: #153e75; }
+        
+        .loading { display: none; margin-top: 15px; color: #f59e0b; font-weight: 600; }
+        
+        /* ข้อมูลนักเรียน */
+        .profile-card { display: none; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 20px; text-align: center; border-top: 5px solid #1e56a0; }
+        .profile-card img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #eef2f5; margin-bottom: 10px; }
+        .profile-card h3 { margin: 0; color: #1e56a0; font-size: 20px; }
+        .profile-card p { margin: 5px 0 15px 0; color: #6c757d; }
+        
+        /* ประวัติการเข้าเรียน */
+        .history-list { text-align: left; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #f1f5f9; }
+        .history-item:last-child { border-bottom: none; }
+        .h-date { font-weight: 500; color: #334155; }
+        .h-status { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-มาเรียน { background: #dcfce7; color: #16a34a; }
+        .status-สาย { background: #fef3c7; color: #d97706; }
+        .status-ขาด { background: #fee2e2; color: #dc2626; }
+        .status-ลา { background: #e0e7ff; color: #4f46e5; }
+        .status-ป่วย { background: #e0e7ff; color: #4f46e5; }
+        
+        .empty-history { text-align: center; color: #94a3b8; padding: 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>👨‍👩‍👧‍👦 ระบบสารสนเทศผู้ปกครอง</h1>
+        <p>ตรวจสอบเวลาเรียน โรงเรียนบ้านเชียงวิทยา</p>
+    </div>
+
+    <div class="search-card">
+        <input type="text" id="studentId" placeholder="กรอกรหัสนักเรียนที่นี่" inputmode="numeric">
+        <button onclick="checkAttendance()">🔍 ตรวจสอบข้อมูล</button>
+        <div id="loading" class="loading">⏳ กำลังค้นหาข้อมูล...</div>
+    </div>
+
+    <div id="profile-card" class="profile-card">
+        <img id="p-img" src="" alt="Profile">
+        <h3 id="p-name">ชื่อนักเรียน</h3>
+        <p>รหัส: <span id="p-id"></span> | ชั้นเรียน: <span id="p-class"></span></p>
+        
+        <h4 style="text-align: left; margin: 20px 0 10px 0; color: #334155; font-size: 16px;">ประวัติการเข้าเรียนล่าสุด</h4>
+        <div id="history-container" class="history-list">
+            </div>
+    </div>
+</div>
+
+<script>
+    // 🔴 นำ URL ของ Web App ตัวเดิมของคุณครู มาวางในนี้ครับ 🔴
+    const GAS_API_URL = "https://script.google.com/macros/library/d/1SbNoALwu6eqyRho-0-oTt7O4CPtftmKwXqdcvMQbQRxPQDHstKIqvQZG/10";
+
+    function checkAttendance() {
+        const studentId = document.getElementById('studentId').value.trim();
+        if (!studentId) {
+            alert("กรุณากรอกรหัสนักเรียนครับ");
+            return;
+        }
+
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('profile-card').style.display = 'none';
+
+        // 🌟 จุดสำคัญ: เพิ่ม ?action=check เพื่อบอก API ว่าขอแค่อ่านข้อมูลประวัติ
+        fetch(GAS_API_URL + "?action=check&id=" + encodeURIComponent(studentId))
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+                
+                if (data.status === "success") {
+                    document.getElementById('p-name').innerText = data.name;
+                    document.getElementById('p-id').innerText = data.id;
+                    document.getElementById('p-class').innerText = data.className;
+                    document.getElementById('p-img').src = `https://ui-avatars.com/api/?name=${data.name}&background=1e56a0&color=fff&rounded=true&size=128`;
+                    
+                    const historyContainer = document.getElementById('history-container');
+                    historyContainer.innerHTML = ''; // ล้างของเก่า
+
+                    if (data.history.length === 0) {
+                        historyContainer.innerHTML = '<div class="empty-history">ยังไม่มีประวัติการเช็คชื่อในระบบครับ</div>';
+                    } else {
+                        // โชว์ประวัติแค่ 10 วันล่าสุด เพื่อไม่ให้หน้าจอยาวเกินไป
+                        const recentHistory = data.history.slice(0, 10);
+                        recentHistory.forEach(record => {
+                            let statusClass = "status-" + record.status;
+                            historyContainer.innerHTML += `
+                                <div class="history-item">
+                                    <div class="h-date">📅 ${record.date}</div>
+                                    <div class="h-status ${statusClass}">${record.status}</div>
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    document.getElementById('profile-card').style.display = 'block';
+                } else {
+                    alert("เกิดข้อผิดพลาด: " + data.message);
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                alert("ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาตรวจสอบอินเทอร์เน็ตครับ");
+            });
+    }
+</script>
+
+</body>
+</html>
