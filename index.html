@@ -3,103 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบสแกนเช็คชื่อ - โรงเรียนบ้านเชียงวิทยา</title>
+    <title>SIS BCW - ระบบบริหารจัดการนักเรียน</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
-        body { font-family: 'Prompt', sans-serif; background-color: #f3f5f9; margin: 0; padding: 20px; color: #15283c; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .card { background: #fff; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        h1 { text-align: center; color: #1e56a0; font-size: 24px; margin-top: 0; }
+        :root { --primary: #1e56a0; --secondary: #15283c; --success: #28a745; --bg: #f3f5f9; }
+        body { font-family: 'Prompt', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: var(--secondary); pb: 70px; }
+        
+        /* Navigation Bar */
+        .navbar { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .nav-menu { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); border-top: 1px solid #ddd; }
+        .nav-item { text-align: center; font-size: 12px; color: #64748b; cursor: pointer; flex: 1; }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 2px; }
+
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        
+        .card { background: #fff; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         #reader { width: 100%; border-radius: 12px; overflow: hidden; border: 2px solid #eef2f5; }
         
-        /* สไตล์ป๊อปอัปแจ้งเตือนสไตล์ Pluto */
-        .result-box { display: none; align-items: center; background: #e8f5e9; padding: 15px; border-radius: 12px; border-left: 6px solid #28a745; margin-top: 20px; animation: fadeIn 0.5s;}
-        .result-box img { width: 60px; height: 60px; border-radius: 50%; margin-right: 15px; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
-        .result-info h3 { margin: 0 0 5px 0; color: #15283c; font-size: 18px;}
-        .result-info p { margin: 0; color: #64748b; font-size: 14px;}
-        .status-badge { background: #28a745; color: white; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; margin-bottom: 5px;}
+        /* สไตล์ผลลัพธ์ */
+        .result-box { display: none; align-items: center; background: #e8f5e9; padding: 15px; border-radius: 12px; border-left: 6px solid var(--success); margin-top: 20px; }
+        .result-box img { width: 60px; height: 60px; border-radius: 50%; margin-right: 15px; border: 2px solid #fff; }
+        .status-badge { background: var(--success); color: white; padding: 3px 10px; border-radius: 20px; font-size: 12px; display: inline-block; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .loading { text-align: center; color: #f59e0b; font-weight: 600; display: none; margin-top: 15px; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .loading { text-align: center; color: #f59e0b; display: none; margin: 15px 0; }
+        
+        /* Table สไตล์ประวัติ */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="card">
-        <h1>🏫 สแกนบัตรเช็คชื่อนักเรียน</h1>
-        <p style="text-align: center; color: #64748b; font-size: 14px; margin-bottom: 20px;">โรงเรียนบ้านเชียงวิทยา</p>
-        
-        <div id="reader"></div>
-        <div id="loading" class="loading">⏳ กำลังบันทึกข้อมูล...</div>
+<div class="navbar">
+    <div style="font-weight: bold;">SIS @ Ban Chiang Wittaya</div>
+    <div style="font-size: 12px;">ครูอัครเดช (Admin)</div>
+</div>
 
-        <div id="result-box" class="result-box">
-            <img id="student-img" src="" alt="Avatar">
-            <div class="result-info">
-                <div class="status-badge" id="status-badge">✅ บันทึกสำเร็จ</div>
-                <h3 id="student-name">ชื่อนักเรียน</h3>
-                <p>รหัส: <b id="student-id">...</b> | ชั้น: <b id="student-class">...</b></p>
+<div class="container">
+    
+    <div id="scan-page" class="page active">
+        <div class="card">
+            <h2 style="text-align: center; margin-top: 0;">📸 บันทึกเข้าแถว</h2>
+            <div id="reader"></div>
+            <div id="loading" class="loading">⏳ กำลังบันทึกข้อมูล...</div>
+            
+            <div id="result-box" class="result-box">
+                <img id="student-img" src="" alt="">
+                <div class="result-info">
+                    <div id="status-badge" class="status-badge">✅ บันทึกสำเร็จ</div>
+                    <h3 id="student-name" style="margin: 5px 0;">ชื่อนักเรียน</h3>
+                    <p style="margin: 0; font-size: 13px;">รหัส: <b id="student-id">...</b> | ชั้น: <b id="student-class">...</b></p>
+                </div>
             </div>
         </div>
+    </div>
+
+    <div id="history-page" class="page">
+        <div class="card">
+            <h2>📅 ประวัติการเข้าแถววันนี้</h2>
+            <p style="color: #666; font-size: 13px;">รายชื่อนักเรียนที่สแกนสำเร็จแล้ว</p>
+            <table id="history-table">
+                <thead>
+                    <tr><th>เวลา</th><th>ชื่อ-นามสกุล</th><th>ห้อง</th></tr>
+                </thead>
+                <tbody id="history-body">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div class="nav-menu">
+    <div class="nav-item active" onclick="switchPage('scan-page', this)">
+        <span>📸</span><br>สแกน
+    </div>
+    <div class="nav-item" onclick="switchPage('history-page', this)">
+        <span>📅</span><br>ประวัติ
+    </div>
+    <div class="nav-item" onclick="window.location.href='parent.html'">
+        <span>👥</span><br>ผู้ปกครอง
     </div>
 </div>
 
 <script>
-    // 🔴 นำ URL ของ Web App ที่ก๊อปปี้มาจาก Step 1 มาวางในเครื่องหมายคำพูดด้านล่างนี้ครับ 🔴
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycby3zyx9w_k1jBHmROtBt9GdfkQtPfuxRLo4H_VZtVoaqFpkvbReVH6upPyV-qGY3kc5/exec";
-
     let lastScannedId = "";
     let lastScanTime = 0;
 
-    function onScanSuccess(decodedText, decodedResult) {
+    function switchPage(pageId, element) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        element.classList.add('active');
+    }
+
+    function onScanSuccess(decodedText) {
         let now = Date.now();
-        // ป้องกันการสแกนซ้ำคนเดิมภายใน 4 วินาที
-        if (decodedText === lastScannedId && (now - lastScanTime) < 4000) {
-            return; 
-        }
+        if (decodedText === lastScannedId && (now - lastScanTime) < 5000) return;
         
         lastScannedId = decodedText;
         lastScanTime = now;
 
-        // ซ่อนผลลัพธ์เก่า โชว์กำลังโหลด
         document.getElementById('result-box').style.display = 'none';
         document.getElementById('loading').style.display = 'block';
 
-        // ส่งข้อมูลไปบันทึกที่ Google Sheets ผ่าน API
         fetch(GAS_API_URL + "?id=" + encodeURIComponent(decodedText))
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 document.getElementById('loading').style.display = 'none';
-                
-                if(data.status === "success") {
-                    // โชว์ข้อมูลการ์ด
+                if(data.status === "success" || data.status === "warning") {
+                    // แสดงการ์ดผลลัพธ์
                     document.getElementById('student-name').innerText = data.name;
                     document.getElementById('student-id').innerText = data.id;
                     document.getElementById('student-class').innerText = data.className;
-                    
-                    // สุ่มสีพื้นหลังให้รูปโปรไฟล์อัตโนมัติ
-                    let imgUrl = `https://ui-avatars.com/api/?name=${data.name}&background=random&color=fff&rounded=true&size=128`;
-                    document.getElementById('student-img').src = imgUrl;
-                    
+                    document.getElementById('student-img').src = `https://ui-avatars.com/api/?name=${data.name}&background=random&color=fff&rounded=true`;
                     document.getElementById('result-box').style.display = 'flex';
+                    
+                    // เพิ่มลงในตารางประวัติ (Link ระหว่างเมนู)
+                    addHistoryRow(data);
                 } else {
-                    alert("เกิดข้อผิดพลาด: " + data.message);
+                    alert(data.message);
                 }
             })
-            .catch(error => {
+            .catch(err => {
                 document.getElementById('loading').style.display = 'none';
-                alert("สแกนติด แต่ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาเช็คอินเทอร์เน็ต");
+                alert("เชื่อมต่อฐานข้อมูลไม่ได้");
             });
     }
 
-    // เปิดกล้องหลังอัตโนมัติ
-    let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250}, videoConstraints: { facingMode: "environment" } }, false);
-    html5QrcodeScanner.render(onScanSuccess, function(error){});
+    function addHistoryRow(data) {
+        const tbody = document.getElementById('history-body');
+        const row = tbody.insertRow(0);
+        const time = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+        row.innerHTML = `<td>${time}</td><td>${data.name}</td><td>${data.className}</td>`;
+    }
+
+    let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess);
 </script>
 
 </body>
-
 </html>
-
-
