@@ -441,7 +441,7 @@
 
     function handleLogin() {
         const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim(), btn = document.getElementById('login-btn');
-        if (!u || !p) { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
+        if (!u || !p) { Swal.fire('ระบบ SIS', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
         btn.innerText = "⏳ กำลังเข้าสู่ระบบ..."; btn.disabled = true;
         
         fetch(`${GAS_API_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`)
@@ -450,34 +450,68 @@
                 if (data.status === "success") {
                     data.userId = u; localStorage.setItem('sis_user', JSON.stringify(data)); localStorage.setItem('sis_last_activity', Date.now());
                     routeUser(data); setupActivityListeners(); resetIdleTimer();
-                } else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '❌ รหัสผ่านไม่ถูกต้อง', 'error');
-            }).catch((err) => { btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '❌ เชื่อมต่อระบบล้มเหลว', 'error'); });
+                } else Swal.fire('ระบบ SIS', '❌ รหัสผ่านไม่ถูกต้อง', 'error');
+            }).catch((err) => { 
+                btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; 
+                console.error("Login Error:", err);
+                Swal.fire('ระบบ SIS', '❌ เชื่อมต่อล้มเหลว (อาจเปิดผ่านแอป LINE หรือเน็ตหลุด)\n\nรายละเอียด: ' + err.message, 'error'); 
+            });
     }
 
     function routeUser(data) {
-        document.getElementById('user-display').innerText = `👤 ${data.name}`;
-        document.getElementById('logout-btn').style.display = 'block';
-        document.getElementById('status-bar').style.display = 'flex';
-        let savedPage = localStorage.getItem('sis_current_page');
-
-        if (data.role === "teacher") { 
-            currentTeacher = data.name; currentClass = data.className; 
-            document.getElementById('class-title').innerText = `(${currentClass})`; document.getElementById('bottom-nav').style.display = 'flex';
-            if(savedPage === 'daily-page') switchPage('daily-page', document.querySelectorAll('.nav-item')[1]); else if(savedPage === 'summary-page') switchPage('summary-page', document.querySelectorAll('.nav-item')[2]); else switchPage('checklist-page', document.querySelectorAll('.nav-item')[0]);
+        try {
+            document.getElementById('user-display').innerText = `👤 ${data.name}`;
+            document.getElementById('logout-btn').style.display = 'block';
+            document.getElementById('status-bar').style.display = 'flex';
+            let savedPage = localStorage.getItem('sis_current_page');
             
-            fetch(`${GAS_API_URL}?action=get_admin_data`).then(res => res.json()).then(adminData => {
-                if(adminData.status === "success") {
-                    adminHolidays = (adminData.config.holidays || []).filter(h => h.trim() !== ""); adminTermStart = adminData.config.startDate; adminTermEnd = adminData.config.endDate;
-                    timeLimitConfig = { enabled: adminData.config.timeLimitEnabled, start: adminData.config.startTime, end: adminData.config.endTime };
-                    if (timeLimitConfig.enabled) document.getElementById('modal-time-limit-text').innerHTML = `<b>2. เวลาบันทึก:</b> กรุณาบันทึกข้อมูลในช่วงเวลา <b style="color:#ef4444; font-size:15px;">${timeLimitConfig.start} - ${timeLimitConfig.end} น.</b> เท่านั้น`;
-                    else document.getElementById('modal-time-limit-text').innerHTML = `<b>2. เวลาบันทึก:</b> ปัจจุบันระบบ <b style="color:#10b981;">เปิดให้บันทึกได้ตลอดเวลา</b>`;
-                    if (!sessionStorage.getItem('teacher_modal_seen')) document.getElementById('teacher-instruction-modal').style.display = 'flex';
-                }
-                if(!savedPage || savedPage === 'checklist-page') fetchStudents(); 
-            });
-        } else if(data.role === "admin") { switchPage('admin-page'); loadAdminData();
-        } else if(data.role === "executive" || data.role === "boss") { switchPage('exec-page'); fetchFullExecData();
-        } else if(data.role === "student") { switchPage('student-page'); document.getElementById('st-name-display').innerText = data.name; loadStudentReport(data.userId); }
+            // 🌟 ป้องกันบั๊กตัวพิมพ์ใหญ่-เล็ก หรือการเว้นวรรคผิดใน Google Sheets
+            let role = data.role ? data.role.toString().trim().toLowerCase() : "";
+
+            if (role === "teacher") { 
+                currentTeacher = data.name; currentClass = data.className || ""; 
+                document.getElementById('class-title').innerText = `(${currentClass})`; 
+                document.getElementById('bottom-nav').style.display = 'flex';
+                
+                let navItems = document.querySelectorAll('.nav-item');
+                if(savedPage === 'daily-page' && navItems.length > 1) switchPage('daily-page', navItems[1]); 
+                else if(savedPage === 'summary-page' && navItems.length > 2) switchPage('summary-page', navItems[2]); 
+                else if(navItems.length > 0) switchPage('checklist-page', navItems[0]);
+                else switchPage('checklist-page', null);
+                
+                fetch(`${GAS_API_URL}?action=get_admin_data`).then(res => res.json()).then(adminData => {
+                    if(adminData.status === "success") {
+                        adminHolidays = (adminData.config.holidays || []).filter(h => h.trim() !== ""); 
+                        adminTermStart = adminData.config.startDate; adminTermEnd = adminData.config.endDate;
+                        timeLimitConfig = { enabled: adminData.config.timeLimitEnabled, start: adminData.config.startTime, end: adminData.config.endTime };
+                        
+                        let modalText = document.getElementById('modal-time-limit-text');
+                        if (modalText) {
+                            if (timeLimitConfig.enabled) modalText.innerHTML = `<b>2. เวลาบันทึก:</b> กรุณาบันทึกข้อมูลในช่วงเวลา <b style="color:#ef4444; font-size:15px;">${timeLimitConfig.start} - ${timeLimitConfig.end} น.</b> เท่านั้น`;
+                            else modalText.innerHTML = `<b>2. เวลาบันทึก:</b> ปัจจุบันระบบ <b style="color:#10b981;">เปิดให้บันทึกได้ตลอดเวลา</b>`;
+                        }
+                        
+                        let modalEl = document.getElementById('teacher-instruction-modal');
+                        if (modalEl && !sessionStorage.getItem('teacher_modal_seen')) modalEl.style.display = 'flex';
+                    }
+                    if(!savedPage || savedPage === 'checklist-page') fetchStudents(); 
+                }).catch(e => console.log("Admin config fetch error", e));
+                
+            } else if(role === "admin") { 
+                switchPage('admin-page', null); loadAdminData();
+            } else if(role === "executive" || role === "boss") { 
+                switchPage('exec-page', null); fetchFullExecData();
+            } else if(role === "student") { 
+                switchPage('student-page', null); 
+                document.getElementById('st-name-display').innerText = data.name; 
+                loadStudentReport(data.userId); 
+            } else {
+                Swal.fire('ระบบ SIS', '❌ ไม่พบสิทธิ์การเข้าถึงข้อมูล กรุณาติดต่อผู้ดูแลระบบ', 'error');
+            }
+        } catch (err) {
+            console.error("RouteUser Error:", err);
+            Swal.fire('ระบบ SIS', '❌ เกิดข้อผิดพลาดในการโหลดหน้าจอ: ' + err.message, 'error');
+        }
     }
 
     function closeTeacherModal() { document.getElementById('teacher-instruction-modal').style.display = 'none'; sessionStorage.setItem('teacher_modal_seen', 'true'); }
@@ -779,4 +813,5 @@
 
 </body>
 </html>
+
 
