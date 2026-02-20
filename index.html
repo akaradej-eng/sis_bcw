@@ -10,34 +10,33 @@
         :root { --primary: #1e56a0; --bg: #f3f5f9; }
         body { font-family: 'Prompt', sans-serif; background-color: var(--bg); margin: 0; padding: 0; padding-bottom: 80px; }
         .navbar { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
-        .container { max-width: 900px; margin: 20px auto; padding: 0 10px; min-height: 80vh;}
+        .container { max-width: 900px; margin: 15px auto; padding: 0 10px; min-height: 80vh;}
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
-        .card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
         
         .nav-menu { position: fixed; bottom: 0; width: 100%; background: white; display: none; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; z-index: 1000;}
         .nav-item { text-align: center; font-size: 13px; color: #64748b; cursor: pointer; flex: 1; }
         .nav-item.active { color: var(--primary); font-weight: bold; }
-        .nav-item i { font-size: 20px; display: block; margin-bottom: 2px; }
         
-        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; font-size: 14px; width: 100%; box-sizing: border-box; margin-bottom: 10px;}
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; width: 100%; box-sizing: border-box; margin-bottom: 10px;}
         button { padding: 10px 15px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: bold;}
         
-        /* สไตล์ตารางเช็คชื่อแถวเดียวสำหรับ iPad/Mobile */
-        .student-row { display: flex; align-items: center; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 12px; margin-bottom: 6px; gap: 8px; transition: 0.3s; position: relative; }
-        .student-number { font-size: 14px; font-weight: bold; color: #64748b; width: 25px; text-align: center; }
-        .student-name { flex: 1; font-size: 14px; color: #15283c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .status-dropdown { width: 105px !important; margin-bottom: 0 !important; padding: 5px !important; font-size: 13px !important; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 6px;}
-        
-        /* สีขอบสถานะ */
-        .row-present { border-left: 5px solid #28a745; background-color: #f0fdf4; }
-        .row-absent { border-left: 5px solid #dc3545; background-color: #fef2f2; }
-        .row-leave { border-left: 5px solid #ffc107; background-color: #fffbeb; }
-        .row-sick { border-left: 5px solid #ef4444; background-color: #fff1f2; }
+        /* แถบแจ้งเวลาบนหน้า Dashboard */
+        .live-status-bar { background: #fff; padding: 10px 15px; border-radius: 10px; margin-bottom: 15px; display: none; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; color: #1e293b; border-bottom: 3px solid var(--primary); }
 
-        /* Footer เครดิต */
-        .footer-credit { text-align: center; padding: 20px; margin-top: 30px; color: #64748b; font-size: 12px; border-top: 1px dashed #ddd; line-height: 1.6; }
+        /* สไตล์ตารางเช็คชื่อแถวเดียว + แสดงชื่อนามสกุลเต็ม */
+        .student-row { display: flex; align-items: center; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; gap: 12px; position: relative; }
+        .student-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1.5px solid #ddd; flex-shrink: 0; }
+        .student-name { flex: 1; font-size: 14px; color: #15283c; font-weight: 500; word-wrap: break-word; white-space: normal; line-height: 1.4; }
+        .status-dropdown { width: 100px !important; margin-bottom: 0 !important; padding: 5px !important; font-size: 12px !important; border-radius: 6px; flex-shrink: 0;}
         
+        .row-present { border-left: 6px solid #28a745; background-color: #f0fdf4; }
+        .row-absent { border-left: 6px solid #dc3545; background-color: #fef2f2; }
+        .row-leave { border-left: 6px solid #ffc107; background-color: #fffbeb; }
+        .row-sick { border-left: 6px solid #ef4444; background-color: #fff1f2; }
+
+        .footer-credit { text-align: center; padding: 25px; margin-top: 40px; color: #64748b; font-size: 13px; border-top: 1px dashed #ddd; line-height: 1.8; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -50,14 +49,15 @@
 
 <div class="container">
     
+    <div id="status-bar" class="live-status-bar">
+        <span id="display-date"></span>
+        <span id="display-clock" style="color:var(--primary);"></span>
+    </div>
+
     <div id="login-page" class="page active">
         <div class="card" style="text-align: center; max-width: 400px; margin: 40px auto;">
-            <h2 style="color: #1e56a0; margin-bottom: 5px;">เข้าสู่ระบบ</h2>
-            
-            <div id="live-clock" style="margin-bottom: 20px; color: #1e293b; font-size: 14px; font-weight: bold; background: #f1f5f9; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; line-height: 1.6;">
-                กำลังโหลดเวลาปัจจุบัน...
-            </div>
-
+            <h2 style="color: #1e56a0; margin-bottom: 10px;">เข้าสู่ระบบ</h2>
+            <p id="login-clock" style="font-size:14px; font-weight:bold; color:#475569; margin-bottom:20px;"></p>
             <input type="text" id="username" placeholder="รหัสผู้ใช้งาน">
             <input type="password" id="password" placeholder="รหัสผ่าน">
             <button id="login-btn" onclick="handleLogin()" style="width: 100%;">เข้าสู่ระบบ</button>
@@ -70,7 +70,7 @@
             <input type="date" id="check-date" class="date-picker">
         </div>
         <div id="student-list-container"></div>
-        <button class="save-btn" id="save-btn" onclick="saveAttendance()" style="width:100%; padding:15px; margin-top:10px;">💾 บันทึกข้อมูลทั้งหมด</button>
+        <button class="save-btn" id="save-btn" onclick="saveAttendance()" style="width:100%; padding:15px; font-size: 16px;">💾 บันทึกข้อมูล (มาเรียนทั้งหมด)</button>
     </div>
 
     <div class="footer-credit">
@@ -89,29 +89,36 @@
 <script>
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycby5v9D0fYSqrePeJM8G0zPOE6o96FMbdt5E0SdzTJfExgDWpmZvjaXHjdfZ1eWrLNNe/exec";
     
-    // ⏰ ฟังก์ชันนาฬิกาเรียลไทม์
     function updateClock() {
         const now = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const datePart = now.toLocaleDateString('th-TH', options);
-        const timePart = now.toLocaleTimeString('th-TH');
-        const clockEl = document.getElementById('live-clock');
-        if(clockEl) clockEl.innerHTML = `📅 วัน${datePart}<br>⏰ เวลา ${timePart} น.`;
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const dateStr = now.toLocaleDateString('th-TH', dateOptions);
+        const timeStr = now.toLocaleTimeString('th-TH');
+        
+        if(document.getElementById('login-clock')) document.getElementById('login-clock').innerHTML = `${dateStr}<br>${timeStr} น.`;
+        if(document.getElementById('display-date')) document.getElementById('display-date').innerText = dateStr;
+        if(document.getElementById('display-clock')) document.getElementById('display-clock').innerText = `🕒 ${timeStr} น.`;
     }
     setInterval(updateClock, 1000);
     updateClock();
 
+    function cleanName(fullName) {
+        if (!fullName) return "";
+        return fullName.replace(/^(เด็กชาย|เด็กหญิง|นาย|นางสาว|ด\.ช\.|ด\.ญ\.)/g, "").trim();
+    }
+
     let students = [], attendanceData = {}, currentTeacher = "", currentClass = "";
 
     function handleLogin() {
-        const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim(), btn = document.getElementById('login-btn');
+        const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim();
         if (!u || !p) return;
-        btn.innerText = "⏳ กำลังตรวจสอบ..."; btn.disabled = true;
+        document.getElementById('login-btn').innerText = "⏳ ตรวจสอบ...";
         fetch(`${GAS_API_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`)
             .then(res => res.json()).then(data => {
-                btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false;
+                document.getElementById('login-btn').innerText = "เข้าสู่ระบบ";
                 if (data.status === "success") {
-                    document.getElementById('user-display').innerText = `${data.name} - ออกจากระบบ`;
+                    document.getElementById('user-display').innerText = `${data.name} - ออก`;
+                    document.getElementById('status-bar').style.display = 'flex';
                     if (data.role === "teacher") { 
                         currentTeacher = data.name; currentClass = data.className; 
                         document.getElementById('class-title').innerText = `(${currentClass})`;
@@ -119,50 +126,52 @@
                         switchPage('checklist-page', document.querySelectorAll('.nav-item')[0]);
                         fetchStudents();
                     } 
-                    // [เรียกฟังก์ชันสำหรับ Role อื่นๆ ตามความเหมาะสม]
                 } else alert("❌ รหัสไม่ถูกต้อง");
-            }).catch(() => { btn.disabled = false; alert("เชื่อมต่อฐานข้อมูลล้มเหลว"); });
+            });
     }
 
     function switchPage(pageId, element) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         if(element) { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); element.classList.add('active'); }
         document.getElementById(pageId).classList.add('active');
-        const isTeacherPage = ['checklist-page', 'daily-page', 'summary-page'].includes(pageId);
-        document.getElementById('bottom-nav').style.display = isTeacherPage ? 'flex' : 'none';
     }
 
     function fetchStudents() {
-        document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px;">⏳ กำลังโหลดรายชื่อ...</div>`;
+        document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px;">⏳ โหลดรายชื่อ...</div>`;
         fetch(`${GAS_API_URL}?action=get_students&className=${encodeURIComponent(currentClass)}`)
             .then(res => res.json()).then(data => {
                 if(data.status === "success") {
                     students = data.data;
-                    renderChecklist(null, "");
+                    renderChecklist();
                 }
             });
     }
 
-    function renderChecklist(existing, recorder) {
+    function renderChecklist() {
         const container = document.getElementById('student-list-container'); container.innerHTML = "";
         students.forEach(std => {
-            let st = 'present'; // ✅ ค่าเริ่มต้นเป็น "มาเรียน"
+            let st = 'present';
             attendanceData[std.id] = { status: st, note: "" };
+            
+            const displayName = cleanName(std.name);
+            const imgUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff&size=128`;
+
             let row = document.createElement('div');
             row.className = `student-row row-${st}`; row.id = `row-${std.id}`;
             row.innerHTML = `
-                <div class="student-number">${std.number}</div>
+                <div class="student-number" style="font-size:12px; font-weight:bold;">${std.number}</div>
+                <img src="${imgUrl}" class="student-img" alt="student">
                 <div class="student-name">${std.name}</div>
                 <select class="status-dropdown" onchange="setStatus('${std.id}', this.value)">
-                    <option value="present" selected>✅ มาเรียน</option>
+                    <option value="present" selected>✅ มา</option>
                     <option value="absent">❌ ขาด</option>
                     <option value="leave">📝 ลา</option>
                     <option value="sick">🤒 ป่วย</option>
                 </select>
-                <button onclick="toggleNote('${std.id}')" style="background:none; border:1px solid #ccc; color:#666; border-radius:50%; width:32px; height:32px; padding:0;">📝</button>
-                <div id="note-box-${std.id}" style="display:none; position:absolute; right:10px; top:45px; z-index:100; background:white; padding:10px; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.1); width:220px;">
+                <button onclick="toggleNote('${std.id}')" style="background:none; border:1px solid #ccc; color:#666; border-radius:50%; width:30px; height:30px; padding:0; flex-shrink:0;">📝</button>
+                <div id="note-box-${std.id}" style="display:none; position:absolute; right:10px; top:45px; z-index:100; background:white; padding:10px; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.1); width:200px;">
                     <textarea class="behavior-note" id="note-${std.id}" placeholder="ระบุหมายเหตุ..."></textarea>
-                    <button onclick="toggleNote('${std.id}')" style="width:100%; margin-top:5px; background:var(--primary); font-size:12px;">บันทึกหมายเหตุ</button>
+                    <button onclick="toggleNote('${std.id}')" style="width:100%; margin-top:5px; background:var(--primary); font-size:11px;">ตกลง</button>
                 </div>
             `;
             container.appendChild(row);
@@ -187,7 +196,7 @@
         fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) })
         .then(res => res.json()).then(data => {
             btn.innerText = "💾 บันทึกข้อมูลทั้งหมด"; btn.disabled = false;
-            alert(data.status === "success" ? "✅ บันทึกข้อมูลสำเร็จ" : "❌ เกิดข้อผิดพลาด");
+            alert(data.status === "success" ? "✅ บันทึกสำเร็จ" : "❌ เกิดข้อผิดพลาด");
         });
     }
 
