@@ -29,10 +29,8 @@
         .student-img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1.5px solid #e2e8f0; flex-shrink: 0; }
         .student-name { flex: 1; font-size: 14px; color: #15283c; font-weight: 500; line-height: 1.3; white-space: normal; word-wrap: break-word;}
         
-        /* Dropdown 6 สถานะ */
         .status-dropdown { width: auto; min-width: 105px; margin-bottom: 0 !important; padding: 6px 4px !important; font-size: 13px !important; border-radius: 6px; flex-shrink: 0; cursor: pointer;}
         
-        /* กำหนดสีขอบตามสถานะ */
         .row-มา { border-left: 5px solid #10b981; background-color: #f0fdf4; }
         .row-ลากิจ { border-left: 5px solid #f59e0b; background-color: #fffbeb; }
         .row-ลาป่วย { border-left: 5px solid #f43f5e; background-color: #fff1f2; }
@@ -45,7 +43,7 @@
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; background: white;}
         th, td { padding: 8px 6px; border-bottom: 1px solid #eee; text-align: center; }
-        th:nth-child(2), td:nth-child(2) { text-align: left; } /* ให้ชื่อชิดซ้าย */
+        th:nth-child(2), td:nth-child(2) { text-align: left; } 
         th { background: #f8f9fa; font-weight: 600;}
         .risk-row { background-color: #fee2e2 !important; }
 
@@ -60,9 +58,15 @@
         .ai-box { background: #f0f7ff; border-left: 5px solid #1e56a0; padding: 15px; border-radius: 8px; margin-bottom: 15px;}
         .ai-box h3 { margin-top: 0; color: #1e56a0; display:flex; align-items:center; gap:8px; font-size:15px; margin-bottom: 5px;}
 
-        /* สไตล์ป้ายวันหยุดของ Admin */
-        .holiday-badge { background: #f43f5e; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; display: inline-flex; align-items: center; margin: 3px; }
-        .holiday-badge span { cursor: pointer; margin-left: 8px; font-weight: bold; }
+        /* 🗓️ สไตล์ปฏิทินวันหยุด (ใหม่ล่าสุด) */
+        .calendar-month { background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px;}
+        .calendar-month h4 { margin: 0 0 10px 0; text-align: center; color: #1e56a0; font-size: 14px;}
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+        .calendar-header { font-weight: bold; font-size: 11px; color: #64748b; padding-bottom: 5px; }
+        .calendar-day { padding: 8px 0; border-radius: 6px; font-size: 12px; cursor: pointer; background: #f1f5f9; border: 1px solid #e2e8f0; transition: 0.2s; }
+        .calendar-day:hover:not(.blank) { background: #cbd5e1; }
+        .calendar-day.holiday { background: #ef4444; color: white; border-color: #ef4444; font-weight: bold; box-shadow: 0 2px 5px rgba(239,68,68,0.3);}
+        .calendar-day.blank { background: transparent; border: none; cursor: default; color: #cbd5e1; }
 
         .footer-credit { text-align: center; padding: 25px; margin-top: 40px; color: #64748b; font-size: 13px; border-top: 1px dashed #ddd; line-height: 1.8; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -156,15 +160,19 @@
         <h2 style="color: #1e56a0;">⚙️ ตั้งค่าระบบ (Admin)</h2>
         <div class="card">
             <h3>📅 กำหนดปีการศึกษา & วันหยุด</h3>
-            <div style="display:flex; gap:10px;"><div style="flex:1"><label>เปิดเทอม</label><input type="date" id="admin-start"></div><div style="flex:1"><label>ปิดเทอม</label><input type="date" id="admin-end"></div></div>
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1"><label style="font-size:12px; font-weight:bold;">วันเปิดเทอม</label><input type="date" id="admin-start" onchange="renderAdminCalendar()"></div>
+                <div style="flex:1"><label style="font-size:12px; font-weight:bold;">วันปิดเทอม</label><input type="date" id="admin-end" onchange="renderAdminCalendar()"></div>
+            </div>
             
             <div style="margin-top: 15px; border-top: 1px dashed #ddd; padding-top:15px;">
-                <label style="font-weight:bold; color:#dc3545;">⛔ เพิ่มวันหยุดพิเศษ (ระบบจะบล็อกไม่ให้ครูเช็คชื่อในวันนี้)</label>
-                <div style="display:flex; gap:10px; margin-top:5px;">
-                    <input type="date" id="admin-holiday-input" style="margin-bottom:0;">
-                    <button onclick="addHoliday()" style="background:#dc3545; white-space:nowrap;">+ เพิ่มวันหยุด</button>
+                <label style="font-weight:bold; color:#ef4444; display:block; margin-bottom:10px;">⛔ กำหนดวันหยุด (คลิกเลือกในปฏิทิน)</label>
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px; font-size:12px;">
+                    <div style="width:15px; height:15px; background:#f1f5f9; border:1px solid #ccc; border-radius:3px;"></div> วันเรียนปกติ
+                    <div style="width:15px; height:15px; background:#ef4444; border-radius:3px; margin-left:10px;"></div> วันหยุด
                 </div>
-                <div id="admin-holiday-list" style="margin-top: 10px; min-height: 35px; border: 1px solid #eee; padding: 10px; border-radius: 8px;">
+                
+                <div id="admin-calendar-container" style="max-height: 350px; overflow-y: auto; padding-right:5px;">
                     </div>
             </div>
         </div>
@@ -228,8 +236,8 @@
 </div>
 
 <script>
-    // 🔗 API (อย่าลืมเปลี่ยน URL หลัง Deploy ใหม่ด้วยนะครับ)
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyrCg8-FO65Ui4Wb-MT4Lagrc1bVfKRDVbtwsqJ3f-UUpxC0HXLV0zUSMnMKWM2SgFF/exec";
+    // 🔗 API 
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwQ4v8pY_iQv9J8eL-p_zN3h1bI7XWzZ8E2gZkM9H92Qk_k8_e8V8C8Z6K1t7K0v0M/exec";
     
     // --- ⏰ อัปเดตนาฬิกา ---
     function updateClock() {
@@ -430,29 +438,81 @@
         });
     }
 
-    // --- ⚙️ ADMIN ---
+    // --- ⚙️ ADMIN (ระบบปฏิทินวันหยุด) ---
     function loadAdminData() {
         fetch(`${GAS_API_URL}?action=get_admin_data`).then(res => res.json()).then(data => {
             if(data.status === "success") {
-                document.getElementById('admin-start').value = data.config.startDate; document.getElementById('admin-end').value = data.config.endDate;
-                adminHolidays = data.config.holidays || []; renderHolidays();
+                document.getElementById('admin-start').value = data.config.startDate; 
+                document.getElementById('admin-end').value = data.config.endDate;
+                adminHolidays = data.config.holidays || []; 
+                
+                renderAdminCalendar(); // สร้างปฏิทินทันทีที่โหลดข้อมูลเสร็จ
                 
                 let uBody = document.getElementById('admin-users-body'); uBody.innerHTML = "";
                 data.users.forEach((u, i) => { uBody.innerHTML += `<tr><td><input type="text" value="${u[0]}"></td><td><input type="text" value="${u[1]}"></td><td><select><option value="teacher" ${u[2]=='teacher'?'selected':''}>Teacher</option><option value="admin" ${u[2]=='admin'?'selected':''}>Admin</option><option value="executive" ${u[2]=='executive'?'selected':''}>Executive</option></select></td><td><input type="text" value="${u[3]}"></td><td><input type="text" value="${u[4]||''}"></td><td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td></tr>`; });
                 allAdminStudentsData = data.students; updateClassDropdown(); renderAdminStudents();
-                document.getElementById('admin-system-ai').innerHTML = `✅ ระบบรันปกติ | วันหยุด ${adminHolidays.length} วัน`;
             }
         });
     }
     
-    // Holiday Logic
-    function renderHolidays() {
-        let box = document.getElementById('admin-holiday-list'); box.innerHTML = "";
-        if(adminHolidays.length === 0) { box.innerHTML = "<span style='color:#999; font-size:12px;'>ยังไม่มีวันหยุด</span>"; return; }
-        adminHolidays.forEach((h, i) => { box.innerHTML += `<div class="holiday-badge">${h} <span onclick="removeHoliday(${i})">✖</span></div>`; });
+    // 🗓️ ฟังก์ชันสร้างปฏิทินในหน้า Admin
+    function renderAdminCalendar() {
+        let container = document.getElementById('admin-calendar-container');
+        let startVal = document.getElementById('admin-start').value;
+        let endVal = document.getElementById('admin-end').value;
+
+        if(!startVal || !endVal) {
+            container.innerHTML = "<div style='text-align:center; padding:20px; color:#94a3b8;'>กรุณาระบุวันเปิด-ปิดเทอมด้านบน เพื่อแสดงปฏิทิน</div>";
+            return;
+        }
+
+        // Parse Date แบบปลอดภัย
+        let sArr = startVal.split('-'); let startDate = new Date(sArr[0], sArr[1]-1, sArr[2]);
+        let eArr = endVal.split('-'); let endDate = new Date(eArr[0], eArr[1]-1, eArr[2]);
+
+        if(startDate > endDate) { container.innerHTML = "<div style='color:red;'>วันเปิดเทอมต้องมาก่อนวันปิดเทอม</div>"; return; }
+
+        let html = "";
+        let currMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+        let endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+        const thDays = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
+
+        while(currMonth <= endMonth) {
+            let monthName = currMonth.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+            html += `<div class="calendar-month"><h4>${monthName}</h4><div class="calendar-grid">`;
+            
+            thDays.forEach(d => html += `<div class="calendar-header">${d}</div>`);
+
+            let firstDay = new Date(currMonth.getFullYear(), currMonth.getMonth(), 1).getDay();
+            let daysInMonth = new Date(currMonth.getFullYear(), currMonth.getMonth() + 1, 0).getDate();
+
+            for(let i=0; i<firstDay; i++) html += `<div class="calendar-day blank"></div>`;
+
+            for(let i=1; i<=daysInMonth; i++) {
+                let dateObj = new Date(currMonth.getFullYear(), currMonth.getMonth(), i);
+                let dStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`;
+                
+                // ถ้านอกเขตเปิดเทอม ให้เทาๆ ไป
+                if(dateObj < startDate || dateObj > endDate) {
+                    html += `<div class="calendar-day blank">${i}</div>`;
+                } else {
+                    let isHoliday = adminHolidays.includes(dStr) ? 'holiday' : '';
+                    html += `<div class="calendar-day ${isHoliday}" onclick="toggleHoliday('${dStr}')">${i}</div>`;
+                }
+            }
+            html += `</div></div>`;
+            currMonth.setMonth(currMonth.getMonth() + 1);
+        }
+        container.innerHTML = html;
     }
-    function addHoliday() { let d = document.getElementById('admin-holiday-input').value; if(d && !adminHolidays.includes(d)) { adminHolidays.push(d); renderHolidays(); document.getElementById('admin-holiday-input').value=""; } }
-    function removeHoliday(i) { adminHolidays.splice(i, 1); renderHolidays(); }
+
+    // Toggle วันหยุดเมื่อแอดมินคลิกที่ตัวเลขในปฏิทิน
+    function toggleHoliday(dateStr) {
+        let idx = adminHolidays.indexOf(dateStr);
+        if(idx > -1) adminHolidays.splice(idx, 1); // ยกเลิกวันหยุด
+        else adminHolidays.push(dateStr); // เพิ่มเป็นวันหยุด
+        renderAdminCalendar(); // รีโหลดสี
+    }
 
     function updateClassDropdown() { let f = document.getElementById('admin-class-filter'); let s = new Set(); allAdminStudentsData.forEach(x => s.add(x[3])); f.innerHTML = '<option value="all">ทุกห้อง</option>'; [...s].sort().forEach(c => f.innerHTML += `<option value="${c}">${c}</option>`); }
     function renderAdminStudents() { let b = document.getElementById('admin-students-body'); b.innerHTML = ""; let f = document.getElementById('admin-class-filter').value; allAdminStudentsData.forEach((s, i) => { if (f==='all'||s[3]===f) b.innerHTML += `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td><td>${s[3]}</td><td><button style="background:red;" onclick="removeStudent(${i})">ลบ</button></td></tr>`; }); }
@@ -461,8 +521,14 @@
     function addStudentRow() { allAdminStudentsData.push(['','','',document.getElementById('admin-class-filter').value==='all'?'':document.getElementById('admin-class-filter').value]); renderAdminStudents(); }
     
     function saveAdminData() {
+        let btn = document.querySelector('#admin-page > button:last-child');
+        btn.innerText = "⏳ กำลังบันทึก..."; btn.disabled = true;
         let u = []; document.querySelectorAll('#admin-users-body tr').forEach(tr => { let i = tr.querySelectorAll('input, select'); u.push([i[0].value, i[1].value, i[2].value, i[3].value, i[4].value]); });
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "admin_update", settings: { startDate: document.getElementById('admin-start').value, endDate: document.getElementById('admin-end').value, holidays: adminHolidays }, users: u, students: allAdminStudentsData }) }).then(() => alert("✅ อัปเดตสำเร็จ"));
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "admin_update", settings: { startDate: document.getElementById('admin-start').value, endDate: document.getElementById('admin-end').value, holidays: adminHolidays }, users: u, students: allAdminStudentsData }) })
+        .then(res => res.json()).then(data => {
+            btn.innerText = "💾 บันทึกการเปลี่ยนแปลงทั้งหมด"; btn.disabled = false;
+            if(data.status === "success") alert("✅ อัปเดตข้อมูลแอดมินและวันหยุดสำเร็จ");
+        });
     }
 
     // --- 📊 EXECUTIVE ---
@@ -492,14 +558,9 @@
         });
         document.getElementById('exec-total').innerText = stats.total; document.getElementById('exec-present').innerText = stats.p; document.getElementById('exec-absent').innerText = stats.a;
         
-        // Render Chart
         let ctx = document.getElementById('execChart').getContext('2d'); if(execChartInstance) execChartInstance.destroy();
         let labels = Object.keys(gStat).sort(), dp = labels.map(k=>gStat[k].p), da = labels.map(k=>gStat[k].a);
         execChartInstance = new Chart(ctx, { type:'bar', data:{ labels:labels, datasets:[{label:'มา', data:dp, backgroundColor:'#10b981'},{label:'ขาด/ลา', data:da, backgroundColor:'#ef4444'}] }, options:{ responsive:true, maintainAspectRatio:false, scales:{x:{stacked:true},y:{stacked:true}} } });
-        
-        let h = document.getElementById('exec-detail-head'); h.innerHTML = `<tr><th>กลุ่ม</th><th>มา</th><th>ขาด/ลา</th><th>%</th></tr>`;
-        let b = document.getElementById('exec-detail-body'); b.innerHTML = "";
-        labels.forEach(k => { let p = (gStat[k].p/(gStat[k].p+gStat[k].a)*100).toFixed(1); b.innerHTML += `<tr><td>${k}</td><td>${gStat[k].p}</td><td>${gStat[k].a}</td><td style="color:${p>=80?'green':'red'}">${p}%</td></tr>`; });
     }
 
     // --- 🧑‍🎓 STUDENT ---
@@ -516,4 +577,3 @@
 
 </body>
 </html>
-
