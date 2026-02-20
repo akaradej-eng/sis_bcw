@@ -58,6 +58,7 @@
         .ai-box { background: #f0f7ff; border-left: 5px solid #1e56a0; padding: 15px; border-radius: 8px; margin-bottom: 15px;}
         .ai-box h3 { margin-top: 0; color: #1e56a0; display:flex; align-items:center; gap:8px; font-size:15px; margin-bottom: 5px;}
 
+        /* 🗓️ สไตล์ปฏิทินวันหยุด */
         .calendar-month { background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px;}
         .calendar-month h4 { margin: 0 0 10px 0; text-align: center; color: #1e56a0; font-size: 14px;}
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
@@ -110,33 +111,15 @@
 
     <div id="daily-page" class="page">
         <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                <h2 style="margin:0; font-size: 18px; color: #1e56a0;">📅 สัปดาห์ปัจจุบัน</h2>
-                <span id="weekly-date-range" style="font-size:12px; font-weight:bold; background:#e0f2fe; color:#0369a1; padding:5px 10px; border-radius:6px;">กำลังโหลด...</span>
-            </div>
-            
+            <h2 style="margin-top:0;">📅 รายละเอียดรายวัน</h2>
+            <input type="date" id="view-date" class="date-picker" style="margin-bottom: 15px; width:100%;" onchange="loadDailyData()">
             <div class="ai-box" style="margin-bottom:10px; padding:10px;">
-                <h3 style="font-size:14px;">🤖 AI สรุปประจำสัปดาห์</h3>
+                <h3 style="font-size:14px;">🤖 AI วิเคราะห์สถานการณ์</h3>
                 <p id="teacher-daily-ai" style="font-size:13px; margin:0;">รอการโหลดข้อมูล...</p>
             </div>
-            
             <div style="overflow-x:auto;">
-                <table style="margin-top:0;">
-                    <thead>
-                        <tr>
-                            <th style="width:30px;">ที่</th>
-                            <th>ชื่อ-สกุล</th>
-                            <th id="th-mon" style="width:40px;">จ.</th>
-                            <th id="th-tue" style="width:40px;">อ.</th>
-                            <th id="th-wed" style="width:40px;">พ.</th>
-                            <th id="th-thu" style="width:40px;">พฤ.</th>
-                            <th id="th-fri" style="width:40px;">ศ.</th>
-                        </tr>
-                    </thead>
-                    <tbody id="daily-body"></tbody>
-                </table>
+                <table style="margin-top:0;"><thead><tr><th style="width:30px;">ที่</th><th>ชื่อ-สกุล</th><th>สถานะ</th><th>หมายเหตุ</th></tr></thead><tbody id="daily-body"></tbody></table>
             </div>
-            <p style="font-size: 11px; color:#666; margin-top:10px;">*ตัวย่อ: ม=มา, ส=สาย, ล=ลากิจ, ป=ลาป่วย, ข=ขาด, น=นอกโรงเรียน</p>
         </div>
     </div>
 
@@ -259,7 +242,7 @@
 
 <script>
     // 🔗 API 
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyR6a-JvJ-z6z-m3kP-j5lT4T_w0mBqF7_E9D-M2m4_D0vC8H1M0z5Y4E4yP1wV4wQz/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyQNOphZT15MqEOAOB2nnxlPba_jtNi9MnLtCQWOEWhJciYZjAGY8yPMGxHcgFAoP2I/exec";
     
     // --- ⏰ อัปเดตนาฬิกา ---
     function updateClock() {
@@ -412,7 +395,6 @@
         tbody.innerHTML = `<tr><td colspan='7' style='text-align:center; padding:20px;'>⏳ กำลังดึงข้อมูลตลอดสัปดาห์...</td></tr>`;
         document.getElementById('teacher-daily-ai').innerHTML = "⏳ กำลังประมวลผลข้อมูลสัปดาห์นี้...";
 
-        // คำนวณหาวันจันทร์ ถึง ศุกร์ ของสัปดาห์ปัจจุบัน
         let curr = new Date();
         let day = curr.getDay(); // 0 = อา, 1 = จ, ... 6 = ส
         let diffToMon = curr.getDate() - day + (day === 0 ? -6 : 1);
@@ -433,12 +415,10 @@
             weekDates.push(`${yyyy}-${mm}-${dd}`); 
             document.getElementById(thElements[i]).innerHTML = `${dayNames[i]}<br><span style="font-size:10px; font-weight:normal;">${dd}/${mm}</span>`;
             
-            // อัปเดตป้ายแจ้งวันที่ด้านบนตาราง
             if(i===0) document.getElementById('weekly-date-range').innerText = `${dd}/${mm} - `;
             if(i===4) document.getElementById('weekly-date-range').innerText += `${dd}/${mm}/${yyyy}`;
         }
 
-        // ดึงข้อมูล 5 วันพร้อมกันแบบเบื้องหลัง
         let fetches = weekDates.map(dateStr => 
             fetch(`${GAS_API_URL}?action=get_daily&className=${encodeURIComponent(currentClass)}&date=${dateStr}`)
             .then(res => res.json())
