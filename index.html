@@ -76,58 +76,48 @@
     <div id="login-page" class="page active">
         <div class="card" style="text-align: center; max-width: 400px; margin: 40px auto;">
             <h2 style="color: #1e56a0;">เข้าสู่ระบบ</h2>
-            <input type="text" id="username" style="width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; font-family: 'Prompt';" placeholder="รหัสครู (พิมพ์ admin)">
-            <input type="password" id="password" style="width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; font-family: 'Prompt';" placeholder="รหัสผ่าน (พิมพ์ 1234)">
-            <button onclick="handleLogin()" style="width: 100%; padding: 12px; background: #1e56a0; color: white; border: none; border-radius: 8px; font-size: 16px; font-family: 'Prompt'; cursor: pointer;">เข้าสู่ระบบ</button>
+            <input type="text" id="username" style="width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; font-family: 'Prompt';" placeholder="รหัสผู้ใช้งาน">
+            <input type="password" id="password" style="width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; font-family: 'Prompt';" placeholder="รหัสผ่าน">
+            <button id="login-btn" onclick="handleLogin()" style="width: 100%; padding: 12px; background: #1e56a0; color: white; border: none; border-radius: 8px; font-size: 16px; font-family: 'Prompt'; cursor: pointer;">เข้าสู่ระบบ</button>
         </div>
     </div>
 
     <div id="checklist-page" class="page">
         <div class="toolbar">
-            <h2 style="margin: 0;">📝 เช็คชื่อเข้าแถว</h2>
+            <h2 style="margin: 0;">📝 เช็คชื่อเข้าแถว <span id="class-title" style="color:var(--primary);"></span></h2>
             <input type="date" id="check-date" class="date-picker">
         </div>
 
         <div id="student-list-container">
             </div>
 
-        <button class="save-btn" onclick="saveAttendance()">💾 บันทึกข้อมูลเข้าฐานข้อมูล</button>
+        <button class="save-btn" id="save-btn" onclick="saveAttendance()">💾 บันทึกข้อมูลเข้าฐานข้อมูล</button>
     </div>
 
     <div id="daily-page" class="page">
         <div class="card">
             <h2>📅 รายละเอียดการมาเรียนรายวัน</h2>
-            <p style="color: #666; font-size: 13px;">เลือกวันที่เพื่อดูข้อมูลที่บันทึกไว้ในวันนั้น</p>
-            <input type="date" id="view-date" class="date-picker" style="margin-bottom: 15px;" onchange="loadDailyData()">
+            <p style="color: #666; font-size: 13px;">เลือกวันที่เพื่อดูข้อมูลที่บันทึกไว้</p>
+            <input type="date" id="view-date" class="date-picker" style="margin-bottom: 15px;">
+            <button onclick="alert('ฟีเจอร์โหลดประวัติย้อนหลังกำลังเชื่อมต่อกับฐานข้อมูล...')" style="padding: 8px 15px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer; font-family: 'Prompt';">โหลดข้อมูล</button>
             
             <table id="daily-table">
-                <thead>
-                    <tr><th>เลขที่</th><th>ชื่อ-สกุล</th><th>สถานะ</th><th>หมายเหตุ</th></tr>
-                </thead>
-                <tbody id="daily-body">
-                    </tbody>
+                <thead><tr><th>เลขที่</th><th>ชื่อ-สกุล</th><th>สถานะ</th><th>หมายเหตุ</th></tr></thead>
+                <tbody id="daily-body"><tr><td colspan='4' style='text-align:center;'>กดบันทึกเพื่อดูข้อมูลปัจจุบัน</td></tr></tbody>
             </table>
         </div>
     </div>
 
     <div id="summary-page" class="page">
         <div class="card">
-            <h2>📊 สรุปสถานะทั้งหมด (ภาพรวม)</h2>
+            <h2>📊 สรุปสถานะทั้งหมด</h2>
             <p style="color: #666; font-size: 13px;">เปรียบเทียบว่านักเรียนแต่ละคน ขาด/ลา/ป่วย กี่วัน</p>
-            
+            <button onclick="alert('ฟีเจอร์โหลดสรุปกำลังเชื่อมต่อกับฐานข้อมูล...')" style="padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-family: 'Prompt'; margin-bottom: 15px;">อัปเดตข้อมูลภาพรวม</button>
             <table id="summary-table">
                 <thead>
-                    <tr>
-                        <th>เลขที่</th>
-                        <th>ชื่อ-สกุล</th>
-                        <th style="color: #28a745;">มา</th>
-                        <th style="color: #dc3545;">ป่วย</th>
-                        <th style="color: #ffc107;">ลา</th>
-                        <th style="color: #fd7e14;">ขาด</th>
-                    </tr>
+                    <tr><th>เลขที่</th><th>ชื่อ-สกุล</th><th style="color:#28a745;">มา</th><th style="color:#dc3545;">ป่วย</th><th style="color:#ffc107;">ลา</th><th style="color:#fd7e14;">ขาด</th></tr>
                 </thead>
-                <tbody id="summary-body">
-                    </tbody>
+                <tbody id="summary-body"><tr><td colspan='6' style='text-align:center;'>ยังไม่มีข้อมูล</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -135,54 +125,75 @@
 </div>
 
 <div class="nav-menu" id="bottom-nav">
-    <div class="nav-item active" onclick="switchPage('checklist-page', this)">
-        <span>📝</span><br>เช็คชื่อ
-    </div>
-    <div class="nav-item" onclick="switchPage('daily-page', this)">
-        <span>📅</span><br>รายวัน
-    </div>
-    <div class="nav-item" onclick="switchPage('summary-page', this)">
-        <span>📊</span><br>สรุปผล
-    </div>
+    <div class="nav-item active" onclick="switchPage('checklist-page', this)"><span>📝</span><br>เช็คชื่อ</div>
+    <div class="nav-item" onclick="switchPage('daily-page', this)"><span>📅</span><br>รายวัน</div>
+    <div class="nav-item" onclick="switchPage('summary-page', this)"><span>📊</span><br>สรุปผล</div>
 </div>
 
 <script>
-    // --- ตั้งค่าวันที่ปัจจุบันให้ Date Picker ---
+    // 🔗 API ตัวจริงที่คุณให้มา
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw8sDL6epl7bqTiS76EFYqPw_9BOSaD9-shezgBajDLHGR0jSE16vUs1urfldFXcWZB/exec";
+
     document.getElementById('check-date').valueAsDate = new Date();
     document.getElementById('view-date').valueAsDate = new Date();
 
-    // --- จำลองข้อมูลนักเรียน ---
-    let students = [
-        { id: "6326", number: 1, name: "ด.ช.จารุกร หงส์สิงห์", img: "https://ui-avatars.com/api/?name=จารุกร&background=f3f5f9" },
-        { id: "6329", number: 2, name: "ด.ช.จิรายุส นามสน", img: "https://ui-avatars.com/api/?name=จิรายุส&background=f3f5f9" },
-        { id: "6348", number: 3, name: "ด.ช.วันชัย แพงวิเศษ", img: "https://ui-avatars.com/api/?name=วันชัย&background=f3f5f9" }
-    ];
-
-    // เก็บสถานะชั่วคราวขณะเช็คชื่อ
+    let students = []; 
     let attendanceData = {}; 
+    let currentTeacher = "";
+    let currentClass = "";
 
-    // --- 🔐 ระบบ Login (จำลอง) ---
+    // --- 🔐 1. ระบบ Login (เช็คจาก Sheet Users) ---
     function handleLogin() {
-        const u = document.getElementById('username').value;
-        const p = document.getElementById('password').value;
-        if (u === "admin" && p === "1234") {
-            document.getElementById('user-display').innerText = "ครูอัครเดช (ออกจากระบบ)";
-            document.getElementById('bottom-nav').style.display = 'flex';
-            switchPage('checklist-page', document.querySelectorAll('.nav-item')[0]);
-            renderChecklist(); // สร้างรายชื่อ
-            loadSummaryData(); // โหลดหน้าสรุป
-        } else {
-            alert("รหัสผ่านไม่ถูกต้อง");
-        }
+        const u = document.getElementById('username').value.trim();
+        const p = document.getElementById('password').value.trim();
+        const btn = document.getElementById('login-btn');
+
+        if (!u || !p) { alert("กรุณากรอกรหัสผ่าน"); return; }
+
+        btn.innerText = "⏳ กำลังเข้าสู่ระบบ...";
+        btn.disabled = true;
+
+        fetch(`${GAS_API_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`)
+            .then(res => res.json())
+            .then(data => {
+                btn.innerText = "เข้าสู่ระบบ";
+                btn.disabled = false;
+
+                if (data.status === "success") {
+                    currentTeacher = data.name;
+                    currentClass = data.className || ""; // ดึงชื่อห้องมาจาก Sheet Users
+                    
+                    document.getElementById('user-display').innerText = `${currentTeacher} (${currentClass}) - ออกจากระบบ`;
+                    document.getElementById('class-title').innerText = `(${currentClass})`;
+                    document.getElementById('bottom-nav').style.display = 'flex';
+                    
+                    switchPage('checklist-page', document.querySelectorAll('.nav-item')[0]);
+                    
+                    // เมื่อ Login ผ่าน ให้ดึงรายชื่อเด็กห้องนั้นทันที
+                    fetchStudents(); 
+                } else {
+                    alert("❌ รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+                }
+            })
+            .catch(err => {
+                btn.innerText = "เข้าสู่ระบบ";
+                btn.disabled = false;
+                alert("❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้");
+            });
     }
 
     function logout() {
+        currentTeacher = "";
+        currentClass = "";
+        students = [];
         document.getElementById('user-display').innerText = "เข้าสู่ระบบ";
         document.getElementById('bottom-nav').style.display = 'none';
+        document.getElementById('username').value = "";
+        document.getElementById('password').value = "";
+        document.getElementById('student-list-container').innerHTML = "";
         switchPage('login-page', null);
     }
 
-    // --- 🧭 เปลี่ยนหน้า ---
     function switchPage(pageId, element) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         if(element) {
@@ -192,138 +203,140 @@
         document.getElementById(pageId).classList.add('active');
     }
 
-    // --- 📝 1. สร้างตารางเช็คชื่อพร้อมปุ่มสี ---
+    // --- 📋 2. ฟังก์ชันดึงรายชื่อนักเรียนจาก Sheet Students ---
+    function fetchStudents() {
+        const container = document.getElementById('student-list-container');
+        container.innerHTML = `<div style="text-align:center; padding: 30px; color:#1e56a0; font-weight:bold;">⏳ กำลังโหลดรายชื่อนักเรียนห้อง ${currentClass}...</div>`;
+        
+        fetch(`${GAS_API_URL}?action=get_students&className=${encodeURIComponent(currentClass)}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success" && data.data.length > 0) {
+                    students = data.data; 
+                    renderChecklist();
+                } else {
+                    container.innerHTML = `<div style="text-align:center; padding: 20px; color:red;">❌ ไม่พบรายชื่อนักเรียนห้อง ${currentClass} โปรดตรวจสอบคอลัมน์ D ในตาราง Students</div>`;
+                }
+            })
+            .catch(err => {
+                container.innerHTML = `<div style="text-align:center; padding: 20px; color:red;">❌ โหลดข้อมูลล้มเหลว กรุณารีเฟรช</div>`;
+            });
+    }
+
+    // --- 📝 3. สร้าง UI ตารางเช็คชื่อตามข้อมูลจริง ---
     function renderChecklist() {
         const container = document.getElementById('student-list-container');
         container.innerHTML = "";
 
         students.forEach(std => {
-            // ค่าเริ่มต้นคือ 'มาเรียน' (present)
             attendanceData[std.id] = { status: 'present', note: '' };
+            let defaultImg = `https://ui-avatars.com/api/?name=${std.name}&background=f3f5f9`;
 
             let row = document.createElement('div');
-            row.className = `student-row row-present`; // สีเริ่มต้นคือสีเขียว
+            row.className = `student-row row-present`; 
             row.id = `row-${std.id}`;
-
             row.innerHTML = `
                 <div class="student-info">
                     <div class="student-number">${std.number}</div>
-                    
                     <div class="img-container">
-                        <img src="${std.img}" id="img-${std.id}" class="student-img">
-                        <label class="upload-btn">
-                            📷
-                            <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, '${std.id}')">
-                        </label>
+                        <img src="${defaultImg}" id="img-${std.id}" class="student-img">
+                        <label class="upload-btn">📷<input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, '${std.id}')"></label>
                     </div>
-
-                    <div class="student-name">${std.name}</div>
+                    <div class="student-name">${std.name}<br><small style="color:#666;">รหัส: ${std.id}</small></div>
                 </div>
-
                 <div class="status-group">
                     <div class="btn-status status-present active" onclick="setStatus('${std.id}', 'present')">✅ มาเรียน</div>
                     <div class="btn-status status-sick" onclick="setStatus('${std.id}', 'sick')">🤒 ป่วย</div>
                     <div class="btn-status status-leave" onclick="setStatus('${std.id}', 'leave')">📝 ลา</div>
                     <div class="btn-status status-absent" onclick="setStatus('${std.id}', 'absent')">❌ ขาด</div>
                 </div>
-
                 <textarea class="behavior-note" id="note-${std.id}" placeholder="จดบันทึกพฤติกรรม/หมายเหตุ... (ไม่บังคับ)"></textarea>
             `;
             container.appendChild(row);
         });
     }
 
-    // --- ฟังก์ชันเปลี่ยนสถานะสี ---
     function setStatus(id, status) {
         attendanceData[id].status = status;
         let row = document.getElementById(`row-${id}`);
-        
-        // ล้างสีพื้นหลังแถวเก่า แล้วใส่สีใหม่
         row.className = `student-row row-${status}`;
-
-        // ล้างสถานะ active ของปุ่มทั้งหมดในแถวนี้
-        let buttons = row.querySelectorAll('.btn-status');
-        buttons.forEach(btn => btn.classList.remove('active'));
-
-        // ใส่สถานะ active ให้ปุ่มที่ถูกกด
+        row.querySelectorAll('.btn-status').forEach(btn => btn.classList.remove('active'));
         row.querySelector(`.status-${status}`).classList.add('active');
     }
 
-    // --- ฟังก์ชันพรีวิวอัปโหลดรูปภาพ ---
     function previewImage(event, id) {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById(`img-${id}`).src = e.target.result;
-                // หากต้องการเซฟรูป ให้ดึง e.target.result (Base64) ส่งเข้า Database
-            }
+            reader.onload = function(e) { document.getElementById(`img-${id}`).src = e.target.result; }
             reader.readAsDataURL(file);
         }
     }
 
-    // --- ฟังก์ชันบันทึกข้อมูล ---
+    // --- 💾 4. บันทึกข้อมูลเข้า Google Sheets ---
     function saveAttendance() {
         let date = document.getElementById('check-date').value;
-        let finalData = [];
+        let saveBtn = document.getElementById('save-btn');
+        let records = [];
         
-        // ดึงข้อความหมายเหตุเข้าไปเก็บด้วย
         students.forEach(std => {
-            let note = document.getElementById(`note-${std.id}`).value;
-            finalData.push({
-                date: date,
+            records.push({
                 id: std.id,
                 name: std.name,
+                className: std.className || currentClass,
                 status: attendanceData[std.id].status,
-                note: note
+                note: document.getElementById(`note-${std.id}`).value
             });
         });
 
-        console.log("ส่งข้อมูลเข้าระบบ:", finalData);
-        alert("✅ บันทึกข้อมูลวันที่ " + date + " เรียบร้อยแล้ว!\n(เปิดดูใน Console เพื่อดูข้อมูลจำลอง)");
-        
-        // จำลองการเพิ่มข้อมูลเข้าหน้า "รายละเอียดรายวัน" ทันที
-        loadDailyData(finalData); 
+        let payload = {
+            action: "save_bulk",
+            date: date,
+            teacherName: currentTeacher,
+            records: records
+        };
+
+        saveBtn.innerText = "⏳ กำลังส่งข้อมูลเข้าฐานข้อมูล...";
+        saveBtn.disabled = true;
+
+        fetch(GAS_API_URL, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            saveBtn.innerText = "💾 บันทึกข้อมูลเข้าฐานข้อมูล";
+            saveBtn.disabled = false;
+            if(data.status === "success") {
+                alert("✅ บันทึกข้อมูลสำเร็จเรียบร้อย!");
+                populateDailyDataLocally(date, records); // นำไปโชว์ในหน้ารายวัน
+            } else {
+                alert("❌ บันทึกไม่สำเร็จ: " + data.message);
+            }
+        })
+        .catch(err => {
+            saveBtn.innerText = "💾 บันทึกข้อมูลเข้าฐานข้อมูล";
+            saveBtn.disabled = false;
+            alert("❌ เกิดข้อผิดพลาด ไม่สามารถเชื่อมต่อ API ได้");
+        });
     }
 
-    // --- 📅 2. หน้าแสดงรายละเอียดแต่ละวัน ---
-    function loadDailyData(mockData = null) {
-        // ในระบบจริง จะยิง fetch() ไปดึงจาก Google Sheets ตามวันที่ที่เลือก
+    // โชว์ข้อมูลที่เพิ่งกดบันทึกในหน้า "รายวัน" แบบเรียลไทม์
+    function populateDailyDataLocally(date, records) {
+        document.getElementById('view-date').value = date;
         let tbody = document.getElementById('daily-body');
         tbody.innerHTML = "";
         
-        if(mockData) {
-            mockData.forEach((d, index) => {
-                let statusTh = d.status === 'present' ? '<span style="color:green">มาเรียน</span>' : 
-                               d.status === 'sick' ? '<span style="color:red">ป่วย</span>' :
-                               d.status === 'leave' ? '<span style="color:#ffc107">ลา</span>' : '<span style="color:orange">ขาด</span>';
-                
-                tbody.innerHTML += `<tr>
-                    <td>${index + 1}</td>
-                    <td>${d.name}</td>
-                    <td><b>${statusTh}</b></td>
-                    <td style="color:#666; font-size:12px;">${d.note || '-'}</td>
-                </tr>`;
-            });
-        } else {
-            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>กรุณากดบันทึกข้อมูลก่อน เพื่อดูการจำลอง</td></tr>";
-        }
-    }
-
-    // --- 📊 3. หน้าสรุปภาพรวมทั้งหมด ---
-    function loadSummaryData() {
-        // ในระบบจริง จะยิง API ดึงข้อมูลทั้งหมดมานับจำนวน
-        let tbody = document.getElementById('summary-body');
-        tbody.innerHTML = "";
-        
-        // ข้อมูลจำลอง
-        students.forEach(std => {
+        records.forEach((d, index) => {
+            let statusTh = d.status === 'present' ? '<span style="color:green">มาเรียน</span>' : 
+                           d.status === 'sick' ? '<span style="color:red">ป่วย</span>' :
+                           d.status === 'leave' ? '<span style="color:#ffc107">ลา</span>' : '<span style="color:orange">ขาด</span>';
+            
             tbody.innerHTML += `<tr>
-                <td>${std.number}</td>
-                <td>${std.name}</td>
-                <td style="color: #28a745; font-weight:bold;">10</td> <td style="color: #dc3545;">0</td>
-                <td style="color: #ffc107;">1</td>
-                <td style="color: #fd7e14;">0</td>
+                <td>${index + 1}</td>
+                <td>${d.name}</td>
+                <td><b>${statusTh}</b></td>
+                <td style="color:#666; font-size:12px;">${d.note || '-'}</td>
             </tr>`;
         });
     }
