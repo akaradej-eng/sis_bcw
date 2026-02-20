@@ -99,11 +99,11 @@
             <h2>📅 รายละเอียดการมาเรียนรายวัน</h2>
             <p style="color: #666; font-size: 13px;">เลือกวันที่เพื่อดูข้อมูลที่บันทึกไว้</p>
             <input type="date" id="view-date" class="date-picker" style="margin-bottom: 15px;">
-            <button onclick="alert('ฟีเจอร์โหลดประวัติย้อนหลังกำลังเชื่อมต่อกับฐานข้อมูล...')" style="padding: 8px 15px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer; font-family: 'Prompt';">โหลดข้อมูล</button>
+            <button onclick="loadDailyData()" style="padding: 8px 15px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer; font-family: 'Prompt';">โหลดข้อมูล</button>
             
             <table id="daily-table">
                 <thead><tr><th>เลขที่</th><th>ชื่อ-สกุล</th><th>สถานะ</th><th>หมายเหตุ</th></tr></thead>
-                <tbody id="daily-body"><tr><td colspan='4' style='text-align:center;'>กดบันทึกเพื่อดูข้อมูลปัจจุบัน</td></tr></tbody>
+                <tbody id="daily-body"><tr><td colspan='4' style='text-align:center;'>กดโหลดข้อมูลเพื่อดูประวัติ</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -112,7 +112,7 @@
         <div class="card">
             <h2>📊 สรุปสถานะทั้งหมด</h2>
             <p style="color: #666; font-size: 13px;">เปรียบเทียบว่านักเรียนแต่ละคน ขาด/ลา/ป่วย กี่วัน</p>
-            <button onclick="alert('ฟีเจอร์โหลดสรุปกำลังเชื่อมต่อกับฐานข้อมูล...')" style="padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-family: 'Prompt'; margin-bottom: 15px;">อัปเดตข้อมูลภาพรวม</button>
+            <button onclick="loadSummaryData()" style="padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-family: 'Prompt'; margin-bottom: 15px;">อัปเดตข้อมูลภาพรวม</button>
             <table id="summary-table">
                 <thead>
                     <tr><th>เลขที่</th><th>ชื่อ-สกุล</th><th style="color:#28a745;">มา</th><th style="color:#dc3545;">ป่วย</th><th style="color:#ffc107;">ลา</th><th style="color:#fd7e14;">ขาด</th></tr>
@@ -416,6 +416,79 @@
                 <td style="color:#666; font-size:12px;">${d.note || '-'}</td>
             </tr>`;
         });
+    }
+
+    // --- 📅 6. หน้าแสดงรายละเอียดแต่ละวัน (ข้อมูลจริง) ---
+    function loadDailyData() {
+        let viewDate = document.getElementById('view-date').value;
+        if (!viewDate) { alert("กรุณาเลือกวันที่"); return; }
+        
+        let tbody = document.getElementById('daily-body');
+        tbody.innerHTML = `<tr><td colspan='4' style='text-align:center;'>⏳ กำลังดึงข้อมูลจากฐานข้อมูล...</td></tr>`;
+        
+        fetch(`${GAS_API_URL}?action=get_daily&className=${encodeURIComponent(currentClass)}&date=${viewDate}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    tbody.innerHTML = "";
+                    if(data.data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan='4' style='text-align:center;'>❌ ไม่มีข้อมูลการเช็คชื่อในวันที่เลือก</td></tr>`;
+                        return;
+                    }
+                    
+                    data.data.forEach((d, index) => {
+                        let statusTh = (d.status === 'มา' || d.status === 'มาเรียน') ? '<span style="color:green; font-weight:bold;">มาเรียน</span>' : 
+                                       d.status === 'ป่วย' ? '<span style="color:red; font-weight:bold;">ป่วย</span>' :
+                                       d.status === 'ลา' ? '<span style="color:#ffc107; font-weight:bold;">ลา</span>' : '<span style="color:orange; font-weight:bold;">ขาด</span>';
+                        
+                        tbody.innerHTML += `<tr>
+                            <td>${index + 1}</td>
+                            <td>${d.name}</td>
+                            <td>${statusTh}</td>
+                            <td style="color:#666; font-size:12px;">${d.note || '-'}</td>
+                        </tr>`;
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan='4' style='text-align:center; color:red;'>❌ โหลดข้อมูลล้มเหลว</td></tr>`;
+                }
+            })
+            .catch(err => {
+                tbody.innerHTML = `<tr><td colspan='4' style='text-align:center; color:red;'>❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้</td></tr>`;
+            });
+    }
+
+    // --- 📊 7. หน้าสรุปภาพรวมทั้งหมด (ข้อมูลจริง) ---
+    function loadSummaryData() {
+        let tbody = document.getElementById('summary-body');
+        tbody.innerHTML = `<tr><td colspan='6' style='text-align:center;'>⏳ กำลังประมวลผลสถิติ...</td></tr>`;
+        
+        fetch(`${GAS_API_URL}?action=get_summary&className=${encodeURIComponent(currentClass)}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    tbody.innerHTML = "";
+                    if(data.data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan='6' style='text-align:center;'>ยังไม่มีข้อมูลการเช็คชื่อในระบบเลย</td></tr>`;
+                        return;
+                    }
+                    
+                    data.data.forEach((d, index) => {
+                        tbody.innerHTML += `<tr>
+                            <td>${index + 1}</td>
+                            <td>${d.name}</td>
+                            <td style="color: #28a745; font-weight:bold;">${d.present}</td>
+                            <td style="color: #dc3545;">${d.sick}</td>
+                            <td style="color: #ffc107;">${d.leave}</td>
+                            <td style="color: #fd7e14;">${d.absent}</td>
+                        </tr>`;
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan='6' style='text-align:center; color:red;'>❌ ประมวลผลล้มเหลว</td></tr>`;
+                }
+            })
+            .catch(err => {
+                tbody.innerHTML = `<tr><td colspan='6' style='text-align:center; color:red;'>❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้</td></tr>`;
+            });
     }
 </script>
 
