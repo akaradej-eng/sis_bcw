@@ -23,7 +23,6 @@
         input, select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; width: 100%; box-sizing: border-box; margin-bottom: 10px;}
         button { padding: 10px 15px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: bold;}
         
-        /* สไตล์ตาราง/แถวเช็คชื่อ (ครู) */
         .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;}
         .date-picker { padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; font-size: 16px; margin-bottom:0; width:auto;}
         .student-row { display: flex; flex-direction: column; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 15px; transition: 0.3s; }
@@ -36,6 +35,7 @@
         .status-group { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px;}
         .btn-status { flex: 1; padding: 8px 5px; border: 1px solid #ddd; border-radius: 6px; background: white; cursor: pointer; font-family: 'Prompt'; font-size: 14px; transition: 0.2s; text-align: center; font-weight: bold; color: #666;}
         .behavior-note { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Prompt'; font-size: 13px; box-sizing: border-box; resize: vertical; min-height: 40px;}
+        
         .status-present.active { background-color: #28a745; color: white; border-color: #28a745; }
         .status-sick.active { background-color: #dc3545; color: white; border-color: #dc3545; }
         .status-leave.active { background-color: #ffc107; color: #000; border-color: #ffc107; }
@@ -58,11 +58,10 @@
         .stat-card h3 { margin: 0; font-size: 13px; opacity: 0.9; }
         .stat-card h2 { margin: 5px 0 0 0; font-size: 24px; }
         
-        /* สไตล์กล่อง AI */
+        /* สไตล์กล่อง AI 🤖 */
         .ai-box { background: #f0f7ff; border-left: 5px solid #1e56a0; padding: 15px; border-radius: 8px; margin-bottom: 20px;}
-        .ai-box h3 { margin-top: 0; color: #1e56a0; display:flex; align-items:center; gap:8px; font-size:18px;}
+        .ai-box h3 { margin-top: 0; color: #1e56a0; display:flex; align-items:center; gap:8px; font-size:16px;}
         
-        /* Exec Filters */
         .exec-filters { display:flex; gap:10px; flex-wrap:wrap; background:#fff; padding:15px; border-radius:10px; margin-bottom:15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
         .exec-filters div { flex: 1; min-width:140px;}
         .exec-filters label { font-size:12px; color:#666; font-weight:bold; }
@@ -81,7 +80,7 @@
     <div id="login-page" class="page active">
         <div class="card" style="text-align: center; max-width: 400px; margin: 40px auto;">
             <h2 style="color: #1e56a0;">เข้าสู่ระบบ</h2>
-            <input type="text" id="username" placeholder="รหัสผู้ใช้งาน (เช่น รหัสครู, admin, รหัสนักเรียน)">
+            <input type="text" id="username" placeholder="รหัสผู้ใช้งาน">
             <input type="password" id="password" placeholder="รหัสผ่าน">
             <button id="login-btn" onclick="handleLogin()" style="width: 100%; font-size:16px;">เข้าสู่ระบบ</button>
         </div>
@@ -124,7 +123,16 @@
             <h2>📅 รายละเอียดรายวัน</h2>
             <input type="date" id="view-date" class="date-picker" style="margin-bottom: 15px; width:100%;">
             <button onclick="loadDailyData()" style="width:100%; background: var(--primary);">โหลดข้อมูล</button>
-            <table id="daily-table"><thead><tr><th>เลขที่</th><th>ชื่อ-สกุล</th><th>สถานะ</th><th>หมายเหตุ</th></tr></thead><tbody id="daily-body"><tr><td colspan='4' style='text-align:center;'>กดโหลดข้อมูลเพื่อดูประวัติ</td></tr></tbody></table>
+            
+            <div class="ai-box" style="margin-top: 20px;">
+                <h3>🤖 AI วิเคราะห์สถานการณ์ประจำวัน</h3>
+                <p id="teacher-daily-ai" style="color:#333; line-height:1.6; margin-bottom:0; font-size:14px;">กดปุ่ม "โหลดข้อมูล" เพื่อให้ระบบวิเคราะห์</p>
+            </div>
+
+            <table id="daily-table" style="margin-top: 0;">
+                <thead><tr><th>เลขที่</th><th>ชื่อ-สกุล</th><th>สถานะ</th><th>หมายเหตุ</th></tr></thead>
+                <tbody id="daily-body"><tr><td colspan='4' style='text-align:center;'>รอโหลดข้อมูล</td></tr></tbody>
+            </table>
         </div>
     </div>
 
@@ -132,12 +140,27 @@
         <div class="card">
             <h2>📊 สรุปสถานะทั้งหมด</h2>
             <button onclick="loadSummaryData()" style="width:100%; background: #28a745; margin-bottom: 15px;">อัปเดตข้อมูลภาพรวม</button>
-            <table id="summary-table"><thead><tr><th>เลขที่</th><th>ชื่อ</th><th style="color:#28a745;">มา</th><th style="color:#dc3545;">ป่วย</th><th style="color:#ffc107;">ลา</th><th style="color:#fd7e14;">ขาด</th></tr></thead><tbody id="summary-body"><tr><td colspan='6' style='text-align:center;'>ยังไม่มีข้อมูล</td></tr></tbody></table>
+            
+            <div class="ai-box">
+                <h3>🤖 AI ประเมินภาพรวมชั้นเรียน</h3>
+                <p id="teacher-summary-ai" style="color:#333; line-height:1.6; margin-bottom:0; font-size:14px;">กดอัปเดตข้อมูลเพื่อรับคำแนะนำ</p>
+            </div>
+
+            <table id="summary-table" style="margin-top:0;">
+                <thead><tr><th>เลขที่</th><th>ชื่อ</th><th style="color:#28a745;">มา</th><th style="color:#dc3545;">ป่วย</th><th style="color:#ffc107;">ลา</th><th style="color:#fd7e14;">ขาด</th></tr></thead>
+                <tbody id="summary-body"><tr><td colspan='6' style='text-align:center;'>ยังไม่มีข้อมูล</td></tr></tbody>
+            </table>
         </div>
     </div>
 
     <div id="admin-page" class="page">
         <h2 style="color: #1e56a0;">⚙️ ระบบผู้ดูแลระบบ (Admin)</h2>
+        
+        <div class="ai-box">
+            <h3>🤖 AI ตรวจสอบสถานะระบบ</h3>
+            <p id="admin-system-ai" style="color:#333; line-height:1.6; margin-bottom:0; font-size:14px;">กำลังตรวจสอบการทำงานของระบบ...</p>
+        </div>
+
         <div class="card">
             <h3>📅 กำหนดระยะเวลาการบันทึก</h3>
             <div style="display:flex; gap:10px;"><div style="flex:1"><label>วันเริ่ม</label><input type="date" id="admin-start"></div><div style="flex:1"><label>วันสิ้นสุด</label><input type="date" id="admin-end"></div></div>
@@ -162,8 +185,6 @@
 
     <div id="exec-page" class="page">
         <h2 style="color: #1e56a0; margin-bottom:5px;">📊 แดชบอร์ดผู้บริหาร (Executive)</h2>
-        <p style="color:#666; font-size:14px; margin-top:0;">วิเคราะห์ข้อมูลการมาเรียนแบบละเอียด พร้อมระบบ AI ประเมินผล</p>
-        
         <div class="exec-filters">
             <div>
                 <label>📌 เลือกมุมมอง</label>
@@ -187,10 +208,10 @@
                 </div>
             </div>
         </div>
-
+        
         <div class="ai-box">
-            <h3>🤖 AI วิเคราะห์ภาพรวมเชิงบริหาร</h3>
-            <p id="exec-ai-text" style="color:#333; line-height:1.6; margin-bottom:0; font-size:14px;">กำลังโหลดข้อมูลฐานข้อมูล...</p>
+            <h3>🤖 AI วิเคราะห์เชิงบริหาร</h3>
+            <p id="exec-ai-text" style="color:#333; line-height:1.6; margin-bottom:0; font-size:14px;">กำลังประมวลผลฐานข้อมูลมหาศาล...</p>
         </div>
 
         <div class="stat-grid">
@@ -198,12 +219,10 @@
             <div class="stat-card stat-green"><h3>มาเรียนสะสม</h3><h2 id="exec-present">0</h2></div>
             <div class="stat-card stat-red"><h3>ขาด/ลา/ป่วยสะสม</h3><h2 id="exec-absent">0</h2></div>
         </div>
-
         <div class="card" style="position: relative; height: 350px;">
             <h3>📈 กราฟแสดงสถิติเปรียบเทียบ</h3>
             <canvas id="execChart"></canvas>
         </div>
-
         <div class="card">
             <h3 id="exec-table-title">ตารางสถิติรายละเอียด</h3>
             <div style="overflow-x: auto; max-height: 400px;">
@@ -225,7 +244,7 @@
 
 <script>
     // 🔗 API ของคุณ
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwQ4v8pY_iQv9J8eL-p_zN3h1bI7XWzZ8E2gZkM9H92Qk_k8_e8V8C8Z6K1t7K0v0M/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwqgW3wGd_ntUn4-u2eZjv8ar-bvcn_eUI2IQWgV2uhMCN0fxnbGXL943rjYAV-eZSS/exec"; // ⚠️ เปลี่ยนให้ตรง
     
     document.getElementById('check-date').valueAsDate = new Date();
     document.getElementById('view-date').valueAsDate = new Date();
@@ -237,8 +256,6 @@
 
     let students = [], attendanceData = {}, currentTeacher = "", currentClass = "";
     let allAdminStudentsData = []; 
-
-    // ตัวแปรสำหรับ Executive
     let execFullAttendance = [];
     let execFullStudents = [];
     let execChartInstance = null;
@@ -253,7 +270,6 @@
         const p = document.getElementById('password').value.trim();
         const btn = document.getElementById('login-btn');
         if (!u || !p) { alert("กรุณากรอกรหัสผ่าน"); return; }
-
         btn.innerText = "⏳ กำลังเข้าสู่ระบบ..."; btn.disabled = true;
 
         fetch(`${GAS_API_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`)
@@ -281,7 +297,7 @@
                         loadStudentReport(u); 
                     }
                 } else { alert("❌ รหัสไม่ถูกต้อง"); }
-            }).catch(err => { btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; alert("ไม่สามารถเชื่อมต่อฐานข้อมูลได้"); });
+            }).catch(err => { btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; });
     }
 
     function logout() { location.reload(); }
@@ -292,11 +308,11 @@
     }
 
     // ==========================================
-    // 👩‍🏫 โหมด TEACHER (ครูประจำชั้น)
+    // 👩‍🏫 โหมด TEACHER
     // ==========================================
     function fetchStudents() {
         const container = document.getElementById('student-list-container');
-        container.innerHTML = `<div style="text-align:center; padding: 30px; color:#1e56a0; font-weight:bold;">⏳ กำลังโหลดข้อมูล...</div>`;
+        container.innerHTML = `<div style="text-align:center; padding: 30px; font-weight:bold;">⏳ กำลังโหลดข้อมูล...</div>`;
         document.getElementById('save-btn').style.display = 'none';
         let dateRaw = document.getElementById('check-date').value;
 
@@ -312,7 +328,7 @@
                             else renderChecklist(null, null); 
                         });
                 } else {
-                    container.innerHTML = `<div style="text-align:center; padding: 20px; color:red;">❌ ไม่พบรายชื่อนักเรียนห้อง ${currentClass}</div>`;
+                    container.innerHTML = `<div style="text-align:center; color:red;">❌ ไม่พบรายชื่อห้อง ${currentClass}</div>`;
                 }
             });
     }
@@ -364,10 +380,7 @@
                         <div class="btn-status status-absent ${initStatus==='absent'?'active':''}" onclick="setStatus('${std.id}', 'absent')">❌ ขาด</div>
                     </div>
                     <textarea class="behavior-note" id="note-${std.id}" placeholder="จดบันทึกพฤติกรรม/หมายเหตุ... (ไม่บังคับ)">${initNote}</textarea>
-                    ${existingData ? `<div style="display:flex; gap:10px; margin-top:10px;">
-                        <button onclick="saveSingleUpdate('${std.id}')" style="flex:1; background:#28a745;">💾 บันทึก</button>
-                        <button onclick="cancelEdit('${std.id}')" style="background:#6c757d;">ยกเลิก</button>
-                    </div>` : ''}
+                    ${existingData ? `<div style="display:flex; gap:10px; margin-top:10px;"><button onclick="saveSingleUpdate('${std.id}')" style="flex:1; background:#28a745;">💾 บันทึก</button><button onclick="cancelEdit('${std.id}')" style="background:#6c757d;">ยกเลิก</button></div>` : ''}
                 </div>`;
             container.appendChild(row);
         });
@@ -390,88 +403,141 @@
         students.forEach(std => {
             records.push({ id: std.id, name: std.name, className: std.className || currentClass, status: attendanceData[std.id].status, note: document.getElementById(`note-${std.id}`).value });
         });
-        saveBtn.innerText = "⏳ กำลังส่งข้อมูลเข้าฐานข้อมูล..."; saveBtn.disabled = true;
+        saveBtn.innerText = "⏳ กำลังส่งข้อมูล..."; saveBtn.disabled = true;
         fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: date, teacherName: currentTeacher, records: records }) })
         .then(res => res.json())
         .then(data => {
             saveBtn.innerText = "💾 บันทึกข้อมูลเข้าฐานข้อมูล"; saveBtn.disabled = false;
-            if(data.status === "success") { alert("✅ บันทึกข้อมูลเรียบร้อย!"); fetchStudents(); } 
-            else { alert("❌ บันทึกไม่สำเร็จ: " + data.message); }
+            if(data.status === "success") { alert("✅ บันทึกข้อมูลเรียบร้อย!"); fetchStudents(); } else alert("❌ บันทึกไม่สำเร็จ: " + data.message);
         });
     }
 
     function saveSingleUpdate(id) {
         fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "update_single", date: document.getElementById('check-date').value, id: id, className: currentClass, status: attendanceData[id].status, note: document.getElementById(`note-${id}`).value, teacherName: currentTeacher }) })
-        .then(res => res.json()).then(data => { if(data.status === "success") { alert("✅ อัปเดตสถานะใหม่เรียบร้อย!"); fetchStudents(); } });
+        .then(res => res.json()).then(data => { if(data.status === "success") { alert("✅ อัปเดตสถานะสำเร็จ!"); fetchStudents(); } });
     }
 
+    // 👨‍🏫 โหลดรายวัน + AI ครู
     function loadDailyData() {
         let viewDate = document.getElementById('view-date').value;
         if (!viewDate) return;
         let tbody = document.getElementById('daily-body');
         tbody.innerHTML = `<tr><td colspan='4' style='text-align:center;'>⏳ กำลังดึงข้อมูล...</td></tr>`;
+        document.getElementById('teacher-daily-ai').innerText = "กำลังวิเคราะห์...";
+
         fetch(`${GAS_API_URL}?action=get_daily&className=${encodeURIComponent(currentClass)}&date=${viewDate}`)
             .then(res => res.json())
             .then(data => {
                 if(data.status === "success") {
                     tbody.innerHTML = "";
-                    if(data.data.length === 0) { tbody.innerHTML = `<tr><td colspan='4' style='text-align:center;'>❌ ไม่มีข้อมูลการเช็คชื่อในวันที่เลือก</td></tr>`; return; }
+                    let totalStd = data.data.length;
+                    let tPres = 0, tAbs = 0, tSick = 0;
+
+                    if(totalStd === 0) { 
+                        tbody.innerHTML = `<tr><td colspan='4' style='text-align:center;'>❌ ไม่มีข้อมูล</td></tr>`; 
+                        document.getElementById('teacher-daily-ai').innerHTML = `ไม่มีข้อมูลการบันทึกในวันที่ ${viewDate}`;
+                        return; 
+                    }
+                    
                     data.data.forEach((d, index) => {
+                        if(d.status === 'มา' || d.status === 'มาเรียน') tPres++;
+                        else if(d.status === 'ขาด') tAbs++;
+                        else tSick++;
+
                         let statusTh = (d.status === 'มา' || d.status === 'มาเรียน') ? '<span style="color:green; font-weight:bold;">มาเรียน</span>' : d.status === 'ป่วย' ? '<span style="color:red; font-weight:bold;">ป่วย</span>' : d.status === 'ลา' ? '<span style="color:#ffc107; font-weight:bold;">ลา</span>' : '<span style="color:orange; font-weight:bold;">ขาด</span>';
                         tbody.innerHTML += `<tr><td>${index + 1}</td><td>${d.name}</td><td>${statusTh}</td><td style="color:#666; font-size:12px;">${d.note || '-'}</td></tr>`;
                     });
+
+                    // 🤖 วิเคราะห์รายวัน
+                    let aiMsg = "";
+                    if(tPres === totalStd) aiMsg = `🌟 <b>ยอดเยี่ยมมาก!</b> วันนี้นักเรียนมาเรียนครบ 100% สมบูรณ์แบบครับ จัดการชั้นเรียนได้ดีเยี่ยม`;
+                    else if(tAbs > 0) aiMsg = `⚠️ วันนี้มีนักเรียน <b>ขาดเรียน ${tAbs} คน</b> แนะนำให้คุณครูติดต่อผู้ปกครองเพื่อสอบถามสาเหตุโดยด่วนครับ`;
+                    else aiMsg = `💡 วันนี้มีนักเรียน <b>ป่วย/ลา ${tSick} คน</b> อย่าลืมส่งข้อความสอบถามอาการ และฝากเพื่อนๆ ติดตามงานให้นะครับ`;
+                    document.getElementById('teacher-daily-ai').innerHTML = aiMsg;
                 }
             });
     }
 
+    // 👨‍🏫 โหลดสรุป + AI ครู
     function loadSummaryData() {
         let tbody = document.getElementById('summary-body');
         tbody.innerHTML = `<tr><td colspan='6' style='text-align:center;'>⏳ กำลังประมวลผลสถิติ...</td></tr>`;
+        document.getElementById('teacher-summary-ai').innerText = "กำลังคำนวณสถิติ...";
+
         fetch(`${GAS_API_URL}?action=get_summary&className=${encodeURIComponent(currentClass)}`)
             .then(res => res.json())
             .then(data => {
                 if(data.status === "success") {
                     tbody.innerHTML = "";
-                    if(data.data.length === 0) { tbody.innerHTML = `<tr><td colspan='6' style='text-align:center;'>ยังไม่มีข้อมูล</td></tr>`; return; }
+                    if(data.data.length === 0) { 
+                        tbody.innerHTML = `<tr><td colspan='6' style='text-align:center;'>ยังไม่มีข้อมูล</td></tr>`; 
+                        document.getElementById('teacher-summary-ai').innerHTML = "ยังไม่สามารถวิเคราะห์ได้เนื่องจากไม่มีข้อมูล";
+                        return; 
+                    }
+
+                    let sumTotal = 0, sumPres = 0;
+                    let riskStudents = [];
+
                     data.data.forEach((d, index) => {
+                        let stTotal = d.present + d.sick + d.leave + d.absent;
+                        if(stTotal > 0) {
+                            sumTotal += stTotal;
+                            sumPres += d.present;
+                            let perc = (d.present / stTotal) * 100;
+                            if(perc < 80) riskStudents.push(`<b>${d.name}</b> (${perc.toFixed(1)}%)`);
+                        }
                         tbody.innerHTML += `<tr><td>${index + 1}</td><td>${d.name}</td><td style="color: #28a745; font-weight:bold;">${d.present}</td><td style="color: #dc3545;">${d.sick}</td><td style="color: #ffc107;">${d.leave}</td><td style="color: #fd7e14;">${d.absent}</td></tr>`;
                     });
+
+                    // 🤖 วิเคราะห์สรุปห้องเรียน
+                    let avgPerc = sumTotal > 0 ? (sumPres / sumTotal) * 100 : 0;
+                    let sumAi = `อัตราการมาเรียนเฉลี่ยของห้อง ${currentClass} อยู่ที่ <b style="color:${avgPerc>=80?'green':'red'}; font-size:16px;">${avgPerc.toFixed(1)}%</b><br><br>`;
+                    
+                    if(riskStudents.length > 0) {
+                        sumAi += `⚠️ <b>พบนักเรียนกลุ่มเสี่ยง (เวลาเรียนไม่ถึง 80%):</b><br>ได้แก่ ${riskStudents.slice(0,3).join(', ')} ${riskStudents.length>3 ? ` และอื่นๆ รวม ${riskStudents.length} คน` : ''}<br>💡 <b>ข้อเสนอแนะ:</b> ครูควรเรียกพบนักเรียนกลุ่มนี้เป็นการส่วนตัว หรือประสานงานฝ่ายปกครองเพื่อป้องกันการหมดสิทธิ์สอบครับ`;
+                    } else {
+                        sumAi += `🌟 <b>สุดยอดการดูแล!</b> นักเรียนทุกคนในห้องมีเวลาเรียนผ่านเกณฑ์ 80% ขอบคุณที่ช่วยดูแลเอาใจใส่นักเรียนเป็นอย่างดีครับ`;
+                    }
+                    document.getElementById('teacher-summary-ai').innerHTML = sumAi;
                 }
             });
     }
 
     // ==========================================
-    // ⚙️ โหมด ADMIN (อัปเดตระบบ Filter ห้องเรียน)
+    // ⚙️ โหมด ADMIN + AI
     // ==========================================
     function loadAdminData() {
+        document.getElementById('admin-system-ai').innerText = "⏳ กำลังดึงข้อมูลสแกนระบบ...";
         fetch(`${GAS_API_URL}?action=get_admin_data`)
             .then(res => res.json())
             .then(data => {
                 if(data.status === "success") {
                     document.getElementById('admin-start').value = data.config.startDate;
                     document.getElementById('admin-end').value = data.config.endDate;
-                    
                     let uBody = document.getElementById('admin-users-body');
                     uBody.innerHTML = "";
                     data.users.forEach((u, i) => {
                         uBody.innerHTML += `<tr>
                             <td><input type="text" value="${u[0]}" id="u-user-${i}"></td>
                             <td><input type="text" value="${u[1]}" id="u-pass-${i}"></td>
-                            <td><select id="u-role-${i}">
-                                <option value="teacher" ${u[2]=='teacher'?'selected':''}>Teacher</option>
-                                <option value="admin" ${u[2]=='admin'?'selected':''}>Admin</option>
-                                <option value="executive" ${u[2]=='executive'?'selected':''}>Executive</option>
-                                <option value="student" ${u[2]=='student'?'selected':''}>Student</option>
-                            </select></td>
+                            <td><select id="u-role-${i}"><option value="teacher" ${u[2]=='teacher'?'selected':''}>Teacher</option><option value="admin" ${u[2]=='admin'?'selected':''}>Admin</option><option value="executive" ${u[2]=='executive'?'selected':''}>Executive</option><option value="student" ${u[2]=='student'?'selected':''}>Student</option></select></td>
                             <td><input type="text" value="${u[3]}" id="u-name-${i}"></td>
                             <td><input type="text" value="${u[4]||''}" id="u-class-${i}"></td>
                             <td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td>
                         </tr>`;
                     });
 
+                    // 🤖 วิเคราะห์ระบบ Admin
+                    let aiAdm = `📊 <b>ข้อมูลในฐาน:</b> ผู้ใช้งาน <b>${data.users.length}</b> บัญชี | นักเรียน <b>${data.students.length}</b> คน<br><br>`;
+                    if(data.config.startDate && data.config.endDate) {
+                        aiAdm += `✅ <b>ระบบพร้อมรัน:</b> ปฏิทินเซ็ตไว้ที่ ${data.config.startDate} ถึง ${data.config.endDate} ครูสามารถเข้าใช้งานได้ตามปกติครับ`;
+                    } else {
+                        aiAdm += `❌ <b>ระบบมีปัญหา:</b> ยังไม่ได้กำหนดวันเริ่มต้น/สิ้นสุดเทอม ระบบจะบล็อกการเช็คชื่อทั้งหมด กรุณาตั้งค่าด่วนครับ!`;
+                    }
+                    document.getElementById('admin-system-ai').innerHTML = aiAdm;
+
                     allAdminStudentsData = data.students; 
-                    updateClassDropdown(); 
-                    renderAdminStudents(); 
+                    updateClassDropdown(); renderAdminStudents(); 
                 }
             });
     }
@@ -481,19 +547,15 @@
         let currentVal = filter.value;
         let classes = new Set();
         allAdminStudentsData.forEach(s => { if(s[3]) classes.add(s[3]); });
-        
         filter.innerHTML = `<option value="all">แสดงทุกห้อง</option>`;
         [...classes].sort().forEach(c => { filter.innerHTML += `<option value="${c}">${c}</option>`; });
-        
-        let exists = Array.from(filter.options).some(opt => opt.value === currentVal);
-        if(exists) filter.value = currentVal;
+        if(Array.from(filter.options).some(opt => opt.value === currentVal)) filter.value = currentVal;
     }
 
     function renderAdminStudents() {
         let sBody = document.getElementById('admin-students-body');
         sBody.innerHTML = "";
         let filterClass = document.getElementById('admin-class-filter').value;
-
         allAdminStudentsData.forEach((s, index) => {
             if (filterClass === 'all' || s[3] === filterClass) {
                 sBody.innerHTML += `<tr>
@@ -508,66 +570,33 @@
     }
 
     function updateStudentData(index, col, val) { allAdminStudentsData[index][col] = val; }
-
-    function removeStudent(index) {
-        if(confirm("ต้องการลบนักเรียนคนนี้ออกจากฐานข้อมูลใช่หรือไม่?")) {
-            allAdminStudentsData.splice(index, 1);
-            updateClassDropdown();
-            renderAdminStudents();
-        }
-    }
-
+    function removeStudent(index) { if(confirm("ลบนักเรียนคนนี้ออกจากฐานข้อมูล?")) { allAdminStudentsData.splice(index, 1); updateClassDropdown(); renderAdminStudents(); } }
+    
     function addUserRow() {
-        let i = Date.now(); 
-        document.getElementById('admin-users-body').innerHTML += `<tr>
-            <td><input type="text" id="u-user-${i}"></td>
-            <td><input type="text" id="u-pass-${i}"></td>
-            <td><select id="u-role-${i}"><option value="teacher">Teacher</option><option value="admin">Admin</option><option value="executive">Executive</option><option value="student">Student</option></select></td>
-            <td><input type="text" id="u-name-${i}"></td>
-            <td><input type="text" id="u-class-${i}"></td>
-            <td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td>
-        </tr>`;
+        let i = Date.now();
+        document.getElementById('admin-users-body').innerHTML += `<tr><td><input type="text"></td><td><input type="text"></td><td><select><option value="teacher">Teacher</option><option value="student">Student</option><option value="admin">Admin</option></select></td><td><input type="text"></td><td><input type="text"></td><td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td></tr>`;
     }
 
     function addStudentRow() {
         let filterClass = document.getElementById('admin-class-filter').value;
-        let defaultClass = filterClass === 'all' ? '' : filterClass;
-        allAdminStudentsData.push(['', '', '', defaultClass]);
-        updateClassDropdown();
-        renderAdminStudents();
-        let container = document.querySelector('#admin-students-table').parentElement;
-        container.scrollTop = container.scrollHeight;
+        allAdminStudentsData.push(['', '', '', filterClass === 'all' ? '' : filterClass]);
+        updateClassDropdown(); renderAdminStudents();
+        let container = document.querySelector('#admin-students-table').parentElement; container.scrollTop = container.scrollHeight;
     }
 
     function saveAdminData() {
-        let btn = document.querySelector('#admin-page > button');
-        btn.innerText = "⏳ กำลังบันทึกข้อมูล...";
-        
+        let btn = document.querySelector('#admin-page > button'); btn.innerText = "⏳ กำลังบันทึก...";
         let users = [];
-        document.querySelectorAll('#admin-users-body tr').forEach(tr => {
-            let inputs = tr.querySelectorAll('input, select');
-            users.push([inputs[0].value, inputs[1].value, inputs[2].value, inputs[3].value, inputs[4].value]);
-        });
-
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({
-            action: "admin_update",
-            settings: { startDate: document.getElementById('admin-start').value, endDate: document.getElementById('admin-end').value },
-            users: users, 
-            students: allAdminStudentsData 
-        }) })
-        .then(res => res.json())
-        .then(data => {
-            btn.innerText = "💾 บันทึกการแก้ไขระบบทั้งหมด";
-            if(data.status === "success") alert("✅ อัปเดตข้อมูลผู้ใช้งานและนักเรียนสำเร็จ!");
-        });
+        document.querySelectorAll('#admin-users-body tr').forEach(tr => { let inputs = tr.querySelectorAll('input, select'); users.push([inputs[0].value, inputs[1].value, inputs[2].value, inputs[3].value, inputs[4].value]); });
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "admin_update", settings: { startDate: document.getElementById('admin-start').value, endDate: document.getElementById('admin-end').value }, users: users, students: allAdminStudentsData }) })
+        .then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกการแก้ไขระบบทั้งหมด"; if(data.status === "success") {alert("✅ อัปเดตสำเร็จ!"); loadAdminData();} });
     }
 
     // ==========================================
-    // 🎓 โหมด STUDENT (โค้ดเดิม) 
+    // 🎓 โหมด STUDENT (ประวัติ + AI)
     // ==========================================
     function loadStudentReport(studentId) {
-        let tbody = document.getElementById('student-history-body');
-        tbody.innerHTML = `<tr><td colspan='3' style='text-align:center;'>⏳ โหลดข้อมูล...</td></tr>`;
+        let tbody = document.getElementById('student-history-body'); tbody.innerHTML = `<tr><td colspan='3' style='text-align:center;'>⏳ โหลดข้อมูล...</td></tr>`;
         fetch(`${GAS_API_URL}?action=get_student_report&studentId=${encodeURIComponent(studentId)}`)
             .then(res => res.json())
             .then(data => {
@@ -576,220 +605,122 @@
                     document.getElementById('st-stat-present').innerText = st.present;
                     document.getElementById('st-stat-absent').innerText = st.absent;
                     document.getElementById('st-stat-leave').innerText = st.sick + st.leave;
+                    
                     let aiText = "";
-                    if(st.total === 0) aiText = "ยังไม่มีข้อมูลครับ เริ่มต้นด้วยความมุ่งมั่นนะครับ! ✌️";
+                    if(st.total === 0) aiText = "ยังไม่มีข้อมูลการมาเข้าแถวในระบบเลยครับ เริ่มต้นเปิดเทอมด้วยความมุ่งมั่นนะครับ! ✌️";
                     else {
                         let presentPercent = (st.present / st.total) * 100;
-                        if(presentPercent >= 90) aiText = `🌟 ยอดเยี่ยมมาก! การเข้าแถวสูงถึง <b>${presentPercent.toFixed(1)}%</b> รักษาความดีไว้นะครับ!`;
-                        else if(presentPercent >= 70) aiText = `👍 น่าพอใจครับ (<b>${presentPercent.toFixed(1)}%</b>) ลองลดวันขาดลงอีกนิดนะ!`;
-                        else aiText = `⚠️ <b>ระวัง:</b> อัตราเข้าแถวของคุณน้อย (<b>${presentPercent.toFixed(1)}%</b>) อาจหมดสิทธิ์สอบได้ ปรึกษาครูประจำชั้นด่วนครับ`;
+                        if(presentPercent >= 90) aiText = `🌟 <b>คำชื่นชม:</b> ยอดเยี่ยมมาก! การเข้าแถวสูงถึง <b>${presentPercent.toFixed(1)}%</b> เป็นตัวอย่างที่ดีรักษาความดีไว้นะครับ!`;
+                        else if(presentPercent >= 70) aiText = `👍 <b>น่าพอใจครับ:</b> (<b>${presentPercent.toFixed(1)}%</b>) ลองลดวันขาดลงอีกนิดนะ สิทธิสอบผ่านแน่นอน!`;
+                        else aiText = `⚠️ <b>ข้อควรระวัง:</b> อัตราเข้าแถวน้อยมาก (<b>${presentPercent.toFixed(1)}%</b>) เสี่ยงหมดสิทธิ์สอบ! ปรึกษาครูประจำชั้นด่วนเพื่อหาทางออกครับ สู้ๆ!`;
                     }
                     document.getElementById('ai-assessment-text').innerHTML = aiText;
+                    
                     tbody.innerHTML = "";
                     if(data.history.length === 0) tbody.innerHTML = `<tr><td colspan='3' style='text-align:center;'>ยังไม่มีประวัติ</td></tr>`;
-                    else {
-                        data.history.reverse().forEach(h => {
-                            let color = (h.status === 'มา' || h.status === 'มาเรียน') ? 'green' : h.status === 'ป่วย' ? 'red' : h.status === 'ลา' ? '#ffc107' : 'orange';
-                            tbody.innerHTML += `<tr><td>${h.date}</td><td><b style="color:${color}">${h.status}</b></td><td style="color:#666; font-size:12px;">${h.note || '-'}</td></tr>`;
-                        });
-                    }
+                    else { data.history.reverse().forEach(h => { let color = (h.status === 'มา' || h.status === 'มาเรียน') ? 'green' : h.status === 'ป่วย' ? 'red' : h.status === 'ลา' ? '#ffc107' : 'orange'; tbody.innerHTML += `<tr><td>${h.date}</td><td><b style="color:${color}">${h.status}</b></td><td style="color:#666; font-size:12px;">${h.note || '-'}</td></tr>`; }); }
                 }
             });
     }
 
     // ==========================================
-    // 💼 โหมด EXECUTIVE (ระบบวิเคราะห์ AI + กราฟ Chart.js)
+    // 💼 โหมด EXECUTIVE (กราฟ + AI)
     // ==========================================
     function fetchFullExecData() {
         document.getElementById('exec-ai-text').innerHTML = "⏳ กำลังดาวน์โหลดฐานข้อมูลทั้งโรงเรียน...";
-        fetch(`${GAS_API_URL}?action=get_full_exec_data`)
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === "success") {
-                    execFullAttendance = data.attendance;
-                    execFullStudents = data.students;
-                    updateExecViewDropdown(); 
-                }
-            });
+        fetch(`${GAS_API_URL}?action=get_full_exec_data`).then(res => res.json()).then(data => { if(data.status === "success") { execFullAttendance = data.attendance; execFullStudents = data.students; updateExecViewDropdown(); } });
     }
 
     function updateExecViewDropdown() {
         let viewType = document.getElementById('exec-view-type').value;
-        let container = document.getElementById('exec-sub-filter-container');
-        let sel = document.getElementById('exec-sub-filter');
-        let inp = document.getElementById('exec-sub-input');
-        
+        let container = document.getElementById('exec-sub-filter-container'), sel = document.getElementById('exec-sub-filter'), inp = document.getElementById('exec-sub-input');
         sel.style.display = 'none'; inp.style.display = 'none';
-        
-        if(viewType === 'school') {
-            container.style.display = 'none';
-        } else if(viewType === 'grade') {
+        if(viewType === 'school') { container.style.display = 'none'; } 
+        else if(viewType === 'grade') {
             container.style.display = 'block'; sel.style.display = 'block';
-            let grades = new Set();
-            execFullStudents.forEach(s => { if(s[3]) grades.add(s[3].split('/')[0]); }); 
-            sel.innerHTML = `<option value="all">ทุกระดับชั้น</option>`;
-            [...grades].sort().forEach(g => sel.innerHTML += `<option value="${g}">${g}</option>`);
+            let grades = new Set(); execFullStudents.forEach(s => { if(s[3]) grades.add(s[3].split('/')[0]); }); 
+            sel.innerHTML = `<option value="all">ทุกระดับชั้น</option>`; [...grades].sort().forEach(g => sel.innerHTML += `<option value="${g}">${g}</option>`);
         } else if(viewType === 'class') {
             container.style.display = 'block'; sel.style.display = 'block';
-            let classes = new Set();
-            execFullStudents.forEach(s => { if(s[3]) classes.add(s[3]); });
-            sel.innerHTML = `<option value="all">ทุกห้อง</option>`;
-            [...classes].sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
-        } else if(viewType === 'student') {
-            container.style.display = 'block'; inp.style.display = 'block';
-            inp.value = "";
-        }
+            let classes = new Set(); execFullStudents.forEach(s => { if(s[3]) classes.add(s[3]); });
+            sel.innerHTML = `<option value="all">ทุกห้อง</option>`; [...classes].sort().forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+        } else if(viewType === 'student') { container.style.display = 'block'; inp.style.display = 'block'; inp.value = ""; }
         processExecData(); 
     }
 
-    function parseThaiDate(dtStr) {
-        if(!dtStr) return new Date(0);
-        let p = String(dtStr).trim().split('/');
-        return new Date(`${p[2]}-${p[1]}-${p[0]}`);
-    }
+    function parseThaiDate(dtStr) { if(!dtStr) return new Date(0); let p = String(dtStr).trim().split('/'); return new Date(`${p[2]}-${p[1]}-${p[0]}`); }
 
     function processExecData() {
         let viewType = document.getElementById('exec-view-type').value;
         let subFilter = viewType === 'student' ? document.getElementById('exec-sub-input').value.trim() : document.getElementById('exec-sub-filter').value;
-        
-        let startD = document.getElementById('exec-date-start').valueAsDate || new Date(0);
-        let endD = document.getElementById('exec-date-end').valueAsDate || new Date();
+        let startD = document.getElementById('exec-date-start').valueAsDate || new Date(0), endD = document.getElementById('exec-date-end').valueAsDate || new Date();
         startD.setHours(0,0,0,0); endD.setHours(23,59,59,999);
 
-        let filteredAtt = [];
-        let stats = { present:0, absent:0, sick:0, leave:0, totalRecords:0 };
-        let groupStats = {}; 
+        let stats = { present:0, absent:0, sick:0, leave:0, totalRecords:0 }, groupStats = {}; 
 
         execFullAttendance.forEach(row => {
             let rowDate = parseThaiDate(row[0]);
             if(rowDate >= startD && rowDate <= endD) {
-                let id = String(row[1]).trim();
-                let cName = String(row[3]).trim();
-                let grade = cName.split('/')[0];
-                let stat = String(row[4]).trim();
-                
-                let match = false;
-                let groupKey = "";
+                let id = String(row[1]).trim(), cName = String(row[3]).trim(), grade = cName.split('/')[0], stat = String(row[4]).trim();
+                let match = false, groupKey = "";
 
                 if(viewType === 'school') { match = true; groupKey = cName; } 
-                else if(viewType === 'grade') { 
-                    if(subFilter === 'all' || grade === subFilter) { match = true; groupKey = cName; }
-                }
-                else if(viewType === 'class') {
-                    if(subFilter === 'all' || cName === subFilter) { match = true; groupKey = row[2]; } 
-                }
-                else if(viewType === 'student') {
-                    if(id === subFilter) { match = true; groupKey = row[0]; } 
-                }
+                else if(viewType === 'grade') { if(subFilter === 'all' || grade === subFilter) { match = true; groupKey = cName; } }
+                else if(viewType === 'class') { if(subFilter === 'all' || cName === subFilter) { match = true; groupKey = row[2]; } }
+                else if(viewType === 'student') { if(id === subFilter) { match = true; groupKey = row[0]; } }
 
                 if(match) {
-                    filteredAtt.push(row);
                     stats.totalRecords++;
                     if(!groupStats[groupKey]) groupStats[groupKey] = {present:0, absent:0, leave:0};
-                    
                     if(stat === "มา" || stat === "มาเรียน") { stats.present++; groupStats[groupKey].present++; }
                     else if(stat === "ขาด") { stats.absent++; groupStats[groupKey].absent++; }
-                    else if(stat === "ป่วย") { stats.sick++; groupStats[groupKey].leave++; }
-                    else if(stat === "ลา") { stats.leave++; groupStats[groupKey].leave++; }
+                    else { stats.sick++; groupStats[groupKey].leave++; } // รวบป่วยลาไว้ด้วยกันในกราฟ
                 }
             }
         });
 
-        document.getElementById('exec-total').innerText = stats.totalRecords;
-        document.getElementById('exec-present').innerText = stats.present;
-        document.getElementById('exec-absent').innerText = stats.absent + stats.sick + stats.leave;
-
-        drawExecChart(viewType, groupStats, stats);
-        drawExecTable(viewType, groupStats);
-        generateAIRecommendation(viewType, stats, groupStats);
+        document.getElementById('exec-total').innerText = stats.totalRecords; document.getElementById('exec-present').innerText = stats.present; document.getElementById('exec-absent').innerText = stats.absent + stats.sick + stats.leave;
+        drawExecChart(viewType, groupStats, stats); drawExecTable(viewType, groupStats); generateAIRecommendation(viewType, stats, groupStats);
     }
 
     function drawExecChart(viewType, groupStats, totalStats) {
         let ctx = document.getElementById('execChart').getContext('2d');
         if(execChartInstance) execChartInstance.destroy();
-
         if(viewType === 'school' && Object.keys(groupStats).length > 5) {
-            execChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['มาเรียน', 'ขาด', 'ป่วย/ลา'],
-                    datasets: [{
-                        data: [totalStats.present, totalStats.absent, totalStats.sick + totalStats.leave],
-                        backgroundColor: ['#28a745', '#dc3545', '#ffc107']
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-            });
+            execChartInstance = new Chart(ctx, { type: 'doughnut', data: { labels: ['มาเรียน', 'ขาด', 'ป่วย/ลา'], datasets: [{ data: [totalStats.present, totalStats.absent, totalStats.sick + totalStats.leave], backgroundColor: ['#28a745', '#dc3545', '#ffc107'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } });
         } else {
-            let labels = Object.keys(groupStats).sort();
-            let dPres = labels.map(k => groupStats[k].present);
-            let dAbs = labels.map(k => groupStats[k].absent);
-            let dLev = labels.map(k => groupStats[k].leave);
-
-            execChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'มาเรียน', data: dPres, backgroundColor: '#28a745' },
-                        { label: 'ขาด', data: dAbs, backgroundColor: '#dc3545' },
-                        { label: 'ป่วย/ลา', data: dLev, backgroundColor: '#ffc107' }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
-            });
+            let labels = Object.keys(groupStats).sort(), dPres = labels.map(k => groupStats[k].present), dAbs = labels.map(k => groupStats[k].absent), dLev = labels.map(k => groupStats[k].leave);
+            execChartInstance = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [ { label: 'มาเรียน', data: dPres, backgroundColor: '#28a745' }, { label: 'ขาด', data: dAbs, backgroundColor: '#dc3545' }, { label: 'ป่วย/ลา', data: dLev, backgroundColor: '#ffc107' } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } } });
         }
     }
 
     function drawExecTable(viewType, groupStats) {
-        let head = document.getElementById('exec-detail-head');
-        let body = document.getElementById('exec-detail-body');
-        
-        let firstCol = viewType === 'class' ? "ชื่อนักเรียน" : viewType === 'student' ? "วันที่" : "ห้องเรียน";
-        head.innerHTML = `<tr><th>${firstCol}</th><th style="color:green;">มา</th><th style="color:red;">ขาด</th><th style="color:orange;">ป่วย/ลา</th><th>% มาเรียน</th></tr>`;
-        
-        body.innerHTML = "";
-        let keys = Object.keys(groupStats).sort();
+        let head = document.getElementById('exec-detail-head'), body = document.getElementById('exec-detail-body');
+        head.innerHTML = `<tr><th>${viewType === 'class' ? "ชื่อนักเรียน" : viewType === 'student' ? "วันที่" : "ห้องเรียน"}</th><th style="color:green;">มา</th><th style="color:red;">ขาด</th><th style="color:orange;">ลา</th><th>% มาเรียน</th></tr>`;
+        body.innerHTML = ""; let keys = Object.keys(groupStats).sort();
         if(keys.length === 0) { body.innerHTML = `<tr><td colspan='5' style='text-align:center;'>ไม่พบข้อมูล</td></tr>`; return; }
-
         keys.forEach(k => {
-            let g = groupStats[k];
-            let tot = g.present + g.absent + g.leave;
-            let perc = tot > 0 ? ((g.present/tot)*100).toFixed(1) : 0;
-            let pColor = perc >= 80 ? 'green' : perc >= 60 ? 'orange' : 'red';
-            
-            body.innerHTML += `<tr>
-                <td><b>${k}</b></td>
-                <td>${g.present}</td><td>${g.absent}</td><td>${g.leave}</td>
-                <td><b style="color:${pColor};">${perc}%</b></td>
-            </tr>`;
+            let g = groupStats[k], tot = g.present + g.absent + g.leave, perc = tot > 0 ? ((g.present/tot)*100).toFixed(1) : 0, pColor = perc >= 80 ? 'green' : perc >= 60 ? 'orange' : 'red';
+            body.innerHTML += `<tr><td><b>${k}</b></td><td>${g.present}</td><td>${g.absent}</td><td>${g.leave}</td><td><b style="color:${pColor};">${perc}%</b></td></tr>`;
         });
     }
 
     function generateAIRecommendation(viewType, stats, groupStats) {
         let aiBox = document.getElementById('exec-ai-text');
         if(stats.totalRecords === 0) { aiBox.innerHTML = "ไม่มีข้อมูลในช่วงวันที่กำหนด กรุณาเปลี่ยนวันที่หรือตัวกรองครับ"; return; }
-
         let presentRate = ((stats.present / stats.totalRecords) * 100).toFixed(1);
         let text = `<b>วิเคราะห์ภาพรวม:</b> อัตราการมาเรียนรวมอยู่ที่ <b style="font-size:16px; color:${presentRate>=80?'green':'red'};">${presentRate}%</b><br><br>`;
-
         if(viewType === 'school' || viewType === 'grade') {
             let worstClass = "", lowestRate = 100;
-            for(let k in groupStats) {
-                let r = (groupStats[k].present / (groupStats[k].present+groupStats[k].absent+groupStats[k].leave))*100;
-                if(r < lowestRate) { lowestRate = r; worstClass = k; }
-            }
-            if(presentRate >= 85) text += `🌟 <b>คำชื่นชม:</b> สถิติภาพรวมอยู่ในเกณฑ์ดีเยี่ยม ระบบบริหารจัดการชั้นเรียนทำงานได้อย่างมีประสิทธิภาพ<br>💡 <b>ข้อเสนอแนะ:</b> อาจพบห้องเรียนที่มีสถิติต่ำกว่าเกณฑ์เล็กน้อย เช่น <b>${worstClass} (${lowestRate.toFixed(1)}%)</b> แนะนำให้มอบหมายครูหัวหน้าระดับเข้าตรวจสอบหรือให้กำลังใจครูประจำชั้นครับ`;
-            else text += `⚠️ <b>ข้อควรระวัง:</b> อัตราการมาเรียนภาพรวมต่ำกว่าเกณฑ์ 85% โดยเฉพาะ <b>${worstClass} (มาเพียง ${lowestRate.toFixed(1)}%)</b><br>💡 <b>แนวทางแก้ไข:</b> แนะนำให้เรียกประชุมครูประจำชั้นเพื่อสอบถามปัญหา (เช่น ปัญหาพาหนะเดินทาง หรือการระบาดของไข้หวัด) เพื่อหาแนวทางแก้ไขระดับนโยบายด่วนครับ`;
+            for(let k in groupStats) { let r = (groupStats[k].present / (groupStats[k].present+groupStats[k].absent+groupStats[k].leave))*100; if(r < lowestRate) { lowestRate = r; worstClass = k; } }
+            if(presentRate >= 85) text += `🌟 <b>คำชื่นชม:</b> สถิติภาพรวมเกณฑ์ดีเยี่ยม ระบบบริหารจัดการชั้นเรียนมีประสิทธิภาพ<br>💡 <b>ข้อเสนอแนะ:</b> ห้องที่มีสถิติต่ำสุดคือ <b>${worstClass} (${lowestRate.toFixed(1)}%)</b> แนะนำให้มอบหมายครูหัวหน้าระดับเข้าสอบถามปัญหาครับ`;
+            else text += `⚠️ <b>ข้อควรระวัง:</b> อัตราภาพรวมต่ำกว่าเกณฑ์ 85% โดยเฉพาะ <b>${worstClass} (${lowestRate.toFixed(1)}%)</b><br>💡 <b>แนวทางแก้ไข:</b> แนะนำเรียกประชุมครูประจำชั้นเพื่อสอบถามปัญหา และหามาตรการช่วยเหลือระดับนโยบายด่วนครับ`;
         } 
-        else if (viewType === 'class') {
-            text += `💡 <b>ข้อเสนอแนะประจำห้อง:</b> ให้คุณครูประจำชั้นสังเกตนักเรียนที่มีแถบสีแดงในตารางด้านล่าง และอาจพิจารณาออกเยี่ยมบ้านนักเรียนกลุ่มเสี่ยงเพื่อป้องกันการหลุดออกจากระบบการศึกษาครับ`;
-        }
-        else { text += `💡 <b>ข้อเสนอแนะรายบุคคล:</b> ใช้ข้อมูลนี้ประกอบการพิจารณาตัดสินผลการเรียนและสิทธิสอบตามระเบียบของโรงเรียนครับ`; }
-
+        else if (viewType === 'class') text += `💡 <b>ข้อเสนอแนะ:</b> ให้ครูประจำชั้นสังเกตนักเรียนที่มีแถบสีแดงด้านล่าง และพิจารณาออกเยี่ยมบ้านนักเรียนกลุ่มเสี่ยงครับ`;
+        else text += `💡 <b>ข้อเสนอแนะ:</b> ใช้ข้อมูลนี้พิจารณาตัดสิทธิสอบตามระเบียบของโรงเรียนอย่างเคร่งครัดครับ`;
         aiBox.innerHTML = text;
     }
-
 </script>
+
 </body>
 </html>
