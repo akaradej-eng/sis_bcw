@@ -80,7 +80,6 @@
         input:checked + .slider { background-color: #10b981; }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        /* 🌟 สไตล์สำหรับแท็บหน้า Admin (ใหม่) */
         .admin-tabs { display: flex; overflow-x: auto; gap: 5px; margin-bottom: 0; }
         .admin-tab-btn { flex: 1; min-width: 110px; padding: 12px 10px; text-align: center; background: #e2e8f0; color: #475569; border-radius: 12px 12px 0 0; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; white-space: nowrap;}
         .admin-tab-btn.active { background: #1e56a0; color: white; }
@@ -248,7 +247,6 @@
                 </table>
             </div>
             <button onclick="addUserRow()" style="background:#28a745; margin-top:10px;">+ เพิ่มผู้ใช้</button>
-            
             <button class="btn-save-admin" onclick="saveAdminData(this)" style="width:100%; padding:15px; font-size:16px; margin-top:20px;">💾 บันทึกข้อมูลผู้ใช้งาน</button>
         </div>
 
@@ -264,7 +262,6 @@
                 </table>
             </div>
             <button onclick="addStudentRow()" style="background:#28a745; margin-top:10px;">+ เพิ่ม นร.</button>
-            
             <button class="btn-save-admin" onclick="saveAdminData(this)" style="width:100%; padding:15px; font-size:16px; margin-top:20px;">💾 บันทึกฐานข้อมูลนักเรียน</button>
         </div>
     </div>
@@ -347,9 +344,10 @@
 </div>
 
 <script>
-    // 🔗 API ของท่านรองฯ
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz1Pi37ZXLJJQGvnfz20a_aH2y4sSDjt8dCmyqgdhaF3gin7jRhTh7jY1ajDRdnw1E2/exec";
+    // 🔗 API (ใส่ URL ของท่านรองฯ)
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyR6a-JvJ-z6z-m3kP-j5lT4T_w0mBqF7_E9D-M2m4_D0vC8H1M0z5Y4E4yP1wV4wQz/exec";
     
+    // --- ⏰ อัปเดตนาฬิกา ---
     function updateClock() {
         const now = new Date();
         const dateStr = now.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -367,7 +365,6 @@
     let timeLimitConfig = { enabled: false, start: "", end: "" }; 
     let execFullAttendance = [], execFullStudents = [], execChartInstance = null;
 
-    // 🌟 เปิด-ปิด กล่องเวลา
     document.getElementById('admin-time-limit-toggle').addEventListener('change', function() {
         let inputs = document.getElementById('time-limit-inputs');
         let text = document.getElementById('time-limit-status-text');
@@ -382,7 +379,6 @@
         }
     });
 
-    // 🌟 ฟังก์ชันสลับแท็บสำหรับ Admin
     function switchAdminTab(tabId, element) {
         document.querySelectorAll('.admin-tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -647,13 +643,30 @@
 
                 document.getElementById('admin-start').value = toFormatDate(data.config.startDate); document.getElementById('admin-end').value = toFormatDate(data.config.endDate);
                 adminHolidays = (data.config.holidays || []).filter(h => h.trim() !== ""); renderAdminCalendar(); 
+                
                 let uBody = document.getElementById('admin-users-body'); uBody.innerHTML = "";
-                data.users.forEach((u, i) => { uBody.innerHTML += `<tr><td><input type="text" value="${u[0]}"></td><td><input type="text" value="${u[1]}"></td><td><select><option value="teacher" ${u[2]=='teacher'?'selected':''}>Teacher</option><option value="admin" ${u[2]=='admin'?'selected':''}>Admin</option><option value="executive" ${u[2]=='executive'?'selected':''}>Executive</option></select></td><td><input type="text" value="${u[3]}"></td><td><input type="text" value="${u[4]||''}"></td><td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td></tr>`; });
+                data.users.forEach((u, i) => { 
+                    uBody.innerHTML += `<tr>
+                        <td><input type="text" value="${u[0]}"></td>
+                        <td><input type="text" value="${u[1]}"></td>
+                        <td>
+                            <select>
+                                <option value="teacher" ${u[2]=='teacher'?'selected':''}>ครู (Teacher)</option>
+                                <option value="admin" ${u[2]=='admin'?'selected':''}>ผู้ดูแลระบบ (Admin)</option>
+                                <option value="executive" ${u[2]=='executive'?'selected':''}>ผู้บริหาร (Executive)</option>
+                                <option value="student" ${u[2]=='student'?'selected':''}>นักเรียน (Student)</option>
+                            </select>
+                        </td>
+                        <td><input type="text" value="${u[3]}"></td>
+                        <td><input type="text" value="${u[4]||''}"></td>
+                        <td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td>
+                    </tr>`; 
+                });
                 allAdminStudentsData = data.students; updateClassDropdown(); renderAdminStudents();
             }
         });
     }
-    
+
     function renderAdminCalendar() {
         let container = document.getElementById('admin-calendar-container'); let startVal = document.getElementById('admin-start').value; let endVal = document.getElementById('admin-end').value;
         if(!startVal || !endVal) { container.innerHTML = "<div style='text-align:center; padding:20px; color:#94a3b8;'>กรุณาระบุวันเปิด-ปิดเทอมด้านบน เพื่อแสดงปฏิทินและคำนวณวันเรียน</div>"; document.getElementById('working-days-text').innerText = "0"; return; }
@@ -695,10 +708,27 @@
     function updateClassDropdown() { let f = document.getElementById('admin-class-filter'); let s = new Set(); allAdminStudentsData.forEach(x => s.add(x[3])); f.innerHTML = '<option value="all">ทุกห้อง</option>'; [...s].sort().forEach(c => f.innerHTML += `<option value="${c}">${c}</option>`); }
     function renderAdminStudents() { let b = document.getElementById('admin-students-body'); b.innerHTML = ""; let f = document.getElementById('admin-class-filter').value; allAdminStudentsData.forEach((s, i) => { if (f==='all'||s[3]===f) b.innerHTML += `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td><td>${s[3]}</td><td><button style="background:red;" onclick="removeStudent(${i})">ลบ</button></td></tr>`; }); }
     function removeStudent(i) { if(confirm("ลบ?")) { allAdminStudentsData.splice(i,1); renderAdminStudents(); } }
-    function addUserRow() { document.getElementById('admin-users-body').innerHTML += `<tr><td><input type="text"></td><td><input type="text"></td><td><select><option value="teacher">Teacher</option><option value="admin">Admin</option></select></td><td><input type="text"></td><td><input type="text"></td><td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td></tr>`; }
+    
+    function addUserRow() { 
+        document.getElementById('admin-users-body').innerHTML += `<tr>
+            <td><input type="text"></td>
+            <td><input type="text"></td>
+            <td>
+                <select>
+                    <option value="teacher">ครู (Teacher)</option>
+                    <option value="admin">ผู้ดูแลระบบ (Admin)</option>
+                    <option value="executive">ผู้บริหาร (Executive)</option>
+                    <option value="student">นักเรียน (Student)</option>
+                </select>
+            </td>
+            <td><input type="text"></td>
+            <td><input type="text"></td>
+            <td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td>
+        </tr>`; 
+    }
+    
     function addStudentRow() { allAdminStudentsData.push(['','','',document.getElementById('admin-class-filter').value==='all'?'':document.getElementById('admin-class-filter').value]); renderAdminStudents(); }
     
-    // 🌟 ฟังก์ชันเซฟสำหรับแอดมิน (ใช้ได้กับทุกปุ่มในแต่ละแท็บ)
     function saveAdminData(btn) {
         let originalText = btn.innerText;
         btn.innerText = "⏳ กำลังบันทึก..."; btn.disabled = true;
