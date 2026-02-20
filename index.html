@@ -165,14 +165,20 @@
                 <div style="flex:1"><label style="font-size:12px; font-weight:bold;">วันปิดเทอม</label><input type="date" id="admin-end" onchange="renderAdminCalendar()"></div>
             </div>
             
+            <div id="school-days-count" style="margin-top: 15px; font-weight: bold; color: #1e56a0; background: #e0f2fe; padding: 12px; border-radius: 8px; border-left: 5px solid #1e56a0; display: flex; justify-content: space-between; align-items: center;">
+                <div>🎓 จำนวนวันเรียนจริง (ไม่รวมหยุด): <span id="working-days-text" style="font-size:18px; color:#ef4444;">0</span> วัน</div>
+            </div>
+
             <div style="margin-top: 15px; border-top: 1px dashed #ddd; padding-top:15px;">
                 <label style="font-weight:bold; color:#ef4444; display:block; margin-bottom:10px;">⛔ กำหนดวันหยุด (คลิกเลือกในปฏิทิน)</label>
-                <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px; font-size:12px;">
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px; font-size:12px; flex-wrap: wrap;">
                     <div style="width:15px; height:15px; background:#f1f5f9; border:1px solid #ccc; border-radius:3px;"></div> วันเรียนปกติ
-                    <div style="width:15px; height:15px; background:#ef4444; border-radius:3px; margin-left:10px;"></div> วันหยุด
+                    <div style="width:15px; height:15px; background:#ef4444; border-radius:3px; margin-left:10px;"></div> วันหยุด / เสาร์-อาทิตย์
+                    
+                    <button id="fetch-holidays-btn" onclick="fetchPublicHolidays()" style="background:#10b981; margin-left:auto; font-size:12px; padding:6px 12px; border-radius: 6px;">🇹🇭 ดึงวันหยุดปฏิทินไทย</button>
                 </div>
                 
-                <div id="admin-calendar-container" style="max-height: 350px; overflow-y: auto; padding-right:5px;">
+                <div id="admin-calendar-container" style="max-height: 400px; overflow-y: auto; padding-right:5px;">
                     </div>
             </div>
         </div>
@@ -236,8 +242,8 @@
 </div>
 
 <script>
-    // 🔗 API ของท่านรองฯ (ใส่ URL Web App ลงไปที่นี่ครับ)
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz1Pi37ZXLJJQGvnfz20a_aH2y4sSDjt8dCmyqgdhaF3gin7jRhTh7jY1ajDRdnw1E2/exec";
+    // 🔗 API (ใส่ URL ของท่านรองฯ ครับ)
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwMD3kmimqJunO-9I1a74G8X0BnD8ZlXMNIZXSCtkFgI99if4d-lmNUtL1S0Uptbfz8/exec";
     
     // --- ⏰ อัปเดตนาฬิกา ---
     function updateClock() {
@@ -438,7 +444,7 @@
         });
     }
 
-    // --- ⚙️ ADMIN (ระบบปฏิทินวันหยุด) ---
+    // --- ⚙️ ADMIN (ระบบปฏิทินและ API วันหยุด) ---
     function loadAdminData() {
         fetch(`${GAS_API_URL}?action=get_admin_data`).then(res => res.json()).then(data => {
             if(data.status === "success") {
@@ -446,7 +452,7 @@
                 document.getElementById('admin-end').value = data.config.endDate;
                 adminHolidays = data.config.holidays || []; 
                 
-                renderAdminCalendar(); // สร้างปฏิทินทันทีที่โหลดข้อมูลเสร็จ
+                renderAdminCalendar(); 
                 
                 let uBody = document.getElementById('admin-users-body'); uBody.innerHTML = "";
                 data.users.forEach((u, i) => { uBody.innerHTML += `<tr><td><input type="text" value="${u[0]}"></td><td><input type="text" value="${u[1]}"></td><td><select><option value="teacher" ${u[2]=='teacher'?'selected':''}>Teacher</option><option value="admin" ${u[2]=='admin'?'selected':''}>Admin</option><option value="executive" ${u[2]=='executive'?'selected':''}>Executive</option></select></td><td><input type="text" value="${u[3]}"></td><td><input type="text" value="${u[4]||''}"></td><td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td></tr>`; });
@@ -455,18 +461,17 @@
         });
     }
     
-    // 🗓️ ฟังก์ชันสร้างปฏิทินในหน้า Admin
     function renderAdminCalendar() {
         let container = document.getElementById('admin-calendar-container');
         let startVal = document.getElementById('admin-start').value;
         let endVal = document.getElementById('admin-end').value;
 
         if(!startVal || !endVal) {
-            container.innerHTML = "<div style='text-align:center; padding:20px; color:#94a3b8;'>กรุณาระบุวันเปิด-ปิดเทอมด้านบน เพื่อแสดงปฏิทิน</div>";
+            container.innerHTML = "<div style='text-align:center; padding:20px; color:#94a3b8;'>กรุณาระบุวันเปิด-ปิดเทอมด้านบน เพื่อแสดงปฏิทินและคำนวณวันเรียน</div>";
+            document.getElementById('working-days-text').innerText = "0";
             return;
         }
 
-        // Parse Date แบบปลอดภัย
         let sArr = startVal.split('-'); let startDate = new Date(sArr[0], sArr[1]-1, sArr[2]);
         let eArr = endVal.split('-'); let endDate = new Date(eArr[0], eArr[1]-1, eArr[2]);
 
@@ -476,6 +481,8 @@
         let currMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
         let endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
         const thDays = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
+
+        let totalWorkingDays = 0;
 
         while(currMonth <= endMonth) {
             let monthName = currMonth.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
@@ -492,26 +499,60 @@
                 let dateObj = new Date(currMonth.getFullYear(), currMonth.getMonth(), i);
                 let dStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`;
                 
-                // ถ้านอกเขตเปิดเทอม ให้เทาๆ ไป
                 if(dateObj < startDate || dateObj > endDate) {
                     html += `<div class="calendar-day blank">${i}</div>`;
                 } else {
-                    let isHoliday = adminHolidays.includes(dStr) ? 'holiday' : '';
-                    html += `<div class="calendar-day ${isHoliday}" onclick="toggleHoliday('${dStr}')">${i}</div>`;
+                    let isWeekend = (dateObj.getDay() === 0 || dateObj.getDay() === 6);
+                    let isHoliday = adminHolidays.includes(dStr);
+                    
+                    if(!isWeekend && !isHoliday) totalWorkingDays++; 
+
+                    let cssClass = (isHoliday || isWeekend) ? 'holiday' : '';
+                    let tooltip = isWeekend ? ' title="เสาร์-อาทิตย์"' : '';
+                    
+                    html += `<div class="calendar-day ${cssClass}" onclick="toggleHoliday('${dStr}', ${isWeekend})" ${tooltip}>${i}</div>`;
                 }
             }
             html += `</div></div>`;
             currMonth.setMonth(currMonth.getMonth() + 1);
         }
         container.innerHTML = html;
+        document.getElementById('working-days-text').innerText = totalWorkingDays;
     }
 
-    // Toggle วันหยุดเมื่อแอดมินคลิกที่ตัวเลขในปฏิทิน
-    function toggleHoliday(dateStr) {
+    function toggleHoliday(dateStr, isWeekend) {
+        if(isWeekend) { alert('📅 วันเสาร์-อาทิตย์ ถูกกำหนดเป็นวันหยุดอัตโนมัติแล้วครับ'); return; }
         let idx = adminHolidays.indexOf(dateStr);
-        if(idx > -1) adminHolidays.splice(idx, 1); // ยกเลิกวันหยุด
-        else adminHolidays.push(dateStr); // เพิ่มเป็นวันหยุด
-        renderAdminCalendar(); // รีโหลดสี
+        if(idx > -1) adminHolidays.splice(idx, 1); 
+        else adminHolidays.push(dateStr); 
+        renderAdminCalendar(); 
+    }
+
+    // 🇹🇭 ฟังก์ชันดึงวันหยุดจาก API
+    async function fetchPublicHolidays() {
+        let startVal = document.getElementById('admin-start').value;
+        if(!startVal) { alert('กรุณากำหนดวันเปิดเทอมก่อนครับ'); return; }
+        
+        let year = startVal.split('-')[0];
+        let btn = document.getElementById('fetch-holidays-btn');
+        btn.innerText = '⏳ กำลังดึงข้อมูล...'; btn.disabled = true;
+
+        try {
+            let res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`);
+            let holidays = await res.json();
+            let addedCount = 0;
+
+            holidays.forEach(h => {
+                if(!adminHolidays.includes(h.date)) { adminHolidays.push(h.date); addedCount++; }
+            });
+
+            renderAdminCalendar();
+            btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false;
+            alert(`✅ ดึงวันหยุดประจำปี ${year} สำเร็จ! เพิ่มเข้าปฏิทิน ${addedCount} วัน`);
+        } catch(e) {
+            btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false;
+            alert('❌ ไม่สามารถดึงข้อมูลออนไลน์ได้ กรุณาจิ้มเพิ่มวันหยุดด้วยตนเองครับ');
+        }
     }
 
     function updateClassDropdown() { let f = document.getElementById('admin-class-filter'); let s = new Set(); allAdminStudentsData.forEach(x => s.add(x[3])); f.innerHTML = '<option value="all">ทุกห้อง</option>'; [...s].sort().forEach(c => f.innerHTML += `<option value="${c}">${c}</option>`); }
@@ -531,7 +572,7 @@
         });
     }
 
-    // --- 📊 EXECUTIVE (ปรับกราฟเป็น 6 สถานะ) ---
+    // --- 📊 EXECUTIVE ---
     function fetchFullExecData() { fetch(`${GAS_API_URL}?action=get_full_exec_data`).then(res=>res.json()).then(data=>{execFullAttendance=data.attendance; execFullStudents=data.students; updateExecViewDropdown();}); }
     function updateExecViewDropdown() {
         let v = document.getElementById('exec-view-type').value, c = document.getElementById('exec-sub-filter-container'), s = document.getElementById('exec-sub-filter'), i = document.getElementById('exec-sub-input');
