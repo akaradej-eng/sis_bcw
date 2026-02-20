@@ -505,12 +505,19 @@
         });
     }
 
+    // 🌟 อัปเกรด: แสดงปุ่มแก้ไขรายบุคคลเมื่อบันทึกข้อมูลไปแล้ว
     function renderChecklist(existing, recorder) {
         const container = document.getElementById('student-list-container'); container.innerHTML = "";
+        
         if(existing) {
-            container.innerHTML = `<div style="background:#fff3cd; color:#856404; padding:10px; border-radius:8px; margin-bottom:15px; font-weight:bold; font-size:13px;">⚠️ วันที่ ${document.getElementById('check-date').value} ถูกบันทึกแล้วโดย: ${recorder}</div>`;
-            document.getElementById('save-btn').style.display = 'none'; 
-        } else document.getElementById('save-btn').style.display = 'block'; 
+            container.innerHTML = `<div style="background:#fff3cd; color:#856404; padding:10px; border-radius:8px; margin-bottom:15px; font-weight:bold; font-size:13px; text-align:center;">
+                ⚠️ บันทึกข้อมูลแล้วโดย: ${recorder} <br>
+                <span style="font-weight:normal; font-size:12px; color:#666;">(หากต้องการเปลี่ยนสถานะ ให้กดปุ่ม "แก้ไข" ท้ายชื่อนักเรียนครับ)</span>
+            </div>`;
+            document.getElementById('save-btn').style.display = 'none'; // ซ่อนปุ่มเซฟรวม
+        } else {
+            document.getElementById('save-btn').style.display = 'block'; 
+        }
 
         students.forEach(std => {
             let st = existing && existing[std.id] ? existing[std.id].status : 'มา';
@@ -520,26 +527,125 @@
             const imgUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=1e56a0&color=fff&size=128&rounded=true`;
 
             let row = document.createElement('div');
-            row.className = `student-row row-${st}`; row.id = `row-${std.id}`;
-            let displayModeHtml = existing ? `<div style="text-align:right; font-size:13px; font-weight:bold; width:90px;">${st}</div>` : `
-                <select class="status-dropdown" onchange="setStatus('${std.id}', this.value)">
-                    <option value="มา" ${st==='มา'?'selected':''}>✅ มา</option>
-                    <option value="สาย" ${st==='สาย'?'selected':''}>⏰ สาย</option>
-                    <option value="ลากิจ" ${st==='ลากิจ'?'selected':''}>📝 ลากิจ</option>
-                    <option value="ลาป่วย" ${st==='ลาป่วย'?'selected':''}>🤒 ลาป่วย</option>
-                    <option value="เรียนนอกโรงเรียน" ${st==='เรียนนอกโรงเรียน'?'selected':''}>🌍 นอกสถานที่</option>
-                    <option value="ขาด" ${st==='ขาด'?'selected':''}>❌ ขาด</option>
-                </select>
-                <button class="btn-note" onclick="toggleNote('${std.id}')">📝</button>
-            `;
-            row.innerHTML = `<div class="student-number">${std.number}</div><img src="${imgUrl}" class="student-img" alt="student"><div class="student-name">${displayName}</div>${displayModeHtml}<div id="note-box-${std.id}" style="display:none; position:absolute; right:10px; top:50px; z-index:100; background:white; padding:10px; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.15); width:220px; border:1px solid #eee;"><textarea class="behavior-note" id="note-${std.id}" placeholder="ระบุหมายเหตุ...">${nt}</textarea><button onclick="toggleNote('${std.id}')" style="width:100%; margin-top:8px; background:var(--primary); font-size:12px; padding:6px;">ตกลง</button></div>`;
+            row.className = `student-row row-${st}`; 
+            row.id = `row-${std.id}`;
+            row.style.flexWrap = "wrap"; // อนุญาตให้ห่อบรรทัดได้เมื่อกดแก้ไข
+
+            if (existing) {
+                // 🛑 โหมดดูข้อมูล (บันทึกไปแล้ว จะมีปุ่มแก้ไข)
+                let c = st==='มา'?'#10b981':st==='ขาด'?'#ef4444':st==='สาย'?'#eab308':st==='เรียนนอกโรงเรียน'?'#3b82f6':'#f97316';
+                row.innerHTML = `
+                    <div class="student-number">${std.number}</div>
+                    <img src="${imgUrl}" class="student-img" alt="student">
+                    <div class="student-name">${displayName}</div>
+                    
+                    <div id="view-${std.id}" style="display:flex; align-items:center; gap:10px; margin-left:auto;">
+                        <div style="text-align:right; font-size:13px; font-weight:bold; color:${c};">${st}</div>
+                        <button onclick="enableEdit('${std.id}')" style="background:#f1f5f9; border:1px solid #cbd5e1; color:#475569; padding:5px 10px; border-radius:6px; font-size:12px; cursor:pointer;">✏️ แก้ไข</button>
+                    </div>
+
+                    <div id="edit-${std.id}" style="display:none; width:100%; margin-top:10px; padding-top:10px; border-top:1px dashed #e2e8f0; flex-direction:column; gap:8px;">
+                        <div style="display:flex; gap:8px; width:100%;">
+                            <select id="sel-${std.id}" class="status-dropdown" style="flex:1;">
+                                <option value="มา" ${st==='มา'?'selected':''}>✅ มา</option>
+                                <option value="สาย" ${st==='สาย'?'selected':''}>⏰ สาย</option>
+                                <option value="ลากิจ" ${st==='ลากิจ'?'selected':''}>📝 ลากิจ</option>
+                                <option value="ลาป่วย" ${st==='ลาป่วย'?'selected':''}>🤒 ลาป่วย</option>
+                                <option value="เรียนนอกโรงเรียน" ${st==='เรียนนอกโรงเรียน'?'selected':''}>🌍 นอกสถานที่</option>
+                                <option value="ขาด" ${st==='ขาด'?'selected':''}>❌ ขาด</option>
+                            </select>
+                            <input type="text" id="nt-${std.id}" placeholder="ระบุหมายเหตุ (ถ้ามี)..." value="${nt}" style="flex:2; margin-bottom:0; font-size:13px; padding:6px; border:1px solid #ccc; border-radius:6px;">
+                        </div>
+                        <div style="display:flex; gap:8px; width:100%;">
+                            <button id="btn-save-${std.id}" onclick="saveSingleUpdate('${std.id}')" style="flex:1; background:#10b981; padding:8px; font-size:13px;">💾 บันทึกให้คนนี้</button>
+                            <button onclick="cancelEdit('${std.id}')" style="flex:1; background:#ef4444; padding:8px; font-size:13px;">ยกเลิก</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // 🟢 โหมดปกติ (ตอนเพิ่งเปิดเข้ามาเช็คชื่อครั้งแรก)
+                row.innerHTML = `
+                    <div class="student-number">${std.number}</div>
+                    <img src="${imgUrl}" class="student-img" alt="student">
+                    <div class="student-name">${displayName}</div>
+                    <select class="status-dropdown" onchange="setStatus('${std.id}', this.value)" style="margin-left:auto;">
+                        <option value="มา" ${st==='มา'?'selected':''}>✅ มา</option>
+                        <option value="สาย" ${st==='สาย'?'selected':''}>⏰ สาย</option>
+                        <option value="ลากิจ" ${st==='ลากิจ'?'selected':''}>📝 ลากิจ</option>
+                        <option value="ลาป่วย" ${st==='ลาป่วย'?'selected':''}>🤒 ลาป่วย</option>
+                        <option value="เรียนนอกโรงเรียน" ${st==='เรียนนอกโรงเรียน'?'selected':''}>🌍 นอกสถานที่</option>
+                        <option value="ขาด" ${st==='ขาด'?'selected':''}>❌ ขาด</option>
+                    </select>
+                    <button class="btn-note" onclick="toggleNote('${std.id}')">📝</button>
+                    <div id="note-box-${std.id}" style="display:none; position:absolute; right:10px; top:50px; z-index:100; background:white; padding:10px; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.15); width:220px; border:1px solid #eee;">
+                        <textarea class="behavior-note" id="note-${std.id}" placeholder="ระบุหมายเหตุ...">${nt}</textarea>
+                        <button onclick="toggleNote('${std.id}')" style="width:100%; margin-top:8px; background:var(--primary); font-size:12px; padding:6px;">ตกลง</button>
+                    </div>
+                `;
+            }
             container.appendChild(row);
+        });
+    }
+
+    // 🔧 ฟังก์ชันเปิดโหมดแก้ไขรายบุคคล
+    function enableEdit(id) { 
+        document.getElementById(`view-${id}`).style.display = 'none'; 
+        document.getElementById(`edit-${id}`).style.display = 'flex'; 
+    }
+    
+    // 🔧 ฟังก์ชันยกเลิกโหมดแก้ไขรายบุคคล
+    function cancelEdit(id) { 
+        document.getElementById(`view-${id}`).style.display = 'flex'; 
+        document.getElementById(`edit-${id}`).style.display = 'none'; 
+    }
+
+    // 💾 ฟังก์ชันบันทึกข้อมูลเฉพาะบุคคลที่แก้ไข
+    function saveSingleUpdate(id) {
+        let btn = document.getElementById(`btn-save-${id}`);
+        btn.innerText = "⏳ บันทึก..."; btn.disabled = true;
+        
+        let newStatus = document.getElementById(`sel-${id}`).value;
+        let newNote = document.getElementById(`nt-${id}`).value;
+
+        fetch(GAS_API_URL, { 
+            method: "POST", 
+            body: JSON.stringify({ 
+                action: "update_single", 
+                date: document.getElementById('check-date').value, 
+                id: id,
+                className: currentClass,
+                status: newStatus,
+                note: newNote,
+                teacherName: currentTeacher 
+            }) 
+        })
+        .then(res => res.json()).then(data => {
+            if(data.status === "success") { 
+                alert("✅ แก้ไขข้อมูลนักเรียนสำเร็จ!"); 
+                fetchStudents(); // รีโหลดให้หน้าจอกลับเป็นโหมดดูข้อมูลอัปเดตใหม่
+            } else { 
+                alert("❌ เกิดข้อผิดพลาด: " + data.message); 
+                btn.innerText = "💾 บันทึกให้คนนี้"; btn.disabled = false;
+            }
+        }).catch(err => {
+            alert("❌ ขัดข้องในการเชื่อมต่อกับฐานข้อมูล");
+            btn.innerText = "💾 บันทึกให้คนนี้"; btn.disabled = false;
         });
     }
 
     function setStatus(id, s) { attendanceData[id].status = s; document.getElementById(`row-${id}`).className = `student-row row-${s}`; }
     function toggleNote(id) { let b = document.getElementById(`note-box-${id}`); b.style.display = b.style.display === 'none' ? 'block' : 'none'; }
 
+    function saveAttendance() {
+        const btn = document.getElementById('save-btn'); btn.innerText = "⏳ ระบบกำลังส่งข้อมูล..."; btn.disabled = true;
+        let records = [];
+        students.forEach(s => records.push({ id: s.id, name: s.name, className: currentClass, status: attendanceData[s.id].status, note: document.getElementById(`note-${s.id}`).value }));
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) })
+        .then(res => res.json()).then(data => {
+            btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false;
+            if(data.status === "success") { alert("✅ บันทึกสำเร็จ!"); fetchStudents(); loadQuickAIInsight(); } else alert("❌ บันทึกไม่สำเร็จ: " + data.message);
+        });
+    }
     function saveAttendance() {
         const btn = document.getElementById('save-btn'); btn.innerText = "⏳ ระบบกำลังส่งข้อมูล..."; btn.disabled = true;
         let records = [];
@@ -903,5 +1009,6 @@
 
 </body>
 </html>
+
 
 
