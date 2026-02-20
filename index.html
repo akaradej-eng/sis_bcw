@@ -135,7 +135,7 @@
         </div>
         <div class="ai-box">
             <h3>🤖 AI ผู้ช่วยครูประจำชั้น</h3>
-            <p id="teacher-quick-ai" style="font-size:13px; margin:0; line-height:1.5; color:#333;">กำลังดึงข้อมูลภาพรวมของห้องเรียน...</p>
+            <p id="teacher-quick-ai" style="font-size:13px; margin:0; line-height:1.5; color:#333;">กำลังเตรียมข้อมูลห้องเรียน...</p>
         </div>
         <div id="student-list-container"></div>
         <button class="save-btn" id="save-btn" onclick="saveAttendance()" style="width:100%; padding:15px; font-size: 16px; margin-top: 10px;">💾 บันทึกข้อมูล</button>
@@ -338,7 +338,7 @@
                 <option value="ลาป่วย">ลาป่วย (ไม่สบาย/พบแพทย์)</option>
             </select>
             <label style="font-size:12px; font-weight:bold; color:#92400e;">เหตุผล (อธิบายให้ครูทราบ)</label>
-            <textarea id="student-leave-reason" placeholder="เช่น ไปทำธุระต่างจังหวัดกับครอบครัว หรือ มีไข้สูง..." rows="2"></textarea>
+            <textarea id="student-leave-reason" placeholder="เช่น ไปทำธุระต่างจังหวัด หรือ มีไข้สูง..." rows="2"></textarea>
             <button onclick="submitLeaveRequest(this)" style="width:100%; background:#f59e0b; font-size:14px;">📤 ส่งคำร้องให้ครูประจำชั้น</button>
         </div>
 
@@ -370,15 +370,17 @@
             <p><b>1. วิธีการบันทึก:</b> เลือกสถานะของนักเรียน (มา, ขาด, สาย, ฯลฯ) แล้วกดปุ่ม <b>"💾 บันทึกข้อมูล"</b> ด้านล่างสุดเพียงครั้งเดียว</p>
             <p id="modal-time-limit-text"><b>2. เวลาบันทึก:</b> กำลังดึงข้อมูล...</p>
             <p><b>3. การแก้ไข:</b> หากบันทึกไปแล้วพบว่าข้อมูลผิด ให้กดปุ่ม <b>"✏️ แก้ไข"</b> ที่ท้ายชื่อนักเรียนคนนั้น เพื่อบันทึกทับใหม่ได้ทันที</p>
-            <p><b>4. ระบบแจ้งลา:</b> หากมีนักเรียนแจ้งลาออนไลน์ผ่านระบบ สถานะจะถูกเปลี่ยนเป็นลาอัตโนมัติ พร้อมขึ้นป้ายเตือนสีส้ม ให้อ่านหมายเหตุก่อนบันทึกครับ</p>
+            <p><b>4. ระบบแจ้งลา:</b> หากมีนักเรียนแจ้งลาออนไลน์ผ่านระบบ สถานะจะถูกเปลี่ยนเป็นลาอัตโนมัติ พร้อมขึ้นป้ายเตือน ให้อ่านหมายเหตุก่อนบันทึกครับ</p>
         </div>
         <button onclick="closeTeacherModal()" style="width: 100%; background: #10b981; color: white; border: none; border-radius: 8px; padding: 12px; font-size: 15px; font-family: 'Prompt'; font-weight: bold; cursor: pointer;">✅ รับทราบและเข้าใช้งาน</button>
     </div>
 </div>
 
 <script>
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwkvdtRPRb8khat5x7pWUxQZOWyVKMAJySDHQhmfMcKvOuMJdjwi4SOrd2CXkPBZoEM/exec";
+    // 🔗 API (ใส่ URL ของท่านรองฯ)
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz1Pi37ZXLJJQGvnfz20a_aH2y4sSDjt8dCmyqgdhaF3gin7jRhTh7jY1ajDRdnw1E2/exec";
     
+    // --- ⏰ ระบบความปลอดภัย & Session Management ---
     const IDLE_TIMEOUT = 5 * 60 * 1000; 
     let idleTimer = null;
 
@@ -489,7 +491,7 @@
         if (pageId === 'summary-page' && currentClass) loadSummaryData();
     }
 
-    // 🌟 ระบบดึงนักเรียน + ตรวจสอบการลา
+    // 🌟 ระบบดึงนักเรียน + ตรวจสอบการลา พร้อม Popup แจ้งครู
     function fetchStudents() {
         let dateInput = document.getElementById('check-date');
         if(!dateInput.value) dateInput.valueAsDate = new Date();
@@ -517,7 +519,6 @@
         fetch(`${GAS_API_URL}?action=get_students&className=${encodeURIComponent(currentClass)}`).then(res => res.json()).then(data => {
             if(data.status === "success") {
                 students = data.data;
-                // 🌟 ดึงข้อมูลเช็คชื่อเดิม + ข้อมูลแจ้งลาหยุดพร้อมกัน
                 Promise.all([
                     fetch(`${GAS_API_URL}?action=check_existing&className=${encodeURIComponent(currentClass)}&date=${selectedDateStr}`).then(r => r.json()),
                     fetch(`${GAS_API_URL}?action=get_leaves_for_date&className=${encodeURIComponent(currentClass)}&date=${selectedDateStr}`).then(r => r.json())
@@ -526,6 +527,31 @@
                     let leaveData = leaves.status === "success" ? leaves.data : {};
                     renderChecklist(existingData, check.recordedBy, leaveData);
                     loadQuickAIInsight(); 
+                    
+                    // 🌟 แจ้งเตือน Popup อัตโนมัติเมื่อมีเด็กแจ้งลา (โชว์เฉพาะตอนยังไม่ได้บันทึกข้อมูล)
+                    if (!existingData && Object.keys(leaveData).length > 0) {
+                        let leaveListHTML = ""; let count = 0;
+                        students.forEach(std => {
+                            if(leaveData[std.id]) {
+                                count++;
+                                leaveListHTML += `<div style="padding: 5px 0; border-bottom: 1px dashed #eee;"><b>${count}. ${cleanName(std.name)}</b> <span style="color:#ef4444; font-size:12px;">(${leaveData[std.id].type})</span></div>`;
+                            }
+                        });
+                        
+                        if (count > 0) {
+                            Swal.fire({
+                                title: '📢 แจ้งเตือนนักเรียนลาหยุด',
+                                html: `วันนี้มีนักเรียนแจ้งลาผ่านระบบจำนวน <b>${count}</b> คน<br><br>
+                                       <div style="text-align:left; background:#f8fafc; padding:10px; border-radius:8px; max-height:150px; overflow-y:auto; font-size:14px;">
+                                           ${leaveListHTML}
+                                       </div><br>
+                                       <span style="color:#10b981; font-size:13px; font-weight:bold;">✅ ระบบได้ดึงข้อมูลลงในแบบฟอร์มให้ท่านเรียบร้อยแล้ว</span>`,
+                                icon: 'info',
+                                confirmButtonText: 'รับทราบ',
+                                confirmButtonColor: '#1e56a0'
+                            });
+                        }
+                    }
                 });
             }
         });
@@ -540,22 +566,14 @@
 
         students.forEach(std => {
             let st = 'มา'; let nt = ''; let hasLeave = false;
-            
-            // 🌟 ตรวจสอบว่าครูเคยบันทึกไว้ หรือนักเรียนแจ้งลาไว้
-            if (existing && existing[std.id]) {
-                st = existing[std.id].status; nt = existing[std.id].note;
-            } else if (leaveData && leaveData[std.id]) {
-                st = leaveData[std.id].type; nt = "[ระบบแจ้งลา] " + leaveData[std.id].reason; hasLeave = true;
-            }
+            if (existing && existing[std.id]) { st = existing[std.id].status; nt = existing[std.id].note;
+            } else if (leaveData && leaveData[std.id]) { st = leaveData[std.id].type; nt = "[ระบบแจ้งลา] " + leaveData[std.id].reason; hasLeave = true; }
             
             attendanceData[std.id] = { status: st, note: nt };
-            const displayName = cleanName(std.name); 
-            const imgUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=1e56a0&color=fff&size=128&rounded=true`;
+            const displayName = cleanName(std.name); const imgUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=1e56a0&color=fff&size=128&rounded=true`;
 
             let row = document.createElement('div'); row.className = `student-row row-${st}`; row.id = `row-${std.id}`; row.style.flexWrap = "wrap"; 
-            
-            // 🌟 ป้ายกำกับถ้าแจ้งลา
-            let leaveBadge = hasLeave ? `<br><span style="background:#fef3c7; border:1px solid #f59e0b; color:#ea580c; font-size:10px; padding:2px 6px; border-radius:10px;">แจ้งลาล่วงหน้า</span>` : '';
+            let leaveBadge = hasLeave ? `<br><span style="background:#fef3c7; border:1px solid #f59e0b; color:#ea580c; font-size:10px; padding:2px 6px; border-radius:10px;">มีแจ้งลาล่วงหน้า</span>` : '';
             let btnNoteColor = nt ? "background:#f59e0b; color:white; border:none;" : "background:none; border:1px solid #ccc; color:#666;";
 
             if (existing) {
@@ -619,24 +637,12 @@
         });
     }
 
-    // 🌟 ระบบส่งคำร้องแจ้งลา (สำหรับนักเรียน)
     function submitLeaveRequest(btn) {
-        let sDate = document.getElementById('student-leave-date').value;
-        let sType = document.getElementById('student-leave-type').value;
-        let sReason = document.getElementById('student-leave-reason').value;
-        
+        let sDate = document.getElementById('student-leave-date').value; let sType = document.getElementById('student-leave-type').value; let sReason = document.getElementById('student-leave-reason').value;
         if(!sDate || !sReason) { Swal.fire('ระบบ SIS', 'กรุณาระบุวันที่และเหตุผลให้ครบถ้วน', 'warning'); return; }
-        
-        let uData = JSON.parse(localStorage.getItem('sis_user'));
-        let originalText = btn.innerText;
-        btn.innerText = '⏳ กำลังส่งข้อมูล...'; btn.disabled = true;
-
-        fetch(GAS_API_URL, {
-            method: "POST",
-            body: JSON.stringify({ action: "submit_leave", date: sDate, studentId: uData.userId, studentName: uData.name, className: uData.className, leaveType: sType, reason: sReason })
-        }).then(res => res.json()).then(data => {
-            btn.innerText = originalText; btn.disabled = false;
-            if(data.status === 'success') { Swal.fire('ระบบ SIS', 'ส่งคำร้องแจ้งลาเรียบร้อยแล้ว ครูประจำชั้นจะเห็นข้อมูลของท่านอัตโนมัติ', 'success'); document.getElementById('student-leave-reason').value = ""; }
+        let uData = JSON.parse(localStorage.getItem('sis_user')); let originalText = btn.innerText; btn.innerText = '⏳ กำลังส่งข้อมูล...'; btn.disabled = true;
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submit_leave", date: sDate, studentId: uData.userId, studentName: uData.name, className: uData.className, leaveType: sType, reason: sReason })
+        }).then(res => res.json()).then(data => { btn.innerText = originalText; btn.disabled = false; if(data.status === 'success') { Swal.fire('ระบบ SIS', 'ส่งคำร้องแจ้งลาเรียบร้อยแล้ว ครูประจำชั้นจะเห็นข้อมูลของท่านอัตโนมัติ', 'success'); document.getElementById('student-leave-reason').value = ""; }
         }).catch(err => { btn.innerText = originalText; btn.disabled = false; Swal.fire('ระบบ SIS', 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่', 'error'); });
     }
 
@@ -713,7 +719,10 @@
     async function fetchPublicHolidays() {
         let startVal = document.getElementById('admin-start').value; if(!startVal) { Swal.fire('ระบบ SIS', 'กำหนดวันเปิดเทอมก่อนครับ', 'warning'); return; }
         let year = startVal.split('-')[0]; let btn = document.getElementById('fetch-holidays-btn'); btn.innerText = '⏳ โหลด...'; btn.disabled = true;
-        try { let res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`); let holidays = await res.json(); let addedCount = 0; holidays.forEach(h => { if(!adminHolidays.includes(h.date)) { adminHolidays.push(h.date); addedCount++; } }); renderAdminCalendar(); btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false; Swal.fire('ระบบ SIS', `✅ เพิ่มวันหยุด ${addedCount} วัน`, 'success');
+        try {
+            let res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`); let holidays = await res.json(); let addedCount = 0;
+            holidays.forEach(h => { if(!adminHolidays.includes(h.date)) { adminHolidays.push(h.date); addedCount++; } });
+            renderAdminCalendar(); btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false; Swal.fire('ระบบ SIS', `✅ เพิ่มวันหยุด ${addedCount} วัน`, 'success');
         } catch(e) { btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false; Swal.fire('ระบบ SIS', '❌ ล้มเหลว', 'error'); }
     }
     
