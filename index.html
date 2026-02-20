@@ -132,7 +132,7 @@
 
 <script>
     // 🔗 API ตัวจริงที่คุณให้มา
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwnV30cvyHovVhXRxE63lZuvwUvGD5q4jp9y2KGVbRWUpw14FxeokgBRv09Khvnb337/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxNLZgmZHDBLm5AtyRu30QjdWDqMlC_gJewTPtPHX3agFAnGCkfLthgtv864_2wFIsY/exec";
 
     document.getElementById('check-date').valueAsDate = new Date();
     document.getElementById('view-date').valueAsDate = new Date();
@@ -142,7 +142,10 @@
     let currentTeacher = "";
     let currentClass = "";
 
-    // --- 🔐 1. ระบบ Login (เช็คจาก Sheet Users) ---
+    // ผูก Event ให้โหลดข้อมูลใหม่ทุกครั้งที่เปลี่ยนวันที่เช็คชื่อ
+    document.getElementById('check-date').addEventListener('change', fetchStudents);
+
+    // --- 🔐 1. ระบบ Login ---
     function handleLogin() {
         const u = document.getElementById('username').value.trim();
         const p = document.getElementById('password').value.trim();
@@ -161,7 +164,7 @@
 
                 if (data.status === "success") {
                     currentTeacher = data.name;
-                    currentClass = data.className || ""; // ดึงชื่อห้องมาจาก Sheet Users
+                    currentClass = data.className || ""; 
                     
                     document.getElementById('user-display').innerText = `${currentTeacher} (${currentClass}) - ออกจากระบบ`;
                     document.getElementById('class-title').innerText = `(${currentClass})`;
@@ -169,7 +172,6 @@
                     
                     switchPage('checklist-page', document.querySelectorAll('.nav-item')[0]);
                     
-                    // เมื่อ Login ผ่าน ให้ดึงรายชื่อเด็กห้องนั้นทันที
                     fetchStudents(); 
                 } else {
                     alert("❌ รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
@@ -183,15 +185,7 @@
     }
 
     function logout() {
-        currentTeacher = "";
-        currentClass = "";
-        students = [];
-        document.getElementById('user-display').innerText = "เข้าสู่ระบบ";
-        document.getElementById('bottom-nav').style.display = 'none';
-        document.getElementById('username').value = "";
-        document.getElementById('password').value = "";
-        document.getElementById('student-list-container').innerHTML = "";
-        switchPage('login-page', null);
+        location.reload(); 
     }
 
     function switchPage(pageId, element) {
@@ -203,17 +197,31 @@
         document.getElementById(pageId).classList.add('active');
     }
 
-    // --- 📋 2. ฟังก์ชันดึงรายชื่อนักเรียนจาก Sheet Students ---
+    // --- 📋 2. ดึงรายชื่อและเช็คประวัติการบันทึก ---
     function fetchStudents() {
         const container = document.getElementById('student-list-container');
-        container.innerHTML = `<div style="text-align:center; padding: 30px; color:#1e56a0; font-weight:bold;">⏳ กำลังโหลดรายชื่อนักเรียนห้อง ${currentClass}...</div>`;
-        
+        container.innerHTML = `<div style="text-align:center; padding: 30px; color:#1e56a0; font-weight:bold;">⏳ กำลังโหลดข้อมูล...</div>`;
+        document.getElementById('save-btn').style.display = 'none';
+
+        let dateRaw = document.getElementById('check-date').value;
+
+        // ดึงรายชื่อนักเรียนก่อน
         fetch(`${GAS_API_URL}?action=get_students&className=${encodeURIComponent(currentClass)}`)
             .then(res => res.json())
-            .then(data => {
-                if(data.status === "success" && data.data.length > 0) {
-                    students = data.data; 
-                    renderChecklist();
+            .then(dataStd => {
+                if(dataStd.status === "success" && dataStd.data.length > 0) {
+                    students = dataStd.data; 
+                    
+                    // เช็คว่าวันนี้ถูกบันทึกไปแล้วหรือยัง
+                    fetch(`${GAS_API_URL}?action=check_existing&className=${encodeURIComponent(currentClass)}&date=${dateRaw}`)
+                        .then(res => res.json())
+                        .then(dataCheck => {
+                            if(dataCheck.status === "found") {
+                                renderChecklist(dataCheck.data, dataCheck.recordedBy); // มีข้อมูลแล้ว = โหมดแก้ไข
+                            } else {
+                                renderChecklist(null, null); // ยังไม่มีข้อมูล = โหมดบันทึกใหม่
+                            }
+                        });
                 } else {
                     container.innerHTML = `<div style="text-align:center; padding: 20px; color:red;">❌ ไม่พบรายชื่อนักเรียนห้อง ${currentClass} โปรดตรวจสอบคอลัมน์ D ในตาราง Students</div>`;
                 }
@@ -223,18 +231,56 @@
             });
     }
 
-    // --- 📝 3. สร้าง UI ตารางเช็คชื่อตามข้อมูลจริง ---
-    function renderChecklist() {
+    // --- 📝 3. สร้าง UI ตารางเช็คชื่อ (รับรองโหมดใหม่ และโหมดแก้ไข) ---
+    function renderChecklist(existingData, recordedBy) {
         const container = document.getElementById('student-list-container');
         container.innerHTML = "";
 
+        if(existingData) {
+            container.innerHTML = `<div style="background:#fff3cd; color:#856404; padding:15px; border-radius:8px; margin-bottom:15px; font-weight:bold;">
+                ⚠️ วันที่ ${document.getElementById('check-date').value} <br>ห้อง ${currentClass} ถูกบันทึกไปแล้วโดย: ${recordedBy}
+            </div>`;
+            document.getElementById('save-btn').style.display = 'none'; // ซ่อนปุ่มเซฟทั้งหมด
+        } else {
+            document.getElementById('save-btn').style.display = 'block'; // โชว์ปุ่มเซฟทั้งหมด
+        }
+
         students.forEach(std => {
-            attendanceData[std.id] = { status: 'present', note: '' };
+            let initStatus = 'present';
+            let initNote = '';
+            
+            if(existingData && existingData[std.id]) {
+                let thStat = existingData[std.id].status;
+                if(thStat === "ป่วย") initStatus = "sick";
+                else if(thStat === "ลา") initStatus = "leave";
+                else if(thStat === "ขาด") initStatus = "absent";
+                initNote = existingData[std.id].note;
+            }
+
+            attendanceData[std.id] = { status: initStatus, note: initNote };
             let defaultImg = `https://ui-avatars.com/api/?name=${std.name}&background=f3f5f9`;
 
             let row = document.createElement('div');
-            row.className = `student-row row-present`; 
+            row.className = `student-row row-${initStatus}`; 
             row.id = `row-${std.id}`;
+
+            let editModeHtml = "";
+            let displayModeHtml = "";
+
+            if (existingData) {
+                let colorStat = initStatus==='present' ? 'green' : initStatus==='sick' ? 'red' : initStatus==='leave' ? '#ffc107' : 'orange';
+                let thText = initStatus==='present' ? '✅ มาเรียน' : initStatus==='sick' ? '🤒 ป่วย' : initStatus==='leave' ? '📝 ลา' : '❌ ขาด';
+                
+                displayModeHtml = `
+                    <div id="display-mode-${std.id}" style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-top:5px; background:#f8f9fa; padding:10px; border-radius:8px; box-sizing:border-box;">
+                        <div>สถานะ: <b style="color:${colorStat}">${thText}</b></div>
+                        <button onclick="enableEdit('${std.id}')" style="padding:5px 15px; background:#17a2b8; color:white; border:none; border-radius:5px; cursor:pointer; font-family:'Prompt';">✏️ แก้ไข</button>
+                    </div>
+                `;
+            }
+
+            let btnStyle = existingData ? "display:none;" : "display:flex;";
+            
             row.innerHTML = `
                 <div class="student-info">
                     <div class="student-number">${std.number}</div>
@@ -244,16 +290,36 @@
                     </div>
                     <div class="student-name">${std.name}<br><small style="color:#666;">รหัส: ${std.id}</small></div>
                 </div>
-                <div class="status-group">
-                    <div class="btn-status status-present active" onclick="setStatus('${std.id}', 'present')">✅ มาเรียน</div>
-                    <div class="btn-status status-sick" onclick="setStatus('${std.id}', 'sick')">🤒 ป่วย</div>
-                    <div class="btn-status status-leave" onclick="setStatus('${std.id}', 'leave')">📝 ลา</div>
-                    <div class="btn-status status-absent" onclick="setStatus('${std.id}', 'absent')">❌ ขาด</div>
+                
+                ${displayModeHtml}
+
+                <div id="edit-mode-${std.id}" style="${btnStyle} flex-direction:column;">
+                    <div class="status-group">
+                        <div class="btn-status status-present ${initStatus==='present'?'active':''}" onclick="setStatus('${std.id}', 'present')">✅ มาเรียน</div>
+                        <div class="btn-status status-sick ${initStatus==='sick'?'active':''}" onclick="setStatus('${std.id}', 'sick')">🤒 ป่วย</div>
+                        <div class="btn-status status-leave ${initStatus==='leave'?'active':''}" onclick="setStatus('${std.id}', 'leave')">📝 ลา</div>
+                        <div class="btn-status status-absent ${initStatus==='absent'?'active':''}" onclick="setStatus('${std.id}', 'absent')">❌ ขาด</div>
+                    </div>
+                    <textarea class="behavior-note" id="note-${std.id}" placeholder="จดบันทึกพฤติกรรม/หมายเหตุ... (ไม่บังคับ)">${initNote}</textarea>
+                    
+                    ${existingData ? `<div style="display:flex; gap:10px; margin-top:10px;">
+                        <button onclick="saveSingleUpdate('${std.id}')" style="flex:1; padding:8px; background:#28a745; color:white; border:none; border-radius:5px; cursor:pointer; font-family:'Prompt';">💾 บันทึกการแก้ไข</button>
+                        <button onclick="cancelEdit('${std.id}')" style="padding:8px; background:#6c757d; color:white; border:none; border-radius:5px; cursor:pointer; font-family:'Prompt';">ยกเลิก</button>
+                    </div>` : ''}
                 </div>
-                <textarea class="behavior-note" id="note-${std.id}" placeholder="จดบันทึกพฤติกรรม/หมายเหตุ... (ไม่บังคับ)"></textarea>
             `;
             container.appendChild(row);
         });
+    }
+
+    function enableEdit(id) {
+        document.getElementById(`display-mode-${id}`).style.display = 'none';
+        document.getElementById(`edit-mode-${id}`).style.display = 'flex';
+    }
+
+    function cancelEdit(id) {
+        document.getElementById(`display-mode-${id}`).style.display = 'flex';
+        document.getElementById(`edit-mode-${id}`).style.display = 'none';
     }
 
     function setStatus(id, status) {
@@ -273,7 +339,7 @@
         }
     }
 
-    // --- 💾 4. บันทึกข้อมูลเข้า Google Sheets ---
+    // --- 💾 4. บันทึกข้อมูลทั้งห้อง (ใหม่) ---
     function saveAttendance() {
         let date = document.getElementById('check-date').value;
         let saveBtn = document.getElementById('save-btn');
@@ -289,27 +355,20 @@
             });
         });
 
-        let payload = {
-            action: "save_bulk",
-            date: date,
-            teacherName: currentTeacher,
-            records: records
-        };
+        let payload = { action: "save_bulk", date: date, teacherName: currentTeacher, records: records };
 
         saveBtn.innerText = "⏳ กำลังส่งข้อมูลเข้าฐานข้อมูล...";
         saveBtn.disabled = true;
 
-        fetch(GAS_API_URL, {
-            method: "POST",
-            body: JSON.stringify(payload)
-        })
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify(payload) })
         .then(res => res.json())
         .then(data => {
             saveBtn.innerText = "💾 บันทึกข้อมูลเข้าฐานข้อมูล";
             saveBtn.disabled = false;
             if(data.status === "success") {
-                alert("✅ บันทึกข้อมูลสำเร็จเรียบร้อย!");
-                populateDailyDataLocally(date, records); // นำไปโชว์ในหน้ารายวัน
+                alert("✅ บันทึกข้อมูลและสร้างชีตห้องเรียนใหม่เรียบร้อย!");
+                populateDailyDataLocally(date, records); 
+                fetchStudents(); // โหลดใหม่เพื่อเปลี่ยนเป็นโหมด View
             } else {
                 alert("❌ บันทึกไม่สำเร็จ: " + data.message);
             }
@@ -321,7 +380,25 @@
         });
     }
 
-    // โชว์ข้อมูลที่เพิ่งกดบันทึกในหน้า "รายวัน" แบบเรียลไทม์
+    // --- ✏️ 5. อัปเดตข้อมูลรายบุคคล ---
+    function saveSingleUpdate(id) {
+        let date = document.getElementById('check-date').value;
+        let note = document.getElementById(`note-${id}`).value;
+        let status = attendanceData[id].status;
+
+        fetch(GAS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "update_single", date: date, id: id, className: currentClass, status: status, note: note, teacherName: currentTeacher })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "success") {
+                alert("✅ อัปเดตสถานะใหม่เรียบร้อยแล้ว!");
+                fetchStudents(); 
+            }
+        });
+    }
+
     function populateDailyDataLocally(date, records) {
         document.getElementById('view-date').value = date;
         let tbody = document.getElementById('daily-body');
@@ -344,4 +421,3 @@
 
 </body>
 </html>
-
