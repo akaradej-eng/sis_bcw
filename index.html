@@ -632,7 +632,7 @@
         });
     }
 
-    // --- 🧑‍🎓 STUDENT ---
+  // --- 🧑‍🎓 STUDENT ---
     function loadStudentReport(id) {
         fetch(`${GAS_API_URL}?action=get_student_report&studentId=${id}`).then(res=>res.json()).then(data => {
             document.getElementById('st-stat-present').innerText = data.stats.present; document.getElementById('st-stat-absent').innerText = data.stats.absent; document.getElementById('st-stat-leave').innerText = data.stats.personal_leave + data.stats.sick_leave;
@@ -642,7 +642,20 @@
             data.history.reverse().forEach(x => b.innerHTML += `<tr><td>${x.date}</td><td>${x.status}</td><td>${x.note||'-'}</td></tr>`);
         });
     }
+
+    // 👇 🌟 เติมฟังก์ชันออกจากระบบตรงนี้ครับ 👇
+    function logout() { 
+        if(confirm("ต้องการออกจากระบบใช่หรือไม่?")) {
+            location.reload(); 
+        }
+    }
+
 </script>
 
 </body>
 </html>
+</script>
+
+</body>
+</html>
+
