@@ -22,6 +22,10 @@
         input, select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; width: 100%; box-sizing: border-box; margin-bottom: 10px;}
         button { padding: 10px 15px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: bold;}
         
+        /* 🌟 ปุ่มออกจากระบบใหม่ */
+        .btn-logout { background: #ef4444; color: white; border: 1px solid #dc2626; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-family: 'Prompt'; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s;}
+        .btn-logout:hover { background: #dc2626; }
+
         .live-status-bar { background: #fff; padding: 10px 15px; border-radius: 10px; margin-bottom: 15px; display: none; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; color: #1e293b; border-bottom: 3px solid var(--primary); }
 
         .student-row { display: flex; align-items: center; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; gap: 8px; position: relative; }
@@ -93,8 +97,13 @@
 <body>
 
 <div class="navbar">
-    <div style="font-weight: bold;">🏫 SIS บ้านเชียงวิทยา</div>
-    <div id="user-display" style="font-size: 12px; cursor: pointer;" onclick="logout()">เข้าสู่ระบบ</div>
+    <div style="font-weight: bold; display: flex; align-items: center; gap: 10px;">
+        🏫 SIS บ้านเชียงวิทยา
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <span id="user-display" style="font-size: 12px; font-weight: normal;"></span>
+        <button id="logout-btn" class="btn-logout" onclick="logout()" style="display: none;">ออกจากระบบ</button>
+    </div>
 </div>
 
 <div class="container">
@@ -234,7 +243,6 @@
                 </div>
                 <div id="admin-calendar-container" style="max-height: 400px; overflow-y: auto; padding-right:5px;"></div>
             </div>
-            
             <button class="btn-save-admin" onclick="saveAdminData(this)" style="width:100%; padding:15px; font-size:16px; margin-top:20px;">💾 บันทึกการตั้งค่าระบบ</button>
         </div>
 
@@ -337,6 +345,18 @@
     <div class="footer-credit">จัดทำโดย<br><b>นายอัครเดช โพธิญาณ์</b><br>รองผู้อำนวยการสถานศึกษา โรงเรียนบ้านเชียงวิทยา</div>
 </div>
 
+<div id="teacher-instruction-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+    <div style="background: white; border-radius: 12px; padding: 25px; max-width: 400px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease;">
+        <h3 style="color: #1e56a0; margin-top: 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">📢 คำชี้แจงการบันทึกเวลาเรียน</h3>
+        <div style="font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
+            <p><b>1. วิธีการบันทึก:</b> เลือกสถานะของนักเรียนแต่ละคน (มา, ขาด, สาย, ฯลฯ) แล้วกดปุ่ม <b>"💾 บันทึกข้อมูล"</b> ที่ด้านล่างสุดเพียงครั้งเดียว</p>
+            <p id="modal-time-limit-text"><b>2. เวลาบันทึก:</b> กำลังดึงข้อมูลจากระบบ...</p>
+            <p><b>3. การแก้ไขข้อมูล:</b> หากบันทึกไปแล้วพบว่าข้อมูลผิดพลาด ให้ท่านกดปุ่ม <b>"✏️ แก้ไข"</b> ที่ท้ายชื่อของนักเรียนคนนั้น และกดบันทึกใหม่เป็นรายบุคคลได้ทันที</p>
+        </div>
+        <button onclick="closeTeacherModal()" style="width: 100%; background: #10b981; color: white; border: none; border-radius: 8px; padding: 12px; font-size: 15px; font-family: 'Prompt'; font-weight: bold; cursor: pointer;">✅ รับทราบและเข้าใช้งาน</button>
+    </div>
+</div>
+
 <div class="nav-menu" id="bottom-nav">
     <div class="nav-item active" onclick="switchPage('checklist-page', this)"><span>📝</span><br>เช็คชื่อ</div>
     <div class="nav-item" onclick="switchPage('daily-page', this)"><span>📅</span><br>รายสัปดาห์</div>
@@ -344,11 +364,11 @@
 </div>
 
 <script>
-    // 🔗 API (ใส่ URL ล่าสุดของท่านรองฯ ลงไป)
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz1Pi37ZXLJJQGvnfz20a_aH2y4sSDjt8dCmyqgdhaF3gin7jRhTh7jY1ajDRdnw1E2/exec";
+    // 🔗 API 
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyR6a-JvJ-z6z-m3kP-j5lT4T_w0mBqF7_E9D-M2m4_D0vC8H1M0z5Y4E4yP1wV4wQz/exec";
     
     // --- ⏰ ระบบความปลอดภัย & Session Management ---
-    const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 นาที
+    const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 นาทีเตะออกอัตโนมัติ
     let idleTimer = null;
 
     window.onload = function() {
@@ -403,7 +423,6 @@
         if(document.getElementById('display-date')) document.getElementById('display-date').innerText = dateStr;
         if(document.getElementById('display-clock')) document.getElementById('display-clock').innerText = `🕒 ${timeStr} น.`;
     }
-    setInterval(updateClock, 1000); 
 
     function cleanName(fullName) { return fullName ? fullName.replace(/^(เด็กชาย|เด็กหญิง|นาย|นางสาว|ด\.ช\.|ด\.ญ\.)\s*/g, "").trim() : ""; }
 
@@ -453,7 +472,9 @@
     }
 
     function routeUser(data) {
-        document.getElementById('user-display').innerText = `${data.name} - ออกระบบ`;
+        // อัปเดตแถบเมนูด้านบน แสดงชื่อและปุ่มออกจากระบบ
+        document.getElementById('user-display').innerText = `👤 ${data.name}`;
+        document.getElementById('logout-btn').style.display = 'block';
         document.getElementById('status-bar').style.display = 'flex';
         
         let savedPage = localStorage.getItem('sis_current_page');
@@ -473,6 +494,17 @@
                     adminTermStart = adminData.config.startDate;
                     adminTermEnd = adminData.config.endDate;
                     timeLimitConfig = { enabled: adminData.config.timeLimitEnabled, start: adminData.config.startTime, end: adminData.config.endTime };
+                    
+                    // 🌟 ตรวจสอบและแสดงคำชี้แจงสำหรับครู
+                    if (timeLimitConfig.enabled) {
+                        document.getElementById('modal-time-limit-text').innerHTML = `<b>2. เวลาบันทึก:</b> กรุณาบันทึกข้อมูลในช่วงเวลา <b style="color:#ef4444; font-size:15px;">${timeLimitConfig.start} - ${timeLimitConfig.end} น.</b> เท่านั้น (หากเลยเวลา ระบบจะล็อคอัตโนมัติ)`;
+                    } else {
+                        document.getElementById('modal-time-limit-text').innerHTML = `<b>2. เวลาบันทึก:</b> ปัจจุบันระบบ <b style="color:#10b981;">เปิดให้บันทึกได้ตลอดเวลา</b>`;
+                    }
+                    
+                    if (!sessionStorage.getItem('teacher_modal_seen')) {
+                        document.getElementById('teacher-instruction-modal').style.display = 'flex';
+                    }
                 }
                 if(!savedPage || savedPage === 'checklist-page') fetchStudents(); 
             });
@@ -484,6 +516,12 @@
         } else if(data.role === "student") {
             switchPage('student-page'); document.getElementById('st-name-display').innerText = data.name; loadStudentReport(data.userId);
         }
+    }
+
+    // 🌟 ฟังก์ชันปิดหน้าต่างคำชี้แจงครู
+    function closeTeacherModal() {
+        document.getElementById('teacher-instruction-modal').style.display = 'none';
+        sessionStorage.setItem('teacher_modal_seen', 'true');
     }
 
     function switchPage(pageId, element) {
@@ -535,7 +573,6 @@
         
         if (timeLimitConfig && timeLimitConfig.enabled && timeLimitConfig.start && timeLimitConfig.end) {
             let nowStr = new Date().toLocaleTimeString('th-TH', { hour12: false, hour: '2-digit', minute: '2-digit' });
-            // ถ้าเลือกวันปัจจุบัน ถึงจะเช็คเวลา (ถ้าเช็คย้อนหลัง ให้แอดมินปลดล็อกให้)
             if (selectedDateStr === new Date().toISOString().split('T')[0]) {
                 if (nowStr < timeLimitConfig.start || nowStr > timeLimitConfig.end) {
                     document.getElementById('student-list-container').innerHTML = `
@@ -595,7 +632,7 @@
                     
                     <div id="view-${std.id}" style="display:flex; align-items:center; gap:10px; margin-left:auto;">
                         <div style="text-align:right; font-size:13px; font-weight:bold; color:${c};">${st}</div>
-                        <button onclick="enableEdit('${std.id}')" style="background:#f1f5f9; border:1px solid #cbd5e1; color:#475569; padding:5px 10px; border-radius:6px; font-size:12px;">✏️ แก้ไข</button>
+                        <button onclick="enableEdit('${std.id}')" style="background:#f1f5f9; border:1px solid #cbd5e1; color:#475569; padding:5px 10px; border-radius:6px; font-size:12px; cursor:pointer;">✏️ แก้ไข</button>
                     </div>
 
                     <div id="edit-${std.id}" style="display:none; width:100%; margin-top:10px; padding-top:10px; border-top:1px dashed #e2e8f0; flex-direction:column; gap:8px;">
@@ -611,8 +648,8 @@
                             <input type="text" id="nt-${std.id}" placeholder="ระบุหมายเหตุ..." value="${nt}" style="flex:2; font-size:13px; padding:6px; border:1px solid #ccc; border-radius:6px;">
                         </div>
                         <div style="display:flex; gap:8px; width:100%;">
-                            <button id="btn-save-${std.id}" onclick="saveSingleUpdate('${std.id}')" style="flex:1; background:#10b981; padding:8px; font-size:13px;">💾 บันทึก</button>
-                            <button onclick="cancelEdit('${std.id}')" style="flex:1; background:#ef4444; padding:8px; font-size:13px;">ยกเลิก</button>
+                            <button id="btn-save-${std.id}" onclick="saveSingleUpdate('${std.id}')" style="flex:1; background:#10b981; padding:8px; font-size:13px; color:white; border:none; border-radius:6px;">💾 บันทึก</button>
+                            <button onclick="cancelEdit('${std.id}')" style="flex:1; background:#ef4444; padding:8px; font-size:13px; color:white; border:none; border-radius:6px;">ยกเลิก</button>
                         </div>
                     </div>
                 `;
@@ -632,7 +669,7 @@
                     <button class="btn-note" onclick="toggleNote('${std.id}')">📝</button>
                     <div id="note-box-${std.id}" style="display:none; position:absolute; right:10px; top:50px; z-index:100; background:white; padding:10px; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.15); width:220px; border:1px solid #eee;">
                         <textarea class="behavior-note" id="note-${std.id}" placeholder="ระบุหมายเหตุ...">${nt}</textarea>
-                        <button onclick="toggleNote('${std.id}')" style="width:100%; margin-top:8px; background:var(--primary); font-size:12px; padding:6px;">ตกลง</button>
+                        <button onclick="toggleNote('${std.id}')" style="width:100%; margin-top:8px; background:var(--primary); font-size:12px; padding:6px; color:white; border:none; border-radius:6px;">ตกลง</button>
                     </div>
                 `;
             }
@@ -664,7 +701,7 @@
         fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) })
         .then(res => res.json()).then(data => {
             btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false;
-            if(data.status === "success") { alert("✅ บันทึกสำเร็จ!"); fetchStudents(); } else alert("❌ บันทึกไม่สำเร็จ: " + data.message);
+            if(data.status === "success") { alert("✅ บันทึกสำเร็จ!"); fetchStudents(); loadQuickAIInsight(); } else alert("❌ บันทึกไม่สำเร็จ: " + data.message);
         });
     }
 
@@ -687,8 +724,8 @@
     }
 
     function loadWeeklyData() {
-        let tbody = document.getElementById('daily-body'); tbody.innerHTML = `<tr><td colspan='7' style='text-align:center; padding:20px;'>⏳ กำลังดึงข้อมูล...</td></tr>`;
-        document.getElementById('teacher-daily-ai').innerHTML = "⏳ วิเคราะห์สัปดาห์นี้...";
+        let tbody = document.getElementById('daily-body'); tbody.innerHTML = `<tr><td colspan='7' style='text-align:center; padding:20px;'>⏳ กำลังดึงข้อมูลตลอดสัปดาห์...</td></tr>`;
+        document.getElementById('teacher-daily-ai').innerHTML = "⏳ กำลังประมวลผลข้อมูลสัปดาห์นี้...";
         let curr = new Date(); let day = curr.getDay(); let diffToMon = curr.getDate() - day + (day === 0 ? -6 : 1);
         let monDate = new Date(curr.setDate(diffToMon)); monDate.setHours(0,0,0,0);
         let weekDates = []; let thElements = ['th-mon', 'th-tue', 'th-wed', 'th-thu', 'th-fri']; let dayNames = ['จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.'];
@@ -720,8 +757,8 @@
                 let st = weeklyData[id];
                 tbody.innerHTML += `<tr><td style="text-align:center;">${index++}</td><td>${cleanName(st.name)}</td><td style="text-align:center; background:#f8fafc;">${st.status[0]}</td><td style="text-align:center;">${st.status[1]}</td><td style="text-align:center; background:#f8fafc;">${st.status[2]}</td><td style="text-align:center;">${st.status[3]}</td><td style="text-align:center; background:#f8fafc;">${st.status[4]}</td></tr>`;
             }
-            if(Object.keys(weeklyData).length === 0) tbody.innerHTML = `<tr><td colspan='7' style='text-align:center; padding:20px;'>❌ ไม่มีข้อมูลนักเรียน</td></tr>`; 
-            if (totalAbs > 0) document.getElementById('teacher-daily-ai').innerHTML = `⚠️ <b>สัปดาห์นี้:</b> ขาดเรียนสะสม <b>${totalAbs} ครั้ง</b>`; else document.getElementById('teacher-daily-ai').innerHTML = `🌟 <b>ยอดเยี่ยม!</b> ไม่มีคนขาดเลยครับ`;
+            if(Object.keys(weeklyData).length === 0) tbody.innerHTML = `<tr><td colspan='7' style='text-align:center; padding:20px;'>❌ ไม่มีข้อมูลนักเรียนในห้องนี้</td></tr>`; 
+            if (totalAbs > 0) document.getElementById('teacher-daily-ai').innerHTML = `⚠️ <b>สัปดาห์นี้:</b> พบการขาดเรียนรวมสะสม <b>${totalAbs} ครั้ง</b> กรุณาสังเกตพฤติกรรมเด็กที่ขาดซ้ำครับ`; else document.getElementById('teacher-daily-ai').innerHTML = `🌟 <b>ยอดเยี่ยมมาก!</b> สัปดาห์นี้นักเรียนมาเรียนดีมาก ไม่มีคนขาดเลยครับ`;
         });
     }
 
@@ -779,7 +816,7 @@
                         </td>
                         <td><input type="text" value="${u[3]}"></td>
                         <td><input type="text" value="${u[4]||''}"></td>
-                        <td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td>
+                        <td><button style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td>
                     </tr>`; 
                 });
                 allAdminStudentsData = data.students; updateClassDropdown(); renderAdminStudents();
@@ -789,10 +826,10 @@
 
     function renderAdminCalendar() {
         let container = document.getElementById('admin-calendar-container'); let startVal = document.getElementById('admin-start').value; let endVal = document.getElementById('admin-end').value;
-        if(!startVal || !endVal) { container.innerHTML = "<div style='text-align:center; padding:20px; color:#94a3b8;'>กรุณาระบุเปิด-ปิดเทอม</div>"; document.getElementById('working-days-text').innerText = "0"; return; }
+        if(!startVal || !endVal) { container.innerHTML = "<div style='text-align:center; padding:20px; color:#94a3b8;'>กรุณาระบุวันเปิด-ปิดเทอมด้านบน เพื่อแสดงปฏิทินและคำนวณวันเรียน</div>"; document.getElementById('working-days-text').innerText = "0"; return; }
         let sArr = startVal.split('-'); let startDate = new Date(sArr[0], sArr[1]-1, sArr[2]);
         let eArr = endVal.split('-'); let endDate = new Date(eArr[0], eArr[1]-1, eArr[2]);
-        if(startDate > endDate) { container.innerHTML = "<div style='color:red;'>เปิดเทอมต้องมาก่อนปิดเทอม</div>"; return; }
+        if(startDate > endDate) { container.innerHTML = "<div style='color:red;'>วันเปิดเทอมต้องมาก่อนวันปิดเทอม</div>"; return; }
         let html = ""; let currMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1); let endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1); const thDays = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
         let totalWorkingDays = 0;
         while(currMonth <= endMonth) {
@@ -813,47 +850,69 @@
         container.innerHTML = html; document.getElementById('working-days-text').innerText = totalWorkingDays;
     }
     
-    function toggleHoliday(dateStr, isWeekend) { if(isWeekend) { alert('เสาร์-อาทิตย์หยุดอัตโนมัติแล้วครับ'); return; } let idx = adminHolidays.indexOf(dateStr); if(idx > -1) adminHolidays.splice(idx, 1); else adminHolidays.push(dateStr); renderAdminCalendar(); }
+    function toggleHoliday(dateStr, isWeekend) { if(isWeekend) { alert('📅 วันเสาร์-อาทิตย์ ถูกกำหนดเป็นวันหยุดอัตโนมัติแล้วครับ'); return; } let idx = adminHolidays.indexOf(dateStr); if(idx > -1) adminHolidays.splice(idx, 1); else adminHolidays.push(dateStr); renderAdminCalendar(); }
     
     async function fetchPublicHolidays() {
-        let startVal = document.getElementById('admin-start').value; if(!startVal) { alert('กำหนดวันเปิดเทอมก่อนครับ'); return; }
-        let year = startVal.split('-')[0]; let btn = document.getElementById('fetch-holidays-btn'); btn.innerText = '⏳ โหลด...'; btn.disabled = true;
+        let startVal = document.getElementById('admin-start').value; if(!startVal) { alert('กรุณากำหนดวันเปิดเทอมก่อนครับ'); return; }
+        let year = startVal.split('-')[0]; let btn = document.getElementById('fetch-holidays-btn'); btn.innerText = '⏳ กำลังดึงข้อมูล...'; btn.disabled = true;
         try {
             let res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`); let holidays = await res.json(); let addedCount = 0;
             holidays.forEach(h => { if(!adminHolidays.includes(h.date)) { adminHolidays.push(h.date); addedCount++; } });
             renderAdminCalendar(); btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false; alert(`✅ เพิ่มวันหยุด ${addedCount} วัน`);
-        } catch(e) { btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false; alert('❌ ล้มเหลว'); }
+        } catch(e) { btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false; alert('❌ ดึงข้อมูลออนไลน์ล้มเหลว'); }
     }
     
     function updateClassDropdown() { let f = document.getElementById('admin-class-filter'); let s = new Set(); allAdminStudentsData.forEach(x => s.add(x[3])); f.innerHTML = '<option value="all">ทุกห้อง</option>'; [...s].sort().forEach(c => f.innerHTML += `<option value="${c}">${c}</option>`); }
-    function renderAdminStudents() { let b = document.getElementById('admin-students-body'); b.innerHTML = ""; let f = document.getElementById('admin-class-filter').value; allAdminStudentsData.forEach((s, i) => { if (f==='all'||s[3]===f) b.innerHTML += `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td><td>${s[3]}</td><td><button style="background:red;" onclick="removeStudent(${i})">ลบ</button></td></tr>`; }); }
+    function renderAdminStudents() { let b = document.getElementById('admin-students-body'); b.innerHTML = ""; let f = document.getElementById('admin-class-filter').value; allAdminStudentsData.forEach((s, i) => { if (f==='all'||s[3]===f) b.innerHTML += `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td><td>${s[3]}</td><td><button style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="removeStudent(${i})">ลบ</button></td></tr>`; }); }
     function removeStudent(i) { if(confirm("ลบ?")) { allAdminStudentsData.splice(i,1); renderAdminStudents(); } }
     
     function addUserRow() { 
         document.getElementById('admin-users-body').innerHTML += `<tr>
-            <td><input type="text"></td><td><input type="text"></td>
-            <td><select><option value="teacher">ครู (Teacher)</option><option value="admin">ผู้ดูแลระบบ (Admin)</option><option value="executive">ผู้บริหาร (Executive)</option><option value="student">นักเรียน (Student)</option></select></td>
-            <td><input type="text"></td><td><input type="text"></td>
-            <td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td>
+            <td><input type="text"></td>
+            <td><input type="text"></td>
+            <td>
+                <select>
+                    <option value="teacher">ครู (Teacher)</option>
+                    <option value="admin">ผู้ดูแลระบบ (Admin)</option>
+                    <option value="executive">ผู้บริหาร (Executive)</option>
+                    <option value="student">นักเรียน (Student)</option>
+                </select>
+            </td>
+            <td><input type="text"></td>
+            <td><input type="text"></td>
+            <td><button style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td>
         </tr>`; 
     }
+    
     function addStudentRow() { allAdminStudentsData.push(['','','',document.getElementById('admin-class-filter').value==='all'?'':document.getElementById('admin-class-filter').value]); renderAdminStudents(); }
     
     function saveAdminData(btn) {
-        let originalText = btn.innerText; btn.innerText = "⏳ กำลังบันทึก..."; btn.disabled = true;
+        let originalText = btn.innerText;
+        btn.innerText = "⏳ กำลังบันทึก..."; btn.disabled = true;
         let u = []; document.querySelectorAll('#admin-users-body tr').forEach(tr => { let i = tr.querySelectorAll('input, select'); u.push([i[0].value, i[1].value, i[2].value, i[3].value, i[4].value]); });
         
         fetch(GAS_API_URL, { 
             method: "POST", 
             body: JSON.stringify({ 
                 action: "admin_update", 
-                settings: { startDate: document.getElementById('admin-start').value, endDate: document.getElementById('admin-end').value, holidays: adminHolidays, timeLimitEnabled: document.getElementById('admin-time-limit-toggle').checked, startTime: document.getElementById('admin-start-time').value, endTime: document.getElementById('admin-end-time').value }, 
-                users: u, students: allAdminStudentsData 
+                settings: { 
+                    startDate: document.getElementById('admin-start').value, 
+                    endDate: document.getElementById('admin-end').value, 
+                    holidays: adminHolidays,
+                    timeLimitEnabled: document.getElementById('admin-time-limit-toggle').checked,
+                    startTime: document.getElementById('admin-start-time').value,
+                    endTime: document.getElementById('admin-end-time').value
+                }, 
+                users: u, 
+                students: allAdminStudentsData 
             }) 
         }).then(res => res.json()).then(data => { 
             btn.innerText = originalText; btn.disabled = false; 
-            if(data.status === "success") alert("✅ สำเร็จ"); 
-        }).catch(err => { btn.innerText = originalText; btn.disabled = false; alert("❌ ล้มเหลว"); });
+            if(data.status === "success") alert("✅ บันทึกข้อมูลสำเร็จเรียบร้อยครับ"); 
+        }).catch(err => {
+            btn.innerText = originalText; btn.disabled = false; 
+            alert("❌ บันทึกไม่สำเร็จ กรุณาลองใหม่");
+        });
     }
 
     // --- 📊 EXECUTIVE ---
@@ -883,8 +942,15 @@
                 if(match) {
                     stats.total++; let key = v==='school'?row[3]:(v==='class'?row[2]:row[0]);
                     if(!gStat[key]) gStat[key] = {มา:0, สาย:0, ลากิจ:0, ลาป่วย:0, นอกร_ร:0, ขาด:0, total:0};
-                    let statText = row[4]; gStat[key].total++;
-                    if(statText === 'มา') { stats.p++; gStat[key].มา++; } else if(statText === 'สาย') { stats.late++; gStat[key].สาย++; } else if(statText === 'ลากิจ') { stats.pleave++; gStat[key].ลากิจ++; } else if(statText === 'ลาป่วย') { stats.sleave++; gStat[key].ลาป่วย++; } else if(statText === 'เรียนนอกโรงเรียน') { stats.out++; gStat[key].นอกร_ร++; } else { stats.abs++; gStat[key].ขาด++; } 
+                    
+                    let statText = row[4];
+                    gStat[key].total++;
+                    if(statText === 'มา') { stats.p++; gStat[key].มา++; }
+                    else if(statText === 'สาย') { stats.late++; gStat[key].สาย++; }
+                    else if(statText === 'ลากิจ') { stats.pleave++; gStat[key].ลากิจ++; }
+                    else if(statText === 'ลาป่วย') { stats.sleave++; gStat[key].ลาป่วย++; }
+                    else if(statText === 'เรียนนอกโรงเรียน') { stats.out++; gStat[key].นอกร_ร++; }
+                    else { stats.abs++; gStat[key].ขาด++; } 
                 }
             }
         });
@@ -895,50 +961,80 @@
         
         let ctx = document.getElementById('execChart').getContext('2d'); if(execChartInstance) execChartInstance.destroy();
         let labels = Object.keys(gStat).sort();
-        let d1 = labels.map(k=>gStat[k].มา), d2 = labels.map(k=>gStat[k].สาย), d3 = labels.map(k=>gStat[k].ลากิจ), d4 = labels.map(k=>gStat[k].ลาป่วย), d5 = labels.map(k=>gStat[k].นอกร_ร), d6 = labels.map(k=>gStat[k].ขาด);
+        let d1 = labels.map(k=>gStat[k].มา), d2 = labels.map(k=>gStat[k].สาย), d3 = labels.map(k=>gStat[k].ลากิจ);
+        let d4 = labels.map(k=>gStat[k].ลาป่วย), d5 = labels.map(k=>gStat[k].นอกร_ร), d6 = labels.map(k=>gStat[k].ขาด);
 
-        execChartInstance = new Chart(ctx, { type:'bar', data:{ labels:labels, datasets:[{label:'มา', data:d1, backgroundColor:'#10b981'},{label:'สาย', data:d2, backgroundColor:'#eab308'},{label:'ลากิจ', data:d3, backgroundColor:'#f97316'},{label:'ลาป่วย', data:d4, backgroundColor:'#f43f5e'},{label:'นอก ร.ร.', data:d5, backgroundColor:'#3b82f6'},{label:'ขาด', data:d6, backgroundColor:'#991b1b'}] }, options:{ responsive:true, maintainAspectRatio:false, scales:{x:{stacked:true},y:{stacked:true}} } });
+        execChartInstance = new Chart(ctx, { 
+            type:'bar', 
+            data:{ labels:labels, datasets:[{label:'มา', data:d1, backgroundColor:'#10b981'},{label:'สาย', data:d2, backgroundColor:'#eab308'},{label:'ลากิจ', data:d3, backgroundColor:'#f97316'},{label:'ลาป่วย', data:d4, backgroundColor:'#f43f5e'},{label:'นอก ร.ร.', data:d5, backgroundColor:'#3b82f6'},{label:'ขาด', data:d6, backgroundColor:'#991b1b'}] }, 
+            options:{ responsive:true, maintainAspectRatio:false, scales:{x:{stacked:true},y:{stacked:true}} } 
+        });
 
         let tBody = document.getElementById('exec-detail-body'); tBody.innerHTML = "";
-        if(labels.length === 0) { tBody.innerHTML = "<tr><td colspan='8' style='text-align:center;'>ไม่พบข้อมูล</td></tr>"; }
+        if(labels.length === 0) { tBody.innerHTML = "<tr><td colspan='8' style='text-align:center;'>ไม่พบข้อมูลในช่วงเวลาที่เลือก</td></tr>"; }
         else {
             labels.forEach(k => {
-                let g = gStat[k]; let p = g.total > 0 ? ((g.มา / g.total) * 100).toFixed(1) : 0; let color = p >= 80 ? '#10b981' : '#ef4444';
-                tBody.innerHTML += `<tr><td style="text-align:left; font-weight:bold;">${k}</td><td style="color:#10b981;">${g.มา}</td><td style="color:#eab308;">${g.สาย}</td><td style="color:#f97316;">${g.ลากิจ}</td><td style="color:#f43f5e;">${g.ลาป่วย}</td><td style="color:#991b1b; font-weight:bold;">${g.ขาด}</td><td style="color:#3b82f6;">${g.นอกร_ร}</td><td style="color:${color}; font-weight:bold;">${p}%</td></tr>`;
+                let g = gStat[k];
+                let p = g.total > 0 ? ((g.มา / g.total) * 100).toFixed(1) : 0;
+                let color = p >= 80 ? '#10b981' : '#ef4444';
+                tBody.innerHTML += `<tr>
+                    <td style="text-align:left; font-weight:bold;">${k}</td>
+                    <td style="color:#10b981;">${g.มา}</td><td style="color:#eab308;">${g.สาย}</td>
+                    <td style="color:#f97316;">${g.ลากิจ}</td><td style="color:#f43f5e;">${g.ลาป่วย}</td>
+                    <td style="color:#991b1b; font-weight:bold;">${g.ขาด}</td><td style="color:#3b82f6;">${g.นอกร_ร}</td>
+                    <td style="color:${color}; font-weight:bold;">${p}%</td>
+                </tr>`;
             });
         }
+
         generateExecutiveAIInsight(stats, gStat, v, overallPerc);
     }
 
     function generateExecutiveAIInsight(totalStats, groupStats, viewType, overallPerc) {
         let aiBox = document.getElementById('exec-ai-insight');
-        if (totalStats.total === 0) { aiBox.innerHTML = "<p style='color:#ef4444;'>ไม่มีข้อมูลสถิติ</p>"; return; }
-        let html = `<p><b>📊 ภาพรวม:</b> มาเรียนเฉลี่ย <span style="color:${overallPerc >= 80 ? '#10b981' : '#ef4444'}; font-weight:bold; font-size:16px;">${overallPerc}%</span> (ข้อมูล ${totalStats.total} รายการ)</p>`;
+        if (totalStats.total === 0) { aiBox.innerHTML = "<p style='color:#ef4444;'>ไม่มีข้อมูลสถิติให้วิเคราะห์ในช่วงเวลาที่ท่านเลือกครับ</p>"; return; }
+
+        let html = `<p><b>📊 ภาพรวมการเข้าเรียน:</b> อัตราการมาเรียนเฉลี่ยอยู่ที่ <span style="color:${overallPerc >= 80 ? '#10b981' : '#ef4444'}; font-weight:bold; font-size:16px;">${overallPerc}%</span> (จากข้อมูลทั้งหมด ${totalStats.total} รายการ)</p>`;
 
         if (viewType === 'school' || viewType === 'grade' || viewType === 'class') {
             let best = { name: '', rate: -1 }, worst = { name: '', rate: 101 }, riskCount = 0;
+            
             for (let k in groupStats) {
-                let rate = (groupStats[k].มา / groupStats[k].total) * 100;
+                let g = groupStats[k];
+                let rate = (g.มา / g.total) * 100;
                 if (rate > best.rate) { best.rate = rate; best.name = k; }
                 if (rate < worst.rate) { worst.rate = rate; worst.name = k; }
                 if (rate < 80) riskCount++;
             }
+
             html += `<ul>`;
-            if (best.name) html += `<li>🏆 <b>ดีที่สุด:</b> ${best.name} (${best.rate.toFixed(1)}%)</li>`;
-            if (worst.name && worst.rate < 100) html += `<li>⚠️ <b>เฝ้าระวัง:</b> ${worst.name} (${worst.rate.toFixed(1)}%)</li>`;
+            if (best.name) html += `<li>🏆 <b>กลุ่มที่ทำผลงานได้ดีที่สุด:</b> ${best.name} มีอัตรามาเรียนสูงถึง ${best.rate.toFixed(1)}%</li>`;
+            if (worst.name && worst.rate < 100) html += `<li>⚠️ <b>กลุ่มที่ควรเฝ้าระวัง:</b> ${worst.name} มีอัตรามาเรียนต่ำสุดที่ ${worst.rate.toFixed(1)}%</li>`;
             html += `</ul>`;
 
-            let issues = [ { name: 'ขาดเรียน', val: totalStats.abs }, { name: 'ลาป่วย', val: totalStats.sleave }, { name: 'ลากิจ', val: totalStats.pleave }, { name: 'มาสาย', val: totalStats.late } ].sort((a,b) => b.val - a.val);
+            let issues = [
+                { name: 'การขาดเรียน', val: totalStats.abs }, { name: 'การลาป่วย', val: totalStats.sleave },
+                { name: 'การลากิจ', val: totalStats.pleave }, { name: 'การมาสาย', val: totalStats.late }
+            ];
+            issues.sort((a,b) => b.val - a.val);
             let topIssue = issues[0];
 
-            html += `<p style="margin-top:10px;"><b>💡 ข้อเสนอแนะ:</b></p><ul>`;
-            if (overallPerc < 80) html += `<li>🔴 ภาพรวมต่ำกว่าเกณฑ์ 80% ควรเร่งติดตามด่วน</li>`;
-            else html += `<li>🟢 ภาพรวมอยู่ในเกณฑ์ดี</li>`;
-            if (riskCount > 0) html += `<li>🔴 มี ${riskCount} กลุ่มที่ต่ำกว่าเกณฑ์</li>`;
-            if (topIssue.val > 0) html += `<li>🔍 ปัญหาหลักคือ <b>"${topIssue.name}" (${topIssue.val} ครั้ง)</b></li>`;
+            html += `<p style="margin-top:10px;"><b>💡 ข้อเสนอแนะเชิงบริหาร (Executive Action Plan):</b></p><ul>`;
+            
+            if (overallPerc < 80) html += `<li>🔴 ภาพรวมของโรงเรียน <b>ต่ำกว่าเกณฑ์มาตรฐาน 80%</b> ท่านรองฯ ควรกำหนดประเด็นนี้เป็นวาระเร่งด่วนในการประชุมครูประจำชั้นครั้งต่อไปครับ</li>`;
+            else html += `<li>🟢 ภาพรวมการมาเรียนอยู่ในเกณฑ์มาตรฐาน ถือว่าฝ่ายวิชาการและครูประจำชั้นบริหารจัดการได้ดีครับ</li>`;
+            
+            if (riskCount > 0) html += `<li>🔴 มีกลุ่มที่เวลาเรียนต่ำกว่าเกณฑ์ถึง <b>${riskCount} กลุ่ม</b> (นำโดย ${worst.name}) แนะนำให้สั่งการหัวหน้าระดับเข้าตรวจสอบสาเหตุเชิงลึกครับ</li>`;
+
+            if (topIssue.val > 0) {
+                if (topIssue.name === 'การขาดเรียน') html += `<li>🔍 ปัญหาที่ส่งผลกระทบมากที่สุดคือ <b>"การขาดเรียน" (${topIssue.val} ครั้ง)</b> ควรเน้นย้ำเรื่องการออกเยี่ยมบ้านนักเรียนกลุ่มเสี่ยงครับ</li>`;
+                else if (topIssue.name === 'การลาป่วย') html += `<li>🔍 ปัญหาที่พบมากที่สุดคือ <b>"การลาป่วย" (${topIssue.val} ครั้ง)</b> แนะนำให้ประสานงานอนามัยโรงเรียนเพื่อเฝ้าระวังเรื่องโรคระบาดตามฤดูกาลครับ</li>`;
+                else if (topIssue.name === 'การมาสาย') html += `<li>🔍 ปัญหาที่พบมากที่สุดคือ <b>"การมาสาย" (${topIssue.val} ครั้ง)</b> อาจต้องพิจารณาตรวจสอบการจราจรหน้าโรงเรียน หรือส่งหนังสือทำความเข้าใจกับผู้ปกครองครับ</li>`;
+            }
             html += `</ul>`;
         } else {
-             if (overallPerc >= 80) html += `<br>💡 <b>สรุป:</b> นักเรียนผ่านเกณฑ์ปกติครับ`; else html += `<br>💡 <b>สรุป:</b> เสี่ยงหมดสิทธิ์สอบ ควรเชิญผู้ปกครองพบครับ`;
+             if (overallPerc >= 80) html += `<br>💡 <b>สรุป:</b> นักเรียนคนนี้มีเวลาเรียนผ่านเกณฑ์ปกติ ไม่มีประเด็นน่าเป็นห่วงครับ`;
+             else html += `<br>💡 <b>สรุป:</b> นักเรียนเสี่ยง <b>หมดสิทธิ์สอบ</b> ควรให้ครูที่ปรึกษาเชิญผู้ปกครองเพื่อหารือแนวทางแก้ไขด่วนครับ`;
         }
         aiBox.innerHTML = html;
     }
