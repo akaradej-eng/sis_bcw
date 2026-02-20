@@ -58,7 +58,7 @@
         .ai-box { background: #f0f7ff; border-left: 5px solid #1e56a0; padding: 15px; border-radius: 8px; margin-bottom: 15px;}
         .ai-box h3 { margin-top: 0; color: #1e56a0; display:flex; align-items:center; gap:8px; font-size:15px; margin-bottom: 5px;}
 
-        /* สไตล์กล่อง AI สำหรับผู้บริหาร (ขยายใหญ่ขึ้น) */
+        /* สไตล์กล่อง AI สำหรับผู้บริหาร */
         .ai-exec-box { background: #fff; border: 1px solid #e2e8f0; border-left: 6px solid #8b5cf6; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);}
         .ai-exec-box h3 { margin-top: 0; color: #6d28d9; display:flex; align-items:center; gap:8px; font-size:16px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
         .ai-exec-box p { margin: 0; line-height: 1.6; font-size: 14px; color: #334155; }
@@ -94,7 +94,11 @@
 
     <div id="login-page" class="page active">
         <div class="card" style="text-align: center; max-width: 400px; margin: 40px auto;">
-            <h2 style="color: #1e56a0; margin-bottom: 10px;">เข้าสู่ระบบ</h2>
+            
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgb1oewS_bG2frmr1y3aOrwykh-wBZiipEUv9BbTxGSQh2d-Ergv_Ez4MWoO4AO8_wdCG19Nrravj8iJCc33arzt3ZXi2lmQ2v1hKGvEIBcLdjcCkZdfdZF-p8DWehYl3lzSWhWSOI4NKeNhWRzWkUHRJnMs1KFVMW_BwwUq83DafDaQpwu3-hOs-Ieix0/s225/304789124_573612801071886_7852363760169451884_n.png" 
+                 alt="โลโก้โรงเรียน" 
+                 style="width: 120px; height: auto; margin-bottom: 15px;">
+            
             <p id="login-clock" style="font-size:14px; font-weight:bold; color:#475569; margin-bottom:20px;"></p>
             <input type="text" id="username" placeholder="รหัสผู้ใช้งาน">
             <input type="password" id="password" placeholder="รหัสผ่าน">
@@ -293,7 +297,7 @@
 </div>
 
 <script>
-    // 🔗 API (ใส่ URL ของท่านรองฯ)
+    // 🔗 API ของท่านรองฯ
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz1Pi37ZXLJJQGvnfz20a_aH2y4sSDjt8dCmyqgdhaF3gin7jRhTh7jY1ajDRdnw1E2/exec";
     
     // --- ⏰ อัปเดตนาฬิกา ---
@@ -348,7 +352,7 @@
         if (pageId === 'summary-page' && currentClass) loadSummaryData();
     }
 
-    // --- 📝 TEACHER CHECKLIST & OTHERS (คงเดิมทั้งหมด) ---
+    // --- 📝 TEACHER CHECKLIST ---
     function fetchStudents() {
         document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px;">⏳ โหลดรายชื่อ...</div>`;
         document.getElementById('check-date').valueAsDate = new Date(); 
@@ -481,7 +485,8 @@
                 });
                 tbody.innerHTML = html;
                 document.getElementById('teacher-stat-grid').style.display = 'flex';
-                document.getElementById('tc-total-std').innerText = totalStudents; document.getElementById('tc-risk-std').innerText = riskCount;
+                document.getElementById('tc-total-std').innerText = totalStudents;
+                document.getElementById('tc-risk-std').innerText = riskCount;
                 let classAvg = sumTotal > 0 ? ((sumPres / sumTotal) * 100).toFixed(1) + "%" : "0%"; document.getElementById('tc-avg-perc').innerText = classAvg;
                 document.getElementById('teacher-summary-ai').innerHTML = `ค่าเฉลี่ยห้องคือ <b>${classAvg}</b> ${riskCount>0?`<br>⚠️ กลุ่มเสี่ยง ${riskCount} คน (แถบแดง)`:`🌟 ทุกคนผ่านเกณฑ์ 80%`}`;
             }
@@ -548,7 +553,7 @@
         .then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกการเปลี่ยนแปลงทั้งหมด"; btn.disabled = false; if(data.status === "success") alert("✅ สำเร็จ"); });
     }
 
-    // --- 📊 EXECUTIVE (อัปเกรด AI และตารางแบบละเอียด) ---
+    // --- 📊 EXECUTIVE ---
     function fetchFullExecData() { 
         document.getElementById('exec-ai-insight').innerHTML = "<p style='text-align:center;'>⏳ กำลังดาวน์โหลดฐานข้อมูลทั้งโรงเรียน...</p>";
         fetch(`${GAS_API_URL}?action=get_full_exec_data`).then(res=>res.json()).then(data=>{execFullAttendance=data.attendance; execFullStudents=data.students; updateExecViewDropdown();}); 
@@ -588,12 +593,10 @@
             }
         });
         
-        // อัปเดตตัวเลขหน้าบัตร
         document.getElementById('exec-total').innerText = stats.total; 
         let overallPerc = stats.total > 0 ? ((stats.p / stats.total) * 100).toFixed(1) : 0;
         document.getElementById('exec-present-perc').innerText = overallPerc + '%';
         
-        // วาดกราฟ 6 สถานะ
         let ctx = document.getElementById('execChart').getContext('2d'); if(execChartInstance) execChartInstance.destroy();
         let labels = Object.keys(gStat).sort();
         let d1 = labels.map(k=>gStat[k].มา), d2 = labels.map(k=>gStat[k].สาย), d3 = labels.map(k=>gStat[k].ลากิจ);
@@ -605,7 +608,6 @@
             options:{ responsive:true, maintainAspectRatio:false, scales:{x:{stacked:true},y:{stacked:true}} } 
         });
 
-        // วาดตารางรายละเอียด
         let tBody = document.getElementById('exec-detail-body'); tBody.innerHTML = "";
         if(labels.length === 0) { tBody.innerHTML = "<tr><td colspan='8' style='text-align:center;'>ไม่พบข้อมูลในช่วงเวลาที่เลือก</td></tr>"; }
         else {
@@ -623,7 +625,6 @@
             });
         }
 
-        // 🌟 ประมวลผล AI ผู้บริหาร
         generateExecutiveAIInsight(stats, gStat, v, overallPerc);
     }
 
@@ -649,7 +650,6 @@
             if (worst.name && worst.rate < 100) html += `<li>⚠️ <b>กลุ่มที่ควรเฝ้าระวัง:</b> ${worst.name} มีอัตรามาเรียนต่ำสุดที่ ${worst.rate.toFixed(1)}%</li>`;
             html += `</ul>`;
 
-            // วิเคราะห์สาเหตุ
             let issues = [
                 { name: 'การขาดเรียน', val: totalStats.abs }, { name: 'การลาป่วย', val: totalStats.sleave },
                 { name: 'การลากิจ', val: totalStats.pleave }, { name: 'การมาสาย', val: totalStats.late }
@@ -688,7 +688,9 @@
         });
     }
 
-    function logout() { if(confirm("ต้องการออกจากระบบใช่หรือไม่?")) location.reload(); }
+    function logout() { 
+        if(confirm("ต้องการออกจากระบบใช่หรือไม่?")) location.reload(); 
+    }
 </script>
 
 </body>
