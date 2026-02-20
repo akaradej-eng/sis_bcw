@@ -23,6 +23,9 @@
         input, select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; width: 100%; box-sizing: border-box; margin-bottom: 10px;}
         button { padding: 10px 15px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: bold;}
         
+        /* สไตล์แถบเวลาสำหรับทุก User (เพิ่มใหม่) */
+        .live-status-bar { background: #fff; padding: 12px 20px; border-radius: 10px; margin-bottom: 15px; display: none; justify-content: space-between; align-items: center; font-size: 14px; font-weight: bold; color: #1e293b; border-bottom: 3px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
         /* สไตล์ตาราง/แถวเช็คชื่อ (ครู) */
         .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;}
         .date-picker { padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; font-size: 16px; margin-bottom:0; width:auto;}
@@ -81,6 +84,11 @@
 
 <div class="container">
     
+    <div id="status-bar" class="live-status-bar">
+        <span id="display-date"></span>
+        <span id="display-clock" style="color:var(--primary);"></span>
+    </div>
+
     <div id="login-page" class="page active">
         <div class="card" style="text-align: center; max-width: 400px; margin: 40px auto;">
             <h2 style="color: #1e56a0; margin-bottom: 5px;">เข้าสู่ระบบ</h2>
@@ -260,8 +268,8 @@
 </div>
 
 <script>
-    // 🔗 API ของคุณ
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw0z7mkaPixNXP0CRoQ5KGaNkCA3xhyuAjBQbT3fYtIOL0F-eFKdPo58mFAzmkT1djg/exec"; 
+    // 🔗 API ของคุณ (ใช้ของเดิมที่เสถียรแล้ว)
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwQ4v8pY_iQv9J8eL-p_zN3h1bI7XWzZ8E2gZkM9H92Qk_k8_e8V8C8Z6K1t7K0v0M/exec"; 
     
     document.getElementById('check-date').valueAsDate = new Date();
     document.getElementById('view-date').valueAsDate = new Date();
@@ -280,15 +288,21 @@
     document.getElementById('check-date').addEventListener('change', fetchStudents);
 
     // ==========================================
-    // ⏰ ฟังก์ชันนาฬิกา Real-time
+    // ⏰ ฟังก์ชันนาฬิกา Real-time (อัปเดตแสดงผล 2 จุด)
     // ==========================================
     setInterval(() => {
         let now = new Date();
         let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         let dateStr = now.toLocaleDateString('th-TH', options);
         let timeStr = now.toLocaleTimeString('th-TH');
-        let clock = document.getElementById('live-clock');
-        if(clock) clock.innerHTML = `📅 วัน${dateStr} <br> ⏰ เวลา ${timeStr} น.`;
+        
+        let loginClock = document.getElementById('live-clock');
+        if(loginClock) loginClock.innerHTML = `📅 วัน${dateStr} <br> ⏰ เวลา ${timeStr} น.`;
+
+        let dispDate = document.getElementById('display-date');
+        let dispClock = document.getElementById('display-clock');
+        if(dispDate) dispDate.innerText = `📅 ${dateStr}`;
+        if(dispClock) dispClock.innerText = `🕒 ${timeStr} น.`;
     }, 1000);
 
     // ==========================================
@@ -307,6 +321,10 @@
                 btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false;
                 if (data.status === "success") {
                     document.getElementById('user-display').innerText = `${data.name} - ออกจากระบบ`;
+                    
+                    // 💡 โชว์แถบเวลาให้ทุก Role หลังจาก Login สำเร็จ
+                    document.getElementById('status-bar').style.display = 'flex'; 
+
                     if (data.role === "admin") {
                         document.getElementById('bottom-nav').style.display = 'none'; 
                         switchPage('admin-page', null); loadAdminData();
@@ -757,4 +775,3 @@
 
 </body>
 </html>
-
