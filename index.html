@@ -444,14 +444,30 @@
         });
     }
 
-    // --- ⚙️ ADMIN (ระบบปฏิทินและ API วันหยุด) ---
+   // --- ⚙️ ADMIN (ระบบปฏิทินและ API วันหยุด) ---
     function loadAdminData() {
         fetch(`${GAS_API_URL}?action=get_admin_data`).then(res => res.json()).then(data => {
             if(data.status === "success") {
-                document.getElementById('admin-start').value = data.config.startDate; 
-                document.getElementById('admin-end').value = data.config.endDate;
-                adminHolidays = data.config.holidays || []; 
                 
+                // 🛠️ 1. ฟังก์ชันแปลงวันที่จากฐานข้อมูลให้เป็นรูปแบบ YYYY-MM-DD เสมอ
+                function toFormatDate(dStr) {
+                    if (!dStr) return "";
+                    let d = new Date(dStr);
+                    if (isNaN(d)) return dStr;
+                    let year = d.getFullYear();
+                    let month = String(d.getMonth() + 1).padStart(2, '0');
+                    let day = String(d.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+
+                // ดึงค่ามาใส่ช่อง input ให้ถูกต้อง
+                document.getElementById('admin-start').value = toFormatDate(data.config.startDate); 
+                document.getElementById('admin-end').value = toFormatDate(data.config.endDate);
+                
+                // 🛠️ 2. ดึงวันหยุดและกรองค่าว่างทิ้ง (ป้องกันบั๊กเวลามีลูกน้ำเกิน)
+                adminHolidays = (data.config.holidays || []).filter(h => h.trim() !== ""); 
+                
+                // 🗓️ 3. สร้างปฏิทินทันทีพร้อมไฮไลท์สีแดงวันหยุดที่เคยบันทึกไว้
                 renderAdminCalendar(); 
                 
                 let uBody = document.getElementById('admin-users-body'); uBody.innerHTML = "";
@@ -658,4 +674,5 @@
 
 </body>
 </html>
+
 
