@@ -117,7 +117,7 @@
 </div>
 
 <script>
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycby3zyx9w_k1jBHmROtBt9GdfkQtPfuxRLo4H_VZtVoaqFpkvbReVH6upPyV-qGY3kc5/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxf3c7bmrFNX4rlvI91f-vfyJBW1xYtu9dRuksq2Mc6fD7Prb1uwAvFES8DWiG0KVa8/exec";
     let lastScannedId = "";
     let lastScanTime = 0;
     let html5QrcodeScanner = null;
@@ -219,7 +219,63 @@
         const time = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
         row.innerHTML = `<td>${time}</td><td>${data.name}</td><td>${data.className}</td>`;
     }
+
+    // --- 🔐 ระบบ Login ผ่าน Google Sheets ---
+    function handleLogin() {
+        const u = document.getElementById('username').value.trim();
+        const p = document.getElementById('password').value.trim();
+        const err = document.getElementById('login-error');
+        const loginBtn = document.querySelector('.login-btn');
+        
+        if (!u || !p) {
+            err.innerText = "❌ กรุณากรอกรหัสผู้ใช้และรหัสผ่าน";
+            err.style.display = 'block';
+            return;
+        }
+
+        err.style.display = 'none';
+        loginBtn.innerText = "⏳ กำลังตรวจสอบ...";
+        loginBtn.disabled = true;
+
+        // ส่งข้อมูลไปตรวจที่ Apps Script
+        const url = `${GAS_API_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`;
+        
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                loginBtn.innerText = "เข้าสู่ระบบ";
+                loginBtn.disabled = false;
+
+                if (data.status === "success") {
+                    // หาก Login สำเร็จ! แยกสิทธิ์ตามที่ดึงมาจากชีต Users
+                    if (data.role === "teacher" || data.role === "admin") {
+                        document.getElementById('user-display').innerText = `${data.name} (ออกจากระบบ)`;
+                        document.getElementById('bottom-nav').style.display = 'flex'; 
+                        switchPage('scan-page', document.getElementById('nav-scan'));
+                        setTimeout(() => { startScanner(); }, 300);
+                        
+                    } else if (data.role === "student") {
+                        document.getElementById('user-display').innerText = `${data.name} (ออกจากระบบ)`;
+                        document.getElementById('bottom-nav').style.display = 'none'; 
+                        document.getElementById('st-name-display').innerText = data.name;
+                        switchPage('student-page', null);
+                        stopScanner();
+                    }
+                } else {
+                    // หากรหัสผิด
+                    err.innerText = `❌ ${data.message}`;
+                    err.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                loginBtn.innerText = "เข้าสู่ระบบ";
+                loginBtn.disabled = false;
+                err.innerText = "❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้";
+                err.style.display = 'block';
+            });
+    }
 </script>
 
 </body>
 </html>
+
