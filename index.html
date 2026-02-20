@@ -24,7 +24,6 @@
         input, select, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; width: 100%; box-sizing: border-box; margin-bottom: 10px;}
         button { padding: 10px 15px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: bold;}
         
-        /* ปุ่มออกจากระบบใหม่ */
         .btn-logout { background: #ef4444; color: white; border: 1px solid #dc2626; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-family: 'Prompt'; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s;}
         .btn-logout:hover { background: #dc2626; }
 
@@ -77,6 +76,7 @@
         .calendar-day { padding: 8px 0; border-radius: 6px; font-size: 12px; cursor: pointer; background: #f1f5f9; border: 1px solid #e2e8f0; transition: 0.2s; }
         .calendar-day:hover:not(.blank) { background: #cbd5e1; }
         .calendar-day.holiday { background: #ef4444; color: white; border-color: #ef4444; font-weight: bold; box-shadow: 0 2px 5px rgba(239,68,68,0.3);}
+        .calendar-day.selected-leave { background: #f59e0b; color: white; border-color: #d97706; font-weight: bold; box-shadow: 0 2px 5px rgba(245,158,11,0.3);} /* 🌟 สีปฏิทินตอนขอลา */
         .calendar-day.blank { background: transparent; border: none; cursor: default; color: #cbd5e1; }
 
         .switch { position: relative; display: inline-block; width: 42px; height: 24px; }
@@ -207,7 +207,6 @@
 
     <div id="admin-page" class="page">
         <h2 style="color: #1e56a0; margin-bottom: 15px;">⚙️ ระบบผู้ดูแล (Admin)</h2>
-        
         <div class="admin-tabs">
             <div class="admin-tab-btn active" onclick="switchAdminTab('tab-settings', this)">⚙️ ตั้งค่าระบบ</div>
             <div class="admin-tab-btn" onclick="switchAdminTab('tab-users', this)">👥 ผู้ใช้งาน</div>
@@ -217,10 +216,7 @@
         <div id="tab-settings" class="admin-tab-content active">
             <h3 style="color:#ef4444; margin-top:0;">⏰ จำกัดเวลาเช็คชื่อประจำวัน</h3>
             <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
-                <label class="switch">
-                    <input type="checkbox" id="admin-time-limit-toggle">
-                    <span class="slider"></span>
-                </label>
+                <label class="switch"><input type="checkbox" id="admin-time-limit-toggle"><span class="slider"></span></label>
                 <span id="time-limit-status-text" style="font-size:13px; font-weight:bold; color:#64748b;">ปิดใช้งาน (ครูบันทึกได้ตลอดเวลา)</span>
             </div>
             <div id="time-limit-inputs" style="display:none; gap:10px; background:#f0fdf4; padding:15px; border-radius:8px; border:1px solid #bbf7d0;">
@@ -331,8 +327,20 @@
         
         <div class="card" style="background:#fffbeb; border:1px solid #fcd34d;">
             <h3 style="margin-top:0; color:#b45309; display:flex; align-items:center; gap:8px;">📝 แจ้งขออนุญาตลาหยุด</h3>
-            <label style="font-size:12px; font-weight:bold; color:#92400e;">วันที่ขอลา</label>
-            <input type="date" id="student-leave-date">
+            
+            <label style="font-size:12px; font-weight:bold; color:#92400e;">เลือกวันที่ขอลา (กดคลิกเลือกได้หลายวัน)</label>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <button onclick="changeStudentMonth(-1)" style="padding:5px 10px; background:#f59e0b; font-size:12px;">◀ ก่อนหน้า</button>
+                <b id="student-calendar-month-label" style="color:#b45309; font-size:14px;">เดือน ปี</b>
+                <button onclick="changeStudentMonth(1)" style="padding:5px 10px; background:#f59e0b; font-size:12px;">ถัดไป ▶</button>
+            </div>
+            <div id="student-leave-calendar-container" style="background:#fff; border-radius:8px; padding:10px; margin-bottom:10px; border:1px solid #fde68a;"></div>
+            
+            <div id="selected-leave-dates-display" style="font-size:12px; color:#b91c1c; margin-bottom:10px; font-weight:bold; background:#fee2e2; padding:8px; border-radius:6px; display:none;">
+                วันที่เลือก: 
+            </div>
+
             <label style="font-size:12px; font-weight:bold; color:#92400e;">ประเภทการลา</label>
             <select id="student-leave-type">
                 <option value="ลากิจ">ลากิจ (มีธุระจำเป็น)</option>
@@ -384,8 +392,8 @@
 </div>
 
 <script>
-    // 🔗 วางลิงก์ Web App API ตรงนี้ครับ
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzQGWPoIxbBIHGnrfL_8oRVFWfVWXb2Td5dbjXSFElv1z3-kuRyMGX78t7lN5m1cc_l/exec";
+    // 🔗 API (ใส่ URL ของท่านรองฯ)
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxAS63nmcgD7SAUE3vG_aoY2OJQKU4VE_LkiRIdSt0-2sa7xlghVfqq276veV9uI02b/exec";
     
     const IDLE_TIMEOUT = 5 * 60 * 1000; 
     let idleTimer = null;
@@ -400,7 +408,7 @@
     }
 
     function autoLogout() {
-        Swal.fire({ title: 'ระบบ SIS บ้านเชียงวิทยา', text: '⏱️ ระบบได้ออกจากระบบอัตโนมัติ เนื่องจากไม่มีการใช้งานเกิน 5 นาที เพื่อความปลอดภัย', icon: 'warning', confirmButtonColor: '#1e56a0', confirmButtonText: 'ตกลง'
+        Swal.fire({ title: 'ระบบ SIS บ้านเชียงวิทยา', text: '⏱️ ระบบได้ออกจากระบบอัตโนมัติ เนื่องจากไม่มีการใช้งานเกิน 5 นาที', icon: 'warning', confirmButtonColor: '#1e56a0', confirmButtonText: 'ตกลง'
         }).then(() => { localStorage.removeItem('sis_user'); localStorage.removeItem('sis_last_activity'); localStorage.removeItem('sis_current_page'); location.reload(); });
     }
 
@@ -433,6 +441,10 @@
     let timeLimitConfig = { enabled: false, start: "", end: "" }; 
     let execFullAttendance = [], execFullStudents = [], execChartInstance = null;
 
+    // 🌟 ตัวแปรสำหรับปฏิทินของนักเรียน
+    let studentLeaveDates = [];
+    let currentStudentCalendarDate = new Date();
+
     document.getElementById('admin-time-limit-toggle').addEventListener('change', function() {
         let inputs = document.getElementById('time-limit-inputs'); let text = document.getElementById('time-limit-status-text');
         if(this.checked) { inputs.style.display = 'flex'; text.innerText = 'เปิดใช้งาน (ล็อกเวลาเช็คชื่อ)'; text.style.color = '#10b981';
@@ -447,7 +459,7 @@
 
     function handleLogin() {
         const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim(), btn = document.getElementById('login-btn');
-        if (!u || !p) { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
+        if (!u || !p) { Swal.fire('ระบบ SIS', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
         btn.innerText = "⏳ กำลังเข้าสู่ระบบ..."; btn.disabled = true;
         
         fetch(`${GAS_API_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`)
@@ -456,10 +468,10 @@
                 if (data.status === "success") {
                     data.userId = u; localStorage.setItem('sis_user', JSON.stringify(data)); localStorage.setItem('sis_last_activity', Date.now());
                     routeUser(data); setupActivityListeners(); resetIdleTimer();
-                } else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '❌ รหัสผ่านไม่ถูกต้อง', 'error');
+                } else Swal.fire('ระบบ SIS', '❌ รหัสผ่านไม่ถูกต้อง', 'error');
             }).catch((err) => { 
                 btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; 
-                Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '❌ เชื่อมต่อล้มเหลว (อาจเปิดผ่านแอป LINE หรือไม่มีเน็ต)\n\nโปรดเปิดใน Google Chrome หรือ Safari แทนครับ', 'error'); 
+                Swal.fire('ระบบ SIS', '❌ เชื่อมต่อล้มเหลว กรุณาเปิดผ่าน Google Chrome', 'error'); 
             });
     }
 
@@ -469,24 +481,19 @@
             document.getElementById('logout-btn').style.display = 'block';
             document.getElementById('status-bar').style.display = 'flex';
             let savedPage = localStorage.getItem('sis_current_page');
-            
             let role = data.role ? data.role.toString().trim().toLowerCase() : "";
 
             if (role === "teacher") { 
                 currentTeacher = data.name; currentClass = data.className || ""; 
-                document.getElementById('class-title').innerText = `(${currentClass})`; 
-                document.getElementById('bottom-nav').style.display = 'flex';
+                document.getElementById('class-title').innerText = `(${currentClass})`; document.getElementById('bottom-nav').style.display = 'flex';
                 
-                let navItems = document.querySelectorAll('.nav-item');
-                if(savedPage === 'daily-page' && navItems.length > 1) switchPage('daily-page', navItems[1]); 
-                else if(savedPage === 'summary-page' && navItems.length > 2) switchPage('summary-page', navItems[2]); 
-                else if(navItems.length > 0) switchPage('checklist-page', navItems[0]);
-                else switchPage('checklist-page', null);
+                if(savedPage === 'daily-page') switchPage('daily-page', document.querySelectorAll('.nav-item')[1]); 
+                else if(savedPage === 'summary-page') switchPage('summary-page', document.querySelectorAll('.nav-item')[2]); 
+                else switchPage('checklist-page', document.querySelectorAll('.nav-item')[0]);
                 
                 fetch(`${GAS_API_URL}?action=get_admin_data`).then(res => res.json()).then(adminData => {
                     if(adminData.status === "success") {
-                        adminHolidays = (adminData.config.holidays || []).filter(h => h.trim() !== ""); 
-                        adminTermStart = adminData.config.startDate; adminTermEnd = adminData.config.endDate;
+                        adminHolidays = (adminData.config.holidays || []).filter(h => h.trim() !== ""); adminTermStart = adminData.config.startDate; adminTermEnd = adminData.config.endDate;
                         timeLimitConfig = { enabled: adminData.config.timeLimitEnabled, start: adminData.config.startTime, end: adminData.config.endTime };
                         
                         let modalText = document.getElementById('modal-time-limit-text');
@@ -494,9 +501,7 @@
                             if (timeLimitConfig.enabled) modalText.innerHTML = `<b>2. เวลาบันทึก:</b> กรุณาบันทึกข้อมูลในช่วงเวลา <b style="color:#ef4444; font-size:15px;">${timeLimitConfig.start} - ${timeLimitConfig.end} น.</b> เท่านั้น`;
                             else modalText.innerHTML = `<b>2. เวลาบันทึก:</b> ปัจจุบันระบบ <b style="color:#10b981;">เปิดให้บันทึกได้ตลอดเวลา</b>`;
                         }
-                        
-                        let modalEl = document.getElementById('teacher-instruction-modal');
-                        if (modalEl && !sessionStorage.getItem('teacher_modal_seen')) modalEl.style.display = 'flex';
+                        if (!sessionStorage.getItem('teacher_modal_seen')) document.getElementById('teacher-instruction-modal').style.display = 'flex';
                     }
                     if(!savedPage || savedPage === 'checklist-page') fetchStudents(); 
                 }).catch(e => console.log("Admin config fetch error", e));
@@ -509,12 +514,12 @@
                 switchPage('student-page', null); 
                 document.getElementById('st-name-display').innerText = data.name; 
                 loadStudentReport(data.userId); 
+                renderStudentCalendar(); // 🌟 โหลดปฏิทินนักเรียนเมื่อล็อกอิน
             } else {
-                Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '❌ ไม่พบสิทธิ์การเข้าถึงข้อมูล กรุณาติดต่อผู้ดูแลระบบ', 'error');
+                Swal.fire('ระบบ SIS', '❌ ไม่พบสิทธิ์การเข้าถึงข้อมูล กรุณาติดต่อผู้ดูแลระบบ', 'error');
             }
         } catch (err) {
-            console.error("RouteUser Error:", err);
-            Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '❌ เกิดข้อผิดพลาดในการโหลดหน้าจอ: ' + err.message, 'error');
+            Swal.fire('ระบบ SIS', '❌ เกิดข้อผิดพลาดในการโหลดหน้าจอ: ' + err.message, 'error');
         }
     }
 
@@ -567,24 +572,12 @@
                     
                     if (!existingData && Object.keys(leaveData).length > 0) {
                         let leaveListHTML = ""; let count = 0;
-                        students.forEach(std => {
-                            if(leaveData[std.id]) {
-                                count++;
-                                leaveListHTML += `<div style="padding: 5px 0; border-bottom: 1px dashed #eee;"><b>${count}. ${cleanName(std.name)}</b> <span style="color:#ef4444; font-size:12px;">(${leaveData[std.id].type})</span></div>`;
-                            }
-                        });
-                        
+                        students.forEach(std => { if(leaveData[std.id]) { count++; leaveListHTML += `<div style="padding: 5px 0; border-bottom: 1px dashed #eee;"><b>${count}. ${cleanName(std.name)}</b> <span style="color:#ef4444; font-size:12px;">(${leaveData[std.id].type})</span></div>`; } });
                         if (count > 0) {
                             Swal.fire({
                                 title: '📢 แจ้งเตือนนักเรียนลาหยุด',
-                                html: `วันนี้มีนักเรียนแจ้งลาผ่านระบบจำนวน <b>${count}</b> คน<br><br>
-                                       <div style="text-align:left; background:#f8fafc; padding:10px; border-radius:8px; max-height:150px; overflow-y:auto; font-size:14px;">
-                                           ${leaveListHTML}
-                                       </div><br>
-                                       <span style="color:#10b981; font-size:13px; font-weight:bold;">✅ ระบบได้ดึงข้อมูลลงในแบบฟอร์มให้ท่านเรียบร้อยแล้ว</span>`,
-                                icon: 'info',
-                                confirmButtonText: 'รับทราบ',
-                                confirmButtonColor: '#1e56a0'
+                                html: `วันนี้มีนักเรียนแจ้งลาผ่านระบบจำนวน <b>${count}</b> คน<br><br><div style="text-align:left; background:#f8fafc; padding:10px; border-radius:8px; max-height:150px; overflow-y:auto; font-size:14px;">${leaveListHTML}</div><br><span style="color:#10b981; font-size:13px; font-weight:bold;">✅ ระบบได้ดึงข้อมูลลงในแบบฟอร์มให้ท่านเรียบร้อยแล้ว</span>`,
+                                icon: 'info', confirmButtonText: 'รับทราบ', confirmButtonColor: '#1e56a0'
                             });
                         }
                     }
@@ -656,7 +649,7 @@
         fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) })
         .then(res => res.json()).then(data => {
             btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false;
-            if(data.status === "success") { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '✅ บันทึกข้อมูลสำเร็จ!', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error');
+            if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ บันทึกสำเร็จ!', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error');
         });
     }
 
@@ -673,12 +666,93 @@
         });
     }
 
+    // 🌟 ฟังก์ชันจัดการปฏิทินนักเรียน (ระบบขอลา)
+    function renderStudentCalendar() {
+        let container = document.getElementById('student-leave-calendar-container');
+        let d = new Date(currentStudentCalendarDate.getFullYear(), currentStudentCalendarDate.getMonth(), 1);
+        document.getElementById('student-calendar-month-label').innerText = d.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+        
+        let html = `<div class="calendar-grid">`;
+        const thDays = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
+        thDays.forEach(day => html += `<div class="calendar-header">${day}</div>`);
+        
+        let firstDay = d.getDay();
+        let daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+        
+        for(let i=0; i<firstDay; i++) html += `<div class="calendar-day blank"></div>`;
+        
+        for(let i=1; i<=daysInMonth; i++) {
+            let dateObj = new Date(d.getFullYear(), d.getMonth(), i);
+            let dStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`;
+            let isWeekend = (dateObj.getDay() === 0 || dateObj.getDay() === 6);
+            let isSelected = studentLeaveDates.includes(dStr);
+            
+            let cssClass = isSelected ? "selected-leave" : "";
+            let bgStyle = isWeekend && !isSelected ? 'style="background:#fee2e2; color:#b91c1c;"' : '';
+            
+            html += `<div class="calendar-day ${cssClass}" ${bgStyle} onclick="toggleStudentLeave('${dStr}', ${isWeekend})">${i}</div>`;
+        }
+        html += `</div>`;
+        container.innerHTML = html;
+        updateSelectedLeaveDisplay();
+    }
+
+    function changeStudentMonth(dir) {
+        currentStudentCalendarDate.setMonth(currentStudentCalendarDate.getMonth() + dir);
+        renderStudentCalendar();
+    }
+
+    function toggleStudentLeave(dateStr, isWeekend) {
+        if(isWeekend) { Swal.fire('แจ้งเตือน', 'ไม่สามารถลาในวันเสาร์-อาทิตย์ได้ครับ', 'info'); return; }
+        
+        let idx = studentLeaveDates.indexOf(dateStr);
+        if(idx > -1) studentLeaveDates.splice(idx, 1);
+        else studentLeaveDates.push(dateStr);
+        
+        studentLeaveDates.sort(); 
+        renderStudentCalendar();
+    }
+    
+    function updateSelectedLeaveDisplay() {
+        let display = document.getElementById('selected-leave-dates-display');
+        if(studentLeaveDates.length === 0) {
+            display.style.display = 'none';
+        } else {
+            display.style.display = 'block';
+            let formattedDates = studentLeaveDates.map(d => { let p = d.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }).join(', ');
+            display.innerText = `📌 วันที่เลือกลา (${studentLeaveDates.length} วัน): ${formattedDates}`;
+        }
+    }
+
     function submitLeaveRequest(btn) {
-        let sDate = document.getElementById('student-leave-date').value; let sType = document.getElementById('student-leave-type').value; let sReason = document.getElementById('student-leave-reason').value;
-        if(!sDate || !sReason) { Swal.fire('ระบบ SIS', 'กรุณาระบุวันที่และเหตุผลให้ครบถ้วน', 'warning'); return; }
-        let uData = JSON.parse(localStorage.getItem('sis_user')); let originalText = btn.innerText; btn.innerText = '⏳ กำลังส่งข้อมูล...'; btn.disabled = true;
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submit_leave", date: sDate, studentId: uData.userId, studentName: uData.name, className: uData.className, leaveType: sType, reason: sReason })
-        }).then(res => res.json()).then(data => { btn.innerText = originalText; btn.disabled = false; if(data.status === 'success') { Swal.fire('ระบบ SIS', 'ส่งคำร้องแจ้งลาเรียบร้อยแล้ว ครูประจำชั้นจะเห็นข้อมูลของท่านอัตโนมัติ', 'success'); document.getElementById('student-leave-reason').value = ""; }
+        if(studentLeaveDates.length === 0) { Swal.fire('ระบบ SIS', 'กรุณาคลิกเลือกวันที่ต้องการลาในปฏิทินครับ', 'warning'); return; }
+        let sType = document.getElementById('student-leave-type').value; 
+        let sReason = document.getElementById('student-leave-reason').value;
+        if(!sReason) { Swal.fire('ระบบ SIS', 'กรุณาระบุเหตุผลให้ครูทราบด้วยครับ', 'warning'); return; }
+        
+        let uData = JSON.parse(localStorage.getItem('sis_user')); 
+        let originalText = btn.innerText; 
+        btn.innerText = '⏳ กำลังส่งข้อมูล...'; btn.disabled = true;
+
+        fetch(GAS_API_URL, { 
+            method: "POST", 
+            body: JSON.stringify({ 
+                action: "submit_leave", 
+                dates: studentLeaveDates, // 🌟 ส่งข้อมูลเป็น Array หลายวัน
+                studentId: uData.userId, 
+                studentName: uData.name, 
+                className: uData.className, 
+                leaveType: sType, 
+                reason: sReason 
+            })
+        }).then(res => res.json()).then(data => { 
+            btn.innerText = originalText; btn.disabled = false; 
+            if(data.status === 'success') { 
+                Swal.fire('ระบบ SIS', 'ส่งคำร้องแจ้งลาเรียบร้อยแล้ว ครูประจำชั้นจะเห็นข้อมูลของท่านโดยอัตโนมัติ', 'success'); 
+                document.getElementById('student-leave-reason').value = ""; 
+                studentLeaveDates = []; // รีเซ็ตปฏิทิน
+                renderStudentCalendar();
+            }
         }).catch(err => { btn.innerText = originalText; btn.disabled = false; Swal.fire('ระบบ SIS', 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่', 'error'); });
     }
 
@@ -693,7 +767,7 @@
             results.forEach((res, dayIndex) => { if(res && res.status === 'success' && res.data) { res.data.forEach(d => { if(!weeklyData[d.id]) weeklyData[d.id] = { name: d.name, status: ['-', '-', '-', '-', '-'] }; let sText = d.status; let shortStat = '-'; if(sText === 'มา') shortStat = '<b style="color:#10b981;">ม</b>'; else if(sText === 'ลากิจ') shortStat = '<b style="color:#f97316;">ล</b>'; else if(sText === 'ลาป่วย') shortStat = '<b style="color:#f43f5e;">ป</b>'; else if(sText === 'ขาด') { shortStat = '<b style="color:#991b1b;">ข</b>'; totalAbs++; } else if(sText === 'สาย') shortStat = '<b style="color:#eab308;">ส</b>'; else if(sText === 'เรียนนอกโรงเรียน') shortStat = '<b style="color:#3b82f6;">น</b>'; weeklyData[d.id].status[dayIndex] = shortStat; }); } });
             tbody.innerHTML = ""; let index = 1; for(let id in weeklyData) { let st = weeklyData[id]; tbody.innerHTML += `<tr><td style="text-align:center;">${index++}</td><td>${cleanName(st.name)}</td><td style="text-align:center; background:#f8fafc;">${st.status[0]}</td><td style="text-align:center;">${st.status[1]}</td><td style="text-align:center; background:#f8fafc;">${st.status[2]}</td><td style="text-align:center;">${st.status[3]}</td><td style="text-align:center; background:#f8fafc;">${st.status[4]}</td></tr>`; }
             if(Object.keys(weeklyData).length === 0) tbody.innerHTML = `<tr><td colspan='7' style='text-align:center; padding:20px;'>❌ ไม่มีข้อมูลนักเรียนในห้องนี้</td></tr>`; 
-            if (totalAbs > 0) document.getElementById('teacher-daily-ai').innerHTML = `⚠️ <b>สัปดาห์นี้:</b> พบการขาดเรียนรวมสะสม <b>${totalAbs} ครั้ง</b>`; else document.getElementById('teacher-daily-ai').innerHTML = `🌟 <b>ยอดเยี่ยมมาก!</b> สัปดาห์นี้นักเรียนมาเรียนดีมาก ไม่มีคนขาดเลยครับ`;
+            if (totalAbs > 0) document.getElementById('teacher-daily-ai').innerHTML = `⚠️ <b>สัปดาห์นี้:</b> พบการขาดเรียนรวมสะสม <b>${totalAbs} ครั้ง</b>`; else document.getElementById('teacher-daily-ai').innerHTML = `🌟 <b>ยอดเยี่ยมมาก!</b> สัปดาห์นี้นักเรียนมาเรียนดีมาก`;
         });
     }
 
@@ -815,4 +889,3 @@
 
 </body>
 </html>
-
