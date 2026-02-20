@@ -426,7 +426,10 @@
                         switchPage('student-page'); document.getElementById('st-name-display').innerText = data.name; loadStudentReport(u);
                     }
                 } else alert("❌ รหัสผ่านไม่ถูกต้อง");
-            }).catch(() => { btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; });
+           }).catch((err) => { 
+    btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; 
+    alert("❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้! \n\nสาเหตุที่เป็นไปได้:\n1. ใส่ URL API ผิด\n2. ลืมเปิดสิทธิ์ Anyone\n3. โค้ด Apps Script มีปัญหา\n\n(รายละเอียด Error: " + err + ")"); 
+});
     }
 
     function switchPage(pageId, element) {
@@ -900,4 +903,5 @@
 
 </body>
 </html>
+
 
