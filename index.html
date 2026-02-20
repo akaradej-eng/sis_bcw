@@ -10,7 +10,7 @@
         :root { --primary: #1e56a0; --bg: #f3f5f9; }
         body { font-family: 'Prompt', sans-serif; background-color: var(--bg); margin: 0; padding: 0; padding-bottom: 80px; }
         .navbar { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
-        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; min-height: 80vh;}
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
@@ -23,6 +23,7 @@
         input, select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; width: 100%; box-sizing: border-box; margin-bottom: 10px;}
         button { padding: 10px 15px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: bold;}
         
+        /* สไตล์ตาราง/แถวเช็คชื่อ (ครู) */
         .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;}
         .date-picker { padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; font-size: 16px; margin-bottom:0; width:auto;}
         .student-row { display: flex; flex-direction: column; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 15px; transition: 0.3s; }
@@ -65,6 +66,9 @@
         .exec-filters { display:flex; gap:10px; flex-wrap:wrap; background:#fff; padding:15px; border-radius:10px; margin-bottom:15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
         .exec-filters div { flex: 1; min-width:140px;}
         .exec-filters label { font-size:12px; color:#666; font-weight:bold; }
+        
+        /* Footer เครดิตผู้จัดทำ */
+        .footer-credit { text-align: center; padding: 20px; margin-top: 40px; margin-bottom: 40px; color: #64748b; font-size: 13px; border-top: 1px dashed #ddd; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -79,8 +83,13 @@
     
     <div id="login-page" class="page active">
         <div class="card" style="text-align: center; max-width: 400px; margin: 40px auto;">
-            <h2 style="color: #1e56a0;">เข้าสู่ระบบ</h2>
-            <input type="text" id="username" placeholder="รหัสผู้ใช้งาน">
+            <h2 style="color: #1e56a0; margin-bottom: 5px;">เข้าสู่ระบบ</h2>
+            
+            <div id="live-clock" style="margin-bottom: 20px; color: #475569; font-size: 14px; font-weight: bold; background: #eef2f5; padding: 10px; border-radius: 8px; line-height: 1.6;">
+                กำลังโหลดเวลา...
+            </div>
+
+            <input type="text" id="username" placeholder="รหัสผู้ใช้งาน (เช่น รหัสครู, admin, รหัสนักเรียน)">
             <input type="password" id="password" placeholder="รหัสผ่าน">
             <button id="login-btn" onclick="handleLogin()" style="width: 100%; font-size:16px;">เข้าสู่ระบบ</button>
         </div>
@@ -120,13 +129,12 @@
 
     <div id="daily-page" class="page">
         <div class="card">
-            <h2>📅 รายละเอียดรายวัน</h2>
-            <input type="date" id="view-date" class="date-picker" style="margin-bottom: 15px; width:100%;">
-            <button onclick="loadDailyData()" style="width:100%; background: var(--primary);">โหลดข้อมูล</button>
+            <h2>📅 รายละเอียดรายวัน (Real-time)</h2>
+            <input type="date" id="view-date" class="date-picker" style="margin-bottom: 15px; width:100%;" onchange="loadDailyData()">
             
-            <div class="ai-box" style="margin-top: 20px;">
+            <div class="ai-box">
                 <h3>🤖 AI วิเคราะห์สถานการณ์ประจำวัน</h3>
-                <p id="teacher-daily-ai" style="color:#333; line-height:1.6; margin-bottom:0; font-size:14px;">กดปุ่ม "โหลดข้อมูล" เพื่อให้ระบบวิเคราะห์</p>
+                <p id="teacher-daily-ai" style="color:#333; line-height:1.6; margin-bottom:0; font-size:14px;">กำลังวิเคราะห์...</p>
             </div>
 
             <table id="daily-table" style="margin-top: 0;">
@@ -138,17 +146,16 @@
 
     <div id="summary-page" class="page">
         <div class="card">
-            <h2>📊 สรุปสถานะทั้งหมด</h2>
-            <button onclick="loadSummaryData()" style="width:100%; background: #28a745; margin-bottom: 15px;">อัปเดตข้อมูลภาพรวม</button>
+            <h2>📊 สรุปสถานะทั้งหมด (Real-time)</h2>
             
             <div class="ai-box">
                 <h3>🤖 AI ประเมินภาพรวมชั้นเรียน</h3>
-                <p id="teacher-summary-ai" style="color:#333; line-height:1.6; margin-bottom:0; font-size:14px;">กดอัปเดตข้อมูลเพื่อรับคำแนะนำ</p>
+                <p id="teacher-summary-ai" style="color:#333; line-height:1.6; margin-bottom:0; font-size:14px;">กำลังประมวลผลสถิติภาพรวม...</p>
             </div>
 
             <table id="summary-table" style="margin-top:0;">
                 <thead><tr><th>เลขที่</th><th>ชื่อ</th><th style="color:#28a745;">มา</th><th style="color:#dc3545;">ป่วย</th><th style="color:#ffc107;">ลา</th><th style="color:#fd7e14;">ขาด</th></tr></thead>
-                <tbody id="summary-body"><tr><td colspan='6' style='text-align:center;'>ยังไม่มีข้อมูล</td></tr></tbody>
+                <tbody id="summary-body"><tr><td colspan='6' style='text-align:center;'>กำลังโหลดข้อมูล</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -185,6 +192,11 @@
 
     <div id="exec-page" class="page">
         <h2 style="color: #1e56a0; margin-bottom:5px;">📊 แดชบอร์ดผู้บริหาร (Executive)</h2>
+        
+        <button onclick="fetchFullExecData()" style="width:100%; padding:10px; margin-bottom:15px; background:#17a2b8; color:white; border:none; border-radius:8px; font-family:'Prompt'; font-weight:bold; cursor:pointer;">
+            🔄 อัปเดตข้อมูลล่าสุด (Real-time)
+        </button>
+
         <div class="exec-filters">
             <div>
                 <label>📌 เลือกมุมมอง</label>
@@ -234,6 +246,11 @@
         </div>
     </div>
 
+    <div class="footer-credit">
+        <b>จัดทำโดย:</b> นายอัครเดช โพธิญาณ์<br>
+        รองผู้อำนวยการสถานศึกษา โรงเรียนบ้านเชียงวิทยา
+    </div>
+
 </div>
 
 <div class="nav-menu" id="bottom-nav">
@@ -244,7 +261,7 @@
 
 <script>
     // 🔗 API ของคุณ
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwqgW3wGd_ntUn4-u2eZjv8ar-bvcn_eUI2IQWgV2uhMCN0fxnbGXL943rjYAV-eZSS/exec"; // ⚠️ เปลี่ยนให้ตรง
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwqgW3wGd_ntUn4-u2eZjv8ar-bvcn_eUI2IQWgV2uhMCN0fxnbGXL943rjYAV-eZSS/exec"; 
     
     document.getElementById('check-date').valueAsDate = new Date();
     document.getElementById('view-date').valueAsDate = new Date();
@@ -261,6 +278,18 @@
     let execChartInstance = null;
 
     document.getElementById('check-date').addEventListener('change', fetchStudents);
+
+    // ==========================================
+    // ⏰ ฟังก์ชันนาฬิกา Real-time
+    // ==========================================
+    setInterval(() => {
+        let now = new Date();
+        let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        let dateStr = now.toLocaleDateString('th-TH', options);
+        let timeStr = now.toLocaleTimeString('th-TH');
+        let clock = document.getElementById('live-clock');
+        if(clock) clock.innerHTML = `📅 วัน${dateStr} <br> ⏰ เวลา ${timeStr} น.`;
+    }, 1000);
 
     // ==========================================
     // 🔐 ระบบ Login
@@ -301,10 +330,16 @@
     }
 
     function logout() { location.reload(); }
+    
+    // อัปเกรด: โหลดข้อมูลออโต้เมื่อสลับหน้าเว็บ (Real-time Experience)
     function switchPage(pageId, element) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         if(element) { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); element.classList.add('active'); }
         document.getElementById(pageId).classList.add('active');
+        
+        // Auto Real-time fetch
+        if (pageId === 'daily-page' && currentClass) loadDailyData();
+        if (pageId === 'summary-page' && currentClass) loadSummaryData();
     }
 
     // ==========================================
@@ -417,7 +452,6 @@
         .then(res => res.json()).then(data => { if(data.status === "success") { alert("✅ อัปเดตสถานะสำเร็จ!"); fetchStudents(); } });
     }
 
-    // 👨‍🏫 โหลดรายวัน + AI ครู
     function loadDailyData() {
         let viewDate = document.getElementById('view-date').value;
         if (!viewDate) return;
@@ -435,7 +469,7 @@
 
                     if(totalStd === 0) { 
                         tbody.innerHTML = `<tr><td colspan='4' style='text-align:center;'>❌ ไม่มีข้อมูล</td></tr>`; 
-                        document.getElementById('teacher-daily-ai').innerHTML = `ไม่มีข้อมูลการบันทึกในวันที่ ${viewDate}`;
+                        document.getElementById('teacher-daily-ai').innerHTML = `ไม่มีข้อมูลการบันทึกในวันที่เลือกครับ`;
                         return; 
                     }
                     
@@ -448,9 +482,9 @@
                         tbody.innerHTML += `<tr><td>${index + 1}</td><td>${d.name}</td><td>${statusTh}</td><td style="color:#666; font-size:12px;">${d.note || '-'}</td></tr>`;
                     });
 
-                    // 🤖 วิเคราะห์รายวัน
+                    // 🤖 วิเคราะห์รายวันของครู
                     let aiMsg = "";
-                    if(tPres === totalStd) aiMsg = `🌟 <b>ยอดเยี่ยมมาก!</b> วันนี้นักเรียนมาเรียนครบ 100% สมบูรณ์แบบครับ จัดการชั้นเรียนได้ดีเยี่ยม`;
+                    if(tPres === totalStd) aiMsg = `🌟 <b>ยอดเยี่ยมมาก!</b> วันนี้นักเรียนห้อง ${currentClass} มาเรียนครบ 100% สมบูรณ์แบบครับ จัดการชั้นเรียนได้ดีเยี่ยม`;
                     else if(tAbs > 0) aiMsg = `⚠️ วันนี้มีนักเรียน <b>ขาดเรียน ${tAbs} คน</b> แนะนำให้คุณครูติดต่อผู้ปกครองเพื่อสอบถามสาเหตุโดยด่วนครับ`;
                     else aiMsg = `💡 วันนี้มีนักเรียน <b>ป่วย/ลา ${tSick} คน</b> อย่าลืมส่งข้อความสอบถามอาการ และฝากเพื่อนๆ ติดตามงานให้นะครับ`;
                     document.getElementById('teacher-daily-ai').innerHTML = aiMsg;
@@ -458,7 +492,6 @@
             });
     }
 
-    // 👨‍🏫 โหลดสรุป + AI ครู
     function loadSummaryData() {
         let tbody = document.getElementById('summary-body');
         tbody.innerHTML = `<tr><td colspan='6' style='text-align:center;'>⏳ กำลังประมวลผลสถิติ...</td></tr>`;
@@ -489,7 +522,7 @@
                         tbody.innerHTML += `<tr><td>${index + 1}</td><td>${d.name}</td><td style="color: #28a745; font-weight:bold;">${d.present}</td><td style="color: #dc3545;">${d.sick}</td><td style="color: #ffc107;">${d.leave}</td><td style="color: #fd7e14;">${d.absent}</td></tr>`;
                     });
 
-                    // 🤖 วิเคราะห์สรุปห้องเรียน
+                    // 🤖 วิเคราะห์สรุปห้องเรียนของครู
                     let avgPerc = sumTotal > 0 ? (sumPres / sumTotal) * 100 : 0;
                     let sumAi = `อัตราการมาเรียนเฉลี่ยของห้อง ${currentClass} อยู่ที่ <b style="color:${avgPerc>=80?'green':'red'}; font-size:16px;">${avgPerc.toFixed(1)}%</b><br><br>`;
                     
@@ -504,7 +537,7 @@
     }
 
     // ==========================================
-    // ⚙️ โหมด ADMIN + AI
+    // ⚙️ โหมด ADMIN
     // ==========================================
     function loadAdminData() {
         document.getElementById('admin-system-ai').innerText = "⏳ กำลังดึงข้อมูลสแกนระบบ...";
@@ -574,7 +607,7 @@
     
     function addUserRow() {
         let i = Date.now();
-        document.getElementById('admin-users-body').innerHTML += `<tr><td><input type="text"></td><td><input type="text"></td><td><select><option value="teacher">Teacher</option><option value="student">Student</option><option value="admin">Admin</option></select></td><td><input type="text"></td><td><input type="text"></td><td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td></tr>`;
+        document.getElementById('admin-users-body').innerHTML += `<tr><td><input type="text" id="u-user-${i}"></td><td><input type="text" id="u-pass-${i}"></td><td><select id="u-role-${i}"><option value="teacher">Teacher</option><option value="student">Student</option><option value="admin">Admin</option><option value="executive">Executive</option></select></td><td><input type="text" id="u-name-${i}"></td><td><input type="text" id="u-class-${i}"></td><td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td></tr>`;
     }
 
     function addStudentRow() {
@@ -593,7 +626,7 @@
     }
 
     // ==========================================
-    // 🎓 โหมด STUDENT (ประวัติ + AI)
+    // 🎓 โหมด STUDENT 
     // ==========================================
     function loadStudentReport(studentId) {
         let tbody = document.getElementById('student-history-body'); tbody.innerHTML = `<tr><td colspan='3' style='text-align:center;'>⏳ โหลดข้อมูล...</td></tr>`;
@@ -624,7 +657,7 @@
     }
 
     // ==========================================
-    // 💼 โหมด EXECUTIVE (กราฟ + AI)
+    // 💼 โหมด EXECUTIVE
     // ==========================================
     function fetchFullExecData() {
         document.getElementById('exec-ai-text').innerHTML = "⏳ กำลังดาวน์โหลดฐานข้อมูลทั้งโรงเรียน...";
@@ -674,7 +707,7 @@
                     if(!groupStats[groupKey]) groupStats[groupKey] = {present:0, absent:0, leave:0};
                     if(stat === "มา" || stat === "มาเรียน") { stats.present++; groupStats[groupKey].present++; }
                     else if(stat === "ขาด") { stats.absent++; groupStats[groupKey].absent++; }
-                    else { stats.sick++; groupStats[groupKey].leave++; } // รวบป่วยลาไว้ด้วยกันในกราฟ
+                    else { stats.sick++; groupStats[groupKey].leave++; } 
                 }
             }
         });
@@ -717,7 +750,7 @@
             else text += `⚠️ <b>ข้อควรระวัง:</b> อัตราภาพรวมต่ำกว่าเกณฑ์ 85% โดยเฉพาะ <b>${worstClass} (${lowestRate.toFixed(1)}%)</b><br>💡 <b>แนวทางแก้ไข:</b> แนะนำเรียกประชุมครูประจำชั้นเพื่อสอบถามปัญหา และหามาตรการช่วยเหลือระดับนโยบายด่วนครับ`;
         } 
         else if (viewType === 'class') text += `💡 <b>ข้อเสนอแนะ:</b> ให้ครูประจำชั้นสังเกตนักเรียนที่มีแถบสีแดงด้านล่าง และพิจารณาออกเยี่ยมบ้านนักเรียนกลุ่มเสี่ยงครับ`;
-        else text += `💡 <b>ข้อเสนอแนะ:</b> ใช้ข้อมูลนี้พิจารณาตัดสิทธิสอบตามระเบียบของโรงเรียนอย่างเคร่งครัดครับ`;
+        else text += `💡 <b>ข้อเสนอแนะ:</b> ใช้ข้อมูลนี้พิจารณาตัดสินผลการเรียนอย่างเคร่งครัดครับ`;
         aiBox.innerHTML = text;
     }
 </script>
