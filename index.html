@@ -58,7 +58,7 @@
         .ai-box { background: #f0f7ff; border-left: 5px solid #1e56a0; padding: 15px; border-radius: 8px; margin-bottom: 15px;}
         .ai-box h3 { margin-top: 0; color: #1e56a0; display:flex; align-items:center; gap:8px; font-size:15px; margin-bottom: 5px;}
 
-        /* 🗓️ สไตล์ปฏิทินวันหยุด (ใหม่ล่าสุด) */
+        /* 🗓️ สไตล์ปฏิทินวันหยุด */
         .calendar-month { background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px;}
         .calendar-month h4 { margin: 0 0 10px 0; text-align: center; color: #1e56a0; font-size: 14px;}
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
@@ -199,7 +199,7 @@
             <div><label>📅 ช่วงวันที่</label><div style="display:flex; gap:5px;"><input type="date" id="exec-date-start" onchange="processExecData()"><input type="date" id="exec-date-end" onchange="processExecData()"></div></div>
         </div>
         <div class="stat-grid">
-            <div class="stat-card stat-blue"><h3>เป้าหมาย (คน/วัน)</h3><h2 id="exec-total">0</h2></div>
+            <div class="stat-card stat-blue"><h3>เช็คชื่อ (วัน)</h3><h2 id="exec-total">0</h2></div>
             <div class="stat-card stat-green"><h3>มาเรียนสะสม</h3><h2 id="exec-present">0</h2></div>
             <div class="stat-card stat-red"><h3>ไม่ได้มาเรียน</h3><h2 id="exec-absent">0</h2></div>
         </div>
@@ -236,7 +236,7 @@
 </div>
 
 <script>
-    // 🔗 API 
+    // 🔗 API ของท่านรองฯ (ใส่ URL Web App ลงไปที่นี่ครับ)
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz1Pi37ZXLJJQGvnfz20a_aH2y4sSDjt8dCmyqgdhaF3gin7jRhTh7jY1ajDRdnw1E2/exec";
     
     // --- ⏰ อัปเดตนาฬิกา ---
@@ -531,7 +531,7 @@
         });
     }
 
-    // --- 📊 EXECUTIVE ---
+    // --- 📊 EXECUTIVE (ปรับกราฟเป็น 6 สถานะ) ---
     function fetchFullExecData() { fetch(`${GAS_API_URL}?action=get_full_exec_data`).then(res=>res.json()).then(data=>{execFullAttendance=data.attendance; execFullStudents=data.students; updateExecViewDropdown();}); }
     function updateExecViewDropdown() {
         let v = document.getElementById('exec-view-type').value, c = document.getElementById('exec-sub-filter-container'), s = document.getElementById('exec-sub-filter'), i = document.getElementById('exec-sub-input');
@@ -545,22 +545,50 @@
         let v = document.getElementById('exec-view-type').value, sub = v==='student'?document.getElementById('exec-sub-input').value:document.getElementById('exec-sub-filter').value;
         let st = document.getElementById('exec-date-start').valueAsDate||new Date(0), en = document.getElementById('exec-date-end').valueAsDate||new Date();
         let stats = {p:0, a:0, total:0}, gStat = {};
+        
         execFullAttendance.forEach(row => {
             let dArr = row[0].split('/'); let rD = new Date(dArr[2], dArr[1]-1, dArr[0]);
             if(rD >= st && rD <= en) {
                 let match = (v==='school')||(v==='grade'&&(sub==='all'||row[3].startsWith(sub)))||(v==='class'&&(sub==='all'||row[3]===sub))||(v==='student'&&row[1]===sub);
                 if(match) {
                     stats.total++; let key = v==='school'?row[3]:(v==='class'?row[2]:row[0]);
-                    if(!gStat[key]) gStat[key]={p:0, a:0};
-                    if(row[4]==='มา') { stats.p++; gStat[key].p++; } else { stats.a++; gStat[key].a++; }
+                    if(!gStat[key]) gStat[key] = {มา:0, สาย:0, ลากิจ:0, ลาป่วย:0, นอกร_ร:0, ขาด:0};
+                    
+                    let statText = row[4];
+                    if(statText === 'มา') { stats.p++; gStat[key].มา++; }
+                    else { 
+                        stats.a++;
+                        if(statText === 'สาย') gStat[key].สาย++;
+                        else if(statText === 'ลากิจ') gStat[key].ลากิจ++;
+                        else if(statText === 'ลาป่วย') gStat[key].ลาป่วย++;
+                        else if(statText === 'เรียนนอกโรงเรียน') gStat[key].นอกร_ร++;
+                        else gStat[key].ขาด++; 
+                    }
                 }
             }
         });
         document.getElementById('exec-total').innerText = stats.total; document.getElementById('exec-present').innerText = stats.p; document.getElementById('exec-absent').innerText = stats.a;
         
         let ctx = document.getElementById('execChart').getContext('2d'); if(execChartInstance) execChartInstance.destroy();
-        let labels = Object.keys(gStat).sort(), dp = labels.map(k=>gStat[k].p), da = labels.map(k=>gStat[k].a);
-        execChartInstance = new Chart(ctx, { type:'bar', data:{ labels:labels, datasets:[{label:'มา', data:dp, backgroundColor:'#10b981'},{label:'ขาด/ลา', data:da, backgroundColor:'#ef4444'}] }, options:{ responsive:true, maintainAspectRatio:false, scales:{x:{stacked:true},y:{stacked:true}} } });
+        let labels = Object.keys(gStat).sort();
+        let d1 = labels.map(k=>gStat[k].มา), d2 = labels.map(k=>gStat[k].สาย), d3 = labels.map(k=>gStat[k].ลากิจ);
+        let d4 = labels.map(k=>gStat[k].ลาป่วย), d5 = labels.map(k=>gStat[k].นอกร_ร), d6 = labels.map(k=>gStat[k].ขาด);
+
+        execChartInstance = new Chart(ctx, { 
+            type:'bar', 
+            data:{ 
+                labels:labels, 
+                datasets:[
+                    {label:'มา', data:d1, backgroundColor:'#10b981'},
+                    {label:'สาย', data:d2, backgroundColor:'#eab308'},
+                    {label:'ลากิจ', data:d3, backgroundColor:'#f97316'},
+                    {label:'ลาป่วย', data:d4, backgroundColor:'#f43f5e'},
+                    {label:'นอก ร.ร.', data:d5, backgroundColor:'#3b82f6'},
+                    {label:'ขาด', data:d6, backgroundColor:'#991b1b'}
+                ] 
+            }, 
+            options:{ responsive:true, maintainAspectRatio:false, scales:{x:{stacked:true},y:{stacked:true}} } 
+        });
     }
 
     // --- 🧑‍🎓 STUDENT ---
@@ -577,4 +605,3 @@
 
 </body>
 </html>
-
