@@ -18,9 +18,34 @@
         .nav-menu { position: fixed; bottom: 0; width: 100%; background: white; display: none; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; z-index: 1000;}
         .nav-item { text-align: center; font-size: 13px; color: #64748b; cursor: pointer; flex: 1; }
         .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 2px; }
+        
         input, select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; width: 100%; box-sizing: border-box; margin-bottom: 10px;}
         button { padding: 10px 15px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: bold;}
         
+        /* สไตล์ตาราง/แถวเช็คชื่อ (ครู) */
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;}
+        .date-picker { padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; font-size: 16px; margin-bottom:0; width:auto;}
+        .student-row { display: flex; flex-direction: column; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 15px; transition: 0.3s; }
+        .student-info { display: flex; align-items: center; margin-bottom: 10px; }
+        .student-number { font-size: 18px; font-weight: bold; color: #64748b; width: 40px; text-align: center; }
+        .img-container { position: relative; width: 60px; height: 60px; margin-right: 15px; }
+        .student-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #ddd; }
+        .upload-btn { position: absolute; bottom: -5px; right: -5px; background: var(--primary); color: white; border: none; border-radius: 50%; width: 25px; height: 25px; font-size: 12px; cursor: pointer; display: flex; justify-content: center; align-items: center;}
+        .student-name { flex-grow: 1; font-size: 16px; font-weight: 600; color: #15283c; }
+        .status-group { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px;}
+        .btn-status { flex: 1; padding: 8px 5px; border: 1px solid #ddd; border-radius: 6px; background: white; cursor: pointer; font-family: 'Prompt'; font-size: 14px; transition: 0.2s; text-align: center; font-weight: bold; color: #666;}
+        .behavior-note { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Prompt'; font-size: 13px; box-sizing: border-box; resize: vertical; min-height: 40px;}
+        .status-present.active { background-color: #28a745; color: white; border-color: #28a745; }
+        .status-sick.active { background-color: #dc3545; color: white; border-color: #dc3545; }
+        .status-leave.active { background-color: #ffc107; color: #000; border-color: #ffc107; }
+        .status-absent.active { background-color: #fd7e14; color: white; border-color: #fd7e14; }
+        .row-present { background-color: #e8f5e9; border-left: 6px solid #28a745; }
+        .row-sick { background-color: #ffebee; border-left: 6px solid #dc3545; }
+        .row-leave { background-color: #fff8e1; border-left: 6px solid #ffc107; }
+        .row-absent { background-color: #fff3e0; border-left: 6px solid #fd7e14; }
+        .save-btn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; font-family: 'Prompt'; margin-top: 10px;}
+
         /* ตารางและอื่นๆ */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; background: white;}
         th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
@@ -49,23 +74,48 @@
     <div id="login-page" class="page active">
         <div class="card" style="text-align: center; max-width: 400px; margin: 40px auto;">
             <h2 style="color: #1e56a0;">เข้าสู่ระบบ</h2>
-            <input type="text" id="username" placeholder="รหัสผู้ใช้งาน (เช่น t01, admin, boss)">
+            <input type="text" id="username" placeholder="รหัสผู้ใช้งาน">
             <input type="password" id="password" placeholder="รหัสผ่าน">
-            <button id="login-btn" onclick="handleLogin()" style="width: 100%;">เข้าสู่ระบบ</button>
+            <button id="login-btn" onclick="handleLogin()" style="width: 100%; font-size:16px;">เข้าสู่ระบบ</button>
         </div>
     </div>
 
-    <div id="teacher-view" class="page">
-        <h2 style="color:var(--primary);">👩‍🏫 ส่วนของครูประจำชั้น <span id="class-title"></span></h2>
-        <div class="card" style="text-align:center;">
-            <p>ระบบพร้อมใช้งานแล้ว คุณสามารถเช็คชื่อนักเรียนได้เลย</p>
-            <button onclick="alert('ฟีเจอร์เช็คชื่อทำงานตามโค้ดตัวเดิมของคุณครับ (ผมย่อให้เห็นโครงสร้างเพื่อโฟกัส Admin/Exec)')">เปิดหน้าเช็คชื่อ</button>
+    <div id="checklist-page" class="page">
+        <div class="toolbar">
+            <h2 style="margin: 0;">📝 เช็คชื่อเข้าแถว <span id="class-title" style="color:var(--primary);"></span></h2>
+            <input type="date" id="check-date" class="date-picker">
+        </div>
+        <div id="student-list-container"></div>
+        <button class="save-btn" id="save-btn" onclick="saveAttendance()">💾 บันทึกข้อมูลเข้าฐานข้อมูล</button>
+    </div>
+
+    <div id="daily-page" class="page">
+        <div class="card">
+            <h2>📅 รายละเอียดการมาเรียนรายวัน</h2>
+            <p style="color: #666; font-size: 13px;">เลือกวันที่เพื่อดูข้อมูลที่บันทึกไว้</p>
+            <input type="date" id="view-date" class="date-picker" style="margin-bottom: 15px; width:100%;">
+            <button onclick="loadDailyData()" style="width:100%; background: var(--primary);">โหลดข้อมูล</button>
+            <table id="daily-table">
+                <thead><tr><th>เลขที่</th><th>ชื่อ-สกุล</th><th>สถานะ</th><th>หมายเหตุ</th></tr></thead>
+                <tbody id="daily-body"><tr><td colspan='4' style='text-align:center;'>กดโหลดข้อมูลเพื่อดูประวัติ</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="summary-page" class="page">
+        <div class="card">
+            <h2>📊 สรุปสถานะทั้งหมด</h2>
+            <p style="color: #666; font-size: 13px;">เปรียบเทียบว่านักเรียนแต่ละคน ขาด/ลา/ป่วย กี่วัน</p>
+            <button onclick="loadSummaryData()" style="width:100%; background: #28a745; margin-bottom: 15px;">อัปเดตข้อมูลภาพรวม</button>
+            <table id="summary-table">
+                <thead><tr><th>เลขที่</th><th>ชื่อ-สกุล</th><th style="color:#28a745;">มา</th><th style="color:#dc3545;">ป่วย</th><th style="color:#ffc107;">ลา</th><th style="color:#fd7e14;">ขาด</th></tr></thead>
+                <tbody id="summary-body"><tr><td colspan='6' style='text-align:center;'>ยังไม่มีข้อมูล</td></tr></tbody>
+            </table>
         </div>
     </div>
 
     <div id="admin-page" class="page">
         <h2 style="color: #1e56a0;">⚙️ ระบบผู้ดูแลระบบ (Admin)</h2>
-        
         <div class="card">
             <h3>📅 กำหนดระยะเวลาการบันทึก</h3>
             <div style="display:flex; gap:10px;">
@@ -73,9 +123,8 @@
                 <div style="flex:1"><label>วันสิ้นสุด</label><input type="date" id="admin-end"></div>
             </div>
         </div>
-
         <div class="card">
-            <h3>👥 จัดการผู้ใช้งาน (ครู)</h3>
+            <h3>👥 จัดการผู้ใช้งาน (ครู/Admin)</h3>
             <p style="font-size:12px; color:#666;">* สามารถพิมพ์แก้ไขในตารางแล้วกดบันทึกได้เลย</p>
             <div style="overflow-x: auto;">
                 <table id="admin-users-table">
@@ -83,9 +132,8 @@
                     <tbody id="admin-users-body"></tbody>
                 </table>
             </div>
-            <button onclick="addUserRow()" style="margin-top:10px; background:#28a745;">+ เพิ่มครู</button>
+            <button onclick="addUserRow()" style="margin-top:10px; background:#28a745;">+ เพิ่มผู้ใช้งาน</button>
         </div>
-
         <div class="card">
             <h3>🎓 จัดการนักเรียน</h3>
             <div style="overflow-x: auto;">
@@ -96,7 +144,6 @@
             </div>
             <button onclick="addStudentRow()" style="margin-top:10px; background:#28a745;">+ เพิ่มนักเรียน</button>
         </div>
-
         <button onclick="saveAdminData()" style="width:100%; padding:15px; font-size:18px; margin-bottom: 20px;">💾 บันทึกการแก้ไขระบบทั้งหมด</button>
     </div>
 
@@ -104,48 +151,46 @@
         <h2 style="color: #1e56a0;">📊 แดชบอร์ดผู้บริหาร (Executive)</h2>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <b>เลือกวันที่รายงาน:</b>
-            <input type="date" id="exec-date" style="width: auto; margin:0;" onchange="loadExecReport()">
+            <input type="date" id="exec-date" class="date-picker" style="width: auto; margin:0;" onchange="loadExecReport()">
         </div>
-
         <div class="stat-grid">
-            <div class="stat-card stat-blue">
-                <h3>นร. ทั้งโรงเรียน</h3>
-                <h2 id="exec-total">0</h2>
-            </div>
-            <div class="stat-card stat-green">
-                <h3>มาเรียนวันนี้</h3>
-                <h2 id="exec-present">0</h2>
-            </div>
-            <div class="stat-card stat-red">
-                <h3>ขาด/ลา/ป่วย</h3>
-                <h2 id="exec-absent">0</h2>
-            </div>
+            <div class="stat-card stat-blue"><h3>นร. ทั้งโรงเรียน</h3><h2 id="exec-total">0</h2></div>
+            <div class="stat-card stat-green"><h3>มาเรียนวันนี้</h3><h2 id="exec-present">0</h2></div>
+            <div class="stat-card stat-red"><h3>ขาด/ลา/ป่วย</h3><h2 id="exec-absent">0</h2></div>
         </div>
-
         <div class="card">
             <h3>📈 สถิติการมาเรียนรายห้อง (ประจำวัน)</h3>
             <table>
-                <thead>
-                    <tr><th>ชั้นเรียน</th><th style="color:green;">มาเรียน</th><th style="color:red;">ขาด</th><th style="color:orange;">ป่วย/ลา</th></tr>
-                </thead>
-                <tbody id="exec-class-body">
-                    <tr><td colspan='4' style='text-align:center;'>กำลังโหลดข้อมูล...</td></tr>
-                </tbody>
+                <thead><tr><th>ชั้นเรียน</th><th style="color:green;">มาเรียน</th><th style="color:red;">ขาด</th><th style="color:orange;">ป่วย/ลา</th></tr></thead>
+                <tbody id="exec-class-body"><tr><td colspan='4' style='text-align:center;'>กำลังโหลดข้อมูล...</td></tr></tbody>
             </table>
         </div>
     </div>
 
 </div>
 
+<div class="nav-menu" id="bottom-nav">
+    <div class="nav-item active" onclick="switchPage('checklist-page', this)"><span>📝</span><br>เช็คชื่อ</div>
+    <div class="nav-item" onclick="switchPage('daily-page', this)"><span>📅</span><br>รายวัน</div>
+    <div class="nav-item" onclick="switchPage('summary-page', this)"><span>📊</span><br>สรุปผล</div>
+</div>
+
 <script>
+    // 🔗 API ของคุณ
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxDBIimksCjbqS--gvganUMDGNLVE3B55IYmDMOz7vK9zq4K8h9kxdgZzEsa9AVM6Jy/exec";
     
+    document.getElementById('check-date').valueAsDate = new Date();
+    document.getElementById('view-date').valueAsDate = new Date();
     document.getElementById('exec-date').valueAsDate = new Date();
 
-    let adminUsers = [];
-    let adminStudents = [];
+    let students = []; 
+    let attendanceData = {}; 
+    let currentTeacher = "";
+    let currentClass = "";
 
-    // --- 🔐 ระบบ Login (แยก Role) ---
+    document.getElementById('check-date').addEventListener('change', fetchStudents);
+
+    // --- 🔐 1. ระบบ Login (แยก Role) ---
     function handleLogin() {
         const u = document.getElementById('username').value.trim();
         const p = document.getElementById('password').value.trim();
@@ -164,24 +209,183 @@
                     document.getElementById('user-display').innerText = `${data.name} - ออกจากระบบ`;
                     
                     if (data.role === "admin") {
-                        switchPage('admin-page');
-                        loadAdminData(); // โหลดข้อมูลมาให้แอดมินแก้
+                        document.getElementById('bottom-nav').style.display = 'none'; // ซ่อนเมนูครู
+                        switchPage('admin-page', null);
+                        loadAdminData();
                     } else if (data.role === "executive" || data.role === "boss") {
-                        switchPage('exec-page');
-                        loadExecReport(); // โหลดกราฟผู้บริหาร
+                        document.getElementById('bottom-nav').style.display = 'none'; // ซ่อนเมนูครู
+                        switchPage('exec-page', null);
+                        loadExecReport();
                     } else if (data.role === "teacher") {
-                        document.getElementById('class-title').innerText = `(${data.className})`;
-                        switchPage('teacher-view');
-                        // (เรียกฟังก์ชันเช็คชื่อครูแบบเดิมของคุณที่นี่)
+                        currentTeacher = data.name;
+                        currentClass = data.className || ""; 
+                        document.getElementById('class-title').innerText = `(${currentClass})`;
+                        document.getElementById('bottom-nav').style.display = 'flex'; // โชว์เมนูครู
+                        switchPage('checklist-page', document.querySelectorAll('.nav-item')[0]);
+                        fetchStudents(); 
                     }
                 } else { alert("❌ รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"); }
-            }).catch(err => { btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; });
+            }).catch(err => { btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; alert("ไม่สามารถเชื่อมต่อฐานข้อมูลได้"); });
     }
 
     function logout() { location.reload(); }
-    function switchPage(pageId) {
+
+    function switchPage(pageId, element) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        if(element) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            element.classList.add('active');
+        }
         document.getElementById(pageId).classList.add('active');
+    }
+
+    // ==========================================
+    // 👩‍🏫 โหมด TEACHER (ครูประจำชั้น)
+    // ==========================================
+    function fetchStudents() {
+        const container = document.getElementById('student-list-container');
+        container.innerHTML = `<div style="text-align:center; padding: 30px; color:#1e56a0; font-weight:bold;">⏳ กำลังโหลดข้อมูล...</div>`;
+        document.getElementById('save-btn').style.display = 'none';
+        let dateRaw = document.getElementById('check-date').value;
+
+        fetch(`${GAS_API_URL}?action=get_students&className=${encodeURIComponent(currentClass)}`)
+            .then(res => res.json())
+            .then(dataStd => {
+                if(dataStd.status === "success" && dataStd.data.length > 0) {
+                    students = dataStd.data; 
+                    fetch(`${GAS_API_URL}?action=check_existing&className=${encodeURIComponent(currentClass)}&date=${dateRaw}`)
+                        .then(res => res.json())
+                        .then(dataCheck => {
+                            if(dataCheck.status === "found") renderChecklist(dataCheck.data, dataCheck.recordedBy);
+                            else renderChecklist(null, null); 
+                        });
+                } else {
+                    container.innerHTML = `<div style="text-align:center; padding: 20px; color:red;">❌ ไม่พบรายชื่อนักเรียนห้อง ${currentClass}</div>`;
+                }
+            });
+    }
+
+    function renderChecklist(existingData, recordedBy) {
+        const container = document.getElementById('student-list-container');
+        container.innerHTML = "";
+        if(existingData) {
+            container.innerHTML = `<div style="background:#fff3cd; color:#856404; padding:15px; border-radius:8px; margin-bottom:15px; font-weight:bold;">⚠️ วันที่ ${document.getElementById('check-date').value} <br>ถูกบันทึกไปแล้วโดย: ${recordedBy}</div>`;
+            document.getElementById('save-btn').style.display = 'none'; 
+        } else {
+            document.getElementById('save-btn').style.display = 'block'; 
+        }
+
+        students.forEach(std => {
+            let initStatus = 'present', initNote = '';
+            if(existingData && existingData[std.id]) {
+                let thStat = existingData[std.id].status;
+                initStatus = thStat === "ป่วย" ? "sick" : thStat === "ลา" ? "leave" : thStat === "ขาด" ? "absent" : "present";
+                initNote = existingData[std.id].note;
+            }
+            attendanceData[std.id] = { status: initStatus, note: initNote };
+            let defaultImg = `https://ui-avatars.com/api/?name=${std.name}&background=f3f5f9`;
+            let row = document.createElement('div');
+            row.className = `student-row row-${initStatus}`; row.id = `row-${std.id}`;
+
+            let displayModeHtml = "";
+            if (existingData) {
+                let colorStat = initStatus==='present' ? 'green' : initStatus==='sick' ? 'red' : initStatus==='leave' ? '#ffc107' : 'orange';
+                let thText = initStatus==='present' ? '✅ มาเรียน' : initStatus==='sick' ? '🤒 ป่วย' : initStatus==='leave' ? '📝 ลา' : '❌ ขาด';
+                displayModeHtml = `<div id="display-mode-${std.id}" style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-top:5px; background:#f8f9fa; padding:10px; border-radius:8px; box-sizing:border-box;">
+                    <div>สถานะ: <b style="color:${colorStat}">${thText}</b></div>
+                    <button onclick="enableEdit('${std.id}')" style="padding:5px 15px; background:#17a2b8;">✏️ แก้ไข</button>
+                </div>`;
+            }
+            let btnStyle = existingData ? "display:none;" : "display:flex;";
+            row.innerHTML = `
+                <div class="student-info">
+                    <div class="student-number">${std.number}</div>
+                    <div class="img-container"><img src="${defaultImg}" id="img-${std.id}" class="student-img"></div>
+                    <div class="student-name">${std.name}<br><small style="color:#666;">รหัส: ${std.id}</small></div>
+                </div>
+                ${displayModeHtml}
+                <div id="edit-mode-${std.id}" style="${btnStyle} flex-direction:column;">
+                    <div class="status-group">
+                        <div class="btn-status status-present ${initStatus==='present'?'active':''}" onclick="setStatus('${std.id}', 'present')">✅ มาเรียน</div>
+                        <div class="btn-status status-sick ${initStatus==='sick'?'active':''}" onclick="setStatus('${std.id}', 'sick')">🤒 ป่วย</div>
+                        <div class="btn-status status-leave ${initStatus==='leave'?'active':''}" onclick="setStatus('${std.id}', 'leave')">📝 ลา</div>
+                        <div class="btn-status status-absent ${initStatus==='absent'?'active':''}" onclick="setStatus('${std.id}', 'absent')">❌ ขาด</div>
+                    </div>
+                    <textarea class="behavior-note" id="note-${std.id}" placeholder="จดบันทึกพฤติกรรม/หมายเหตุ... (ไม่บังคับ)">${initNote}</textarea>
+                    ${existingData ? `<div style="display:flex; gap:10px; margin-top:10px;">
+                        <button onclick="saveSingleUpdate('${std.id}')" style="flex:1; background:#28a745;">💾 บันทึก</button>
+                        <button onclick="cancelEdit('${std.id}')" style="background:#6c757d;">ยกเลิก</button>
+                    </div>` : ''}
+                </div>`;
+            container.appendChild(row);
+        });
+    }
+
+    function enableEdit(id) { document.getElementById(`display-mode-${id}`).style.display = 'none'; document.getElementById(`edit-mode-${id}`).style.display = 'flex'; }
+    function cancelEdit(id) { document.getElementById(`display-mode-${id}`).style.display = 'flex'; document.getElementById(`edit-mode-${id}`).style.display = 'none'; }
+    function setStatus(id, status) {
+        attendanceData[id].status = status;
+        let row = document.getElementById(`row-${id}`);
+        row.className = `student-row row-${status}`;
+        row.querySelectorAll('.btn-status').forEach(btn => btn.classList.remove('active'));
+        row.querySelector(`.status-${status}`).classList.add('active');
+    }
+
+    function saveAttendance() {
+        let date = document.getElementById('check-date').value;
+        let saveBtn = document.getElementById('save-btn');
+        let records = [];
+        students.forEach(std => {
+            records.push({ id: std.id, name: std.name, className: std.className || currentClass, status: attendanceData[std.id].status, note: document.getElementById(`note-${std.id}`).value });
+        });
+        saveBtn.innerText = "⏳ กำลังส่งข้อมูลเข้าฐานข้อมูล..."; saveBtn.disabled = true;
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: date, teacherName: currentTeacher, records: records }) })
+        .then(res => res.json())
+        .then(data => {
+            saveBtn.innerText = "💾 บันทึกข้อมูลเข้าฐานข้อมูล"; saveBtn.disabled = false;
+            if(data.status === "success") { alert("✅ บันทึกข้อมูลเรียบร้อย!"); fetchStudents(); } 
+            else { alert("❌ บันทึกไม่สำเร็จ: " + data.message); }
+        });
+    }
+
+    function saveSingleUpdate(id) {
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "update_single", date: document.getElementById('check-date').value, id: id, className: currentClass, status: attendanceData[id].status, note: document.getElementById(`note-${id}`).value, teacherName: currentTeacher }) })
+        .then(res => res.json()).then(data => { if(data.status === "success") { alert("✅ อัปเดตสถานะใหม่เรียบร้อย!"); fetchStudents(); } });
+    }
+
+    function loadDailyData() {
+        let viewDate = document.getElementById('view-date').value;
+        if (!viewDate) return;
+        let tbody = document.getElementById('daily-body');
+        tbody.innerHTML = `<tr><td colspan='4' style='text-align:center;'>⏳ กำลังดึงข้อมูล...</td></tr>`;
+        fetch(`${GAS_API_URL}?action=get_daily&className=${encodeURIComponent(currentClass)}&date=${viewDate}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    tbody.innerHTML = "";
+                    if(data.data.length === 0) { tbody.innerHTML = `<tr><td colspan='4' style='text-align:center;'>❌ ไม่มีข้อมูลการเช็คชื่อในวันที่เลือก</td></tr>`; return; }
+                    data.data.forEach((d, index) => {
+                        let statusTh = (d.status === 'มา' || d.status === 'มาเรียน') ? '<span style="color:green; font-weight:bold;">มาเรียน</span>' : d.status === 'ป่วย' ? '<span style="color:red; font-weight:bold;">ป่วย</span>' : d.status === 'ลา' ? '<span style="color:#ffc107; font-weight:bold;">ลา</span>' : '<span style="color:orange; font-weight:bold;">ขาด</span>';
+                        tbody.innerHTML += `<tr><td>${index + 1}</td><td>${d.name}</td><td>${statusTh}</td><td style="color:#666; font-size:12px;">${d.note || '-'}</td></tr>`;
+                    });
+                }
+            });
+    }
+
+    function loadSummaryData() {
+        let tbody = document.getElementById('summary-body');
+        tbody.innerHTML = `<tr><td colspan='6' style='text-align:center;'>⏳ กำลังประมวลผลสถิติ...</td></tr>`;
+        fetch(`${GAS_API_URL}?action=get_summary&className=${encodeURIComponent(currentClass)}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    tbody.innerHTML = "";
+                    if(data.data.length === 0) { tbody.innerHTML = `<tr><td colspan='6' style='text-align:center;'>ยังไม่มีข้อมูล</td></tr>`; return; }
+                    data.data.forEach((d, index) => {
+                        tbody.innerHTML += `<tr><td>${index + 1}</td><td>${d.name}</td><td style="color: #28a745; font-weight:bold;">${d.present}</td><td style="color: #dc3545;">${d.sick}</td><td style="color: #ffc107;">${d.leave}</td><td style="color: #fd7e14;">${d.absent}</td></tr>`;
+                    });
+                }
+            });
     }
 
     // ==========================================
@@ -194,7 +398,6 @@
                 if(data.status === "success") {
                     document.getElementById('admin-start').value = data.config.startDate;
                     document.getElementById('admin-end').value = data.config.endDate;
-                    
                     let uBody = document.getElementById('admin-users-body');
                     uBody.innerHTML = "";
                     data.users.forEach((u, i) => {
@@ -211,7 +414,6 @@
                             <td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td>
                         </tr>`;
                     });
-
                     let sBody = document.getElementById('admin-students-body');
                     sBody.innerHTML = "";
                     data.students.forEach((s, i) => {
@@ -228,11 +430,11 @@
     }
 
     function addUserRow() {
-        let i = Date.now(); // สุ่มไอดี
+        let i = Date.now();
         document.getElementById('admin-users-body').innerHTML += `<tr>
             <td><input type="text" id="u-user-${i}"></td>
             <td><input type="text" id="u-pass-${i}"></td>
-            <td><select id="u-role-${i}"><option value="teacher">Teacher</option></select></td>
+            <td><select id="u-role-${i}"><option value="teacher">Teacher</option><option value="admin">Admin</option><option value="executive">Executive</option></select></td>
             <td><input type="text" id="u-name-${i}"></td>
             <td><input type="text" id="u-class-${i}"></td>
             <td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td>
@@ -253,7 +455,6 @@
     function saveAdminData() {
         let btn = document.querySelector('#admin-page > button');
         btn.innerText = "⏳ กำลังบันทึกข้อมูล...";
-
         let users = [], students = [];
         document.querySelectorAll('#admin-users-body tr').forEach(tr => {
             let inputs = tr.querySelectorAll('input, select');
@@ -264,17 +465,11 @@
             students.push([inputs[0].value, inputs[1].value, inputs[2].value, inputs[3].value]);
         });
 
-        let payload = {
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({
             action: "admin_update",
-            settings: {
-                startDate: document.getElementById('admin-start').value,
-                endDate: document.getElementById('admin-end').value
-            },
-            users: users,
-            students: students
-        };
-
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify(payload) })
+            settings: { startDate: document.getElementById('admin-start').value, endDate: document.getElementById('admin-end').value },
+            users: users, students: students
+        }) })
         .then(res => res.json())
         .then(data => {
             btn.innerText = "💾 บันทึกการแก้ไขระบบทั้งหมด";
@@ -318,4 +513,3 @@
 
 </body>
 </html>
-
