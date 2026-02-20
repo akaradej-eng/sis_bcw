@@ -73,6 +73,14 @@
         .calendar-day.holiday { background: #ef4444; color: white; border-color: #ef4444; font-weight: bold; box-shadow: 0 2px 5px rgba(239,68,68,0.3);}
         .calendar-day.blank { background: transparent; border: none; cursor: default; color: #cbd5e1; }
 
+        /* สไตล์ปุ่ม Toggle Switch สำหรับหน้า Admin */
+        .switch { position: relative; display: inline-block; width: 42px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 24px;}
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+        input:checked + .slider { background-color: #10b981; }
+        input:checked + .slider:before { transform: translateX(18px); }
+
         .footer-credit { text-align: center; padding: 25px; margin-top: 40px; color: #64748b; font-size: 13px; border-top: 1px dashed #ddd; line-height: 1.8; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -110,7 +118,7 @@
         </div>
         <div class="ai-box">
             <h3>🤖 AI ผู้ช่วยครูประจำชั้น</h3>
-            <p id="teacher-quick-ai" style="font-size:13px; margin:0; line-height:1.5; color:#333;">กำลังเตรียมข้อมูลห้องเรียน...</p>
+            <p id="teacher-quick-ai" style="font-size:13px; margin:0; line-height:1.5; color:#333;">กำลังดึงข้อมูลภาพรวมของห้องเรียน...</p>
         </div>
         <div id="student-list-container"></div>
         <button class="save-btn" id="save-btn" onclick="saveAttendance()" style="width:100%; padding:15px; font-size: 16px; margin-top: 10px;">💾 บันทึกข้อมูล</button>
@@ -181,8 +189,24 @@
 
     <div id="admin-page" class="page">
         <h2 style="color: #1e56a0;">⚙️ ตั้งค่าระบบ (Admin)</h2>
+        
         <div class="card">
-            <h3>📅 กำหนดปีการศึกษา & วันหยุด</h3>
+            <h3 style="color:#ef4444; margin-top:0;">⏰ จำกัดเวลาเช็คชื่อประจำวัน</h3>
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+                <label class="switch">
+                    <input type="checkbox" id="admin-time-limit-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span id="time-limit-status-text" style="font-size:13px; font-weight:bold; color:#64748b;">ปิดใช้งาน (ครูบันทึกได้ตลอดเวลา)</span>
+            </div>
+            <div id="time-limit-inputs" style="display:none; gap:10px; background:#f0fdf4; padding:15px; border-radius:8px; border:1px solid #bbf7d0;">
+                <div style="flex:1"><label style="font-size:12px; font-weight:bold; color:#166534;">เวลาเริ่ม (น.)</label><input type="time" id="admin-start-time" value="07:30" style="margin-bottom:0;"></div>
+                <div style="flex:1"><label style="font-size:12px; font-weight:bold; color:#166534;">เวลาสิ้นสุด (น.)</label><input type="time" id="admin-end-time" value="08:30" style="margin-bottom:0;"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top:0;">📅 กำหนดปีการศึกษา & วันหยุด</h3>
             <div style="display:flex; gap:10px;">
                 <div style="flex:1"><label style="font-size:12px; font-weight:bold;">วันเปิดเทอม</label><input type="date" id="admin-start" onchange="renderAdminCalendar()"></div>
                 <div style="flex:1"><label style="font-size:12px; font-weight:bold;">วันปิดเทอม</label><input type="date" id="admin-end" onchange="renderAdminCalendar()"></div>
@@ -284,7 +308,7 @@
         </div>
     </div>
 
-    <div class="footer-credit">จัดทำโดย<br><b>นายอัครเดช โพธิญาณ์</b><br>รองผู้อำนวยการสถานศึกษา โรงเรียนบ้านเชียงวิทยา</div>
+    <div class="footer-credit">ry<พัฒนาโดย<br><b>นายอัครเดช โพธิญาณ์</b><br>รองผู้อำนวยการโรงเรียนบ้านเชียงวิทยา<br>สำนักงานเขตพื้นที่การศึกษามัธยมศึกษาอุดรธานี</div>
 </div>
 
 <div class="nav-menu" id="bottom-nav">
@@ -294,14 +318,14 @@
 </div>
 
 <script>
-    // 🔗 API (ใส่ URL Web App ของท่านรองฯ ตรงนี้ครับ)
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz1Pi37ZXLJJQGvnfz20a_aH2y4sSDjt8dCmyqgdhaF3gin7jRhTh7jY1ajDRdnw1E2/exec";
+    // 🔗 API ของท่านรองฯ (อัปเดตเป็น URL ใหม่ที่ได้จากการ Deploy ล่าสุด)
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxsuGTyYDh-O_q3g3N1gThgH_bzy30xmoI8_pl8QHT2_RmlNJVndb6QO8QXSKB7twTY/exec";
     
     // --- ⏰ อัปเดตนาฬิกา ---
     function updateClock() {
         const now = new Date();
         const dateStr = now.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        const timeStr = now.toLocaleTimeString('th-TH');
+        const timeStr = now.toLocaleTimeString('th-TH', { hour12: false });
         if(document.getElementById('login-clock')) document.getElementById('login-clock').innerHTML = `${dateStr}<br>${timeStr} น.`;
         if(document.getElementById('display-date')) document.getElementById('display-date').innerText = dateStr;
         if(document.getElementById('display-clock')) document.getElementById('display-clock').innerText = `🕒 ${timeStr} น.`;
@@ -310,10 +334,25 @@
 
     function cleanName(fullName) { return fullName ? fullName.replace(/^(เด็กชาย|เด็กหญิง|นาย|นางสาว|ด\.ช\.|ด\.ญ\.)\s*/g, "").trim() : ""; }
 
-    // 🌟 ตัวแปรเก็บวันหยุดไว้เช็คหน้าแรก
     let students = [], attendanceData = {}, currentTeacher = "", currentClass = "";
     let allAdminStudentsData = [], adminHolidays = [], adminTermStart = "", adminTermEnd = "";
+    let timeLimitConfig = { enabled: false, start: "", end: "" }; // 🌟 เก็บค่าจำกัดเวลา
     let execFullAttendance = [], execFullStudents = [], execChartInstance = null;
+
+    // --- 🌟 Toggle สวิตช์เปิด-ปิดเวลาเช็คชื่อหน้า Admin ---
+    document.getElementById('admin-time-limit-toggle').addEventListener('change', function() {
+        let inputs = document.getElementById('time-limit-inputs');
+        let text = document.getElementById('time-limit-status-text');
+        if(this.checked) {
+            inputs.style.display = 'flex';
+            text.innerText = 'เปิดใช้งาน (ล็อกเวลาเช็คชื่อ)';
+            text.style.color = '#10b981';
+        } else {
+            inputs.style.display = 'none';
+            text.innerText = 'ปิดใช้งาน (ครูบันทึกได้ตลอดเวลา)';
+            text.style.color = '#64748b';
+        }
+    });
 
     function handleLogin() {
         const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim(), btn = document.getElementById('login-btn');
@@ -333,12 +372,16 @@
                         document.getElementById('bottom-nav').style.display = 'flex';
                         switchPage('checklist-page', document.querySelectorAll('.nav-item')[0]);
                         
-                        // 🌟 ดึงข้อมูลวันหยุดจาก Admin มาซ่อนไว้ตรวจสอบทันทีที่ล็อกอิน
                         fetch(`${GAS_API_URL}?action=get_admin_data`).then(res => res.json()).then(adminData => {
                             if(adminData.status === "success") {
                                 adminHolidays = (adminData.config.holidays || []).filter(h => h.trim() !== "");
                                 adminTermStart = adminData.config.startDate;
                                 adminTermEnd = adminData.config.endDate;
+                                timeLimitConfig = {
+                                    enabled: adminData.config.timeLimitEnabled,
+                                    start: adminData.config.startTime,
+                                    end: adminData.config.endTime
+                                };
                             }
                             fetchStudents(); 
                         });
@@ -362,7 +405,7 @@
         if (pageId === 'summary-page' && currentClass) loadSummaryData();
     }
 
-    // --- 📝 TEACHER CHECKLIST (อัปเกรดเช็ควันหยุด) ---
+    // --- 📝 TEACHER CHECKLIST ---
     function fetchStudents() {
         let dateInput = document.getElementById('check-date');
         if(!dateInput.value) dateInput.valueAsDate = new Date();
@@ -398,6 +441,21 @@
             document.getElementById('save-btn').style.display = 'none';
             document.getElementById('teacher-quick-ai').innerHTML = "พักผ่อนให้เต็มที่ครับคุณครู ☕";
             return;
+        }
+        
+        // 🛑 บล็อกถ้านอกเวลาที่ Admin กำหนด (Client-side check)
+        if (timeLimitConfig && timeLimitConfig.enabled && timeLimitConfig.start && timeLimitConfig.end) {
+            let nowStr = new Date().toLocaleTimeString('th-TH', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            if (nowStr < timeLimitConfig.start || nowStr > timeLimitConfig.end) {
+                document.getElementById('student-list-container').innerHTML = `
+                <div style="background:#fff7ed; color:#c2410c; padding:20px; border-radius:10px; text-align:center; border: 2px dashed #fb923c;">
+                    <h3 style="margin:0 0 5px 0;">⏰ นอกเวลาเช็คชื่อ</h3>
+                    <p style="margin:0;">ระบบเปิดให้บันทึกข้อมูลเฉพาะเวลา<br><b style="font-size:16px;">${timeLimitConfig.start} - ${timeLimitConfig.end} น.</b></p>
+                </div>`;
+                document.getElementById('save-btn').style.display = 'none';
+                document.getElementById('teacher-quick-ai').innerHTML = "ขณะนี้ระบบล็อกการเช็คชื่ออัตโนมัติครับ";
+                return;
+            }
         }
 
         document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px;">⏳ โหลดรายชื่อ...</div>`;
@@ -548,14 +606,26 @@
         fetch(`${GAS_API_URL}?action=get_admin_data`).then(res => res.json()).then(data => {
             if(data.status === "success") {
                 function toFormatDate(dStr) { if (!dStr) return ""; let d = new Date(dStr); if (isNaN(d)) return dStr; return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
-                document.getElementById('admin-start').value = toFormatDate(data.config.startDate); document.getElementById('admin-end').value = toFormatDate(data.config.endDate);
-                adminHolidays = (data.config.holidays || []).filter(h => h.trim() !== ""); renderAdminCalendar(); 
+                
+                // 🌟 ดึงค่าตั้งเวลามาโชว์ในหน้า Admin
+                document.getElementById('admin-time-limit-toggle').checked = data.config.timeLimitEnabled;
+                document.getElementById('admin-start-time').value = data.config.startTime || "07:30";
+                document.getElementById('admin-end-time').value = data.config.endTime || "08:30";
+                document.getElementById('admin-time-limit-toggle').dispatchEvent(new Event('change'));
+
+                document.getElementById('admin-start').value = toFormatDate(data.config.startDate); 
+                document.getElementById('admin-end').value = toFormatDate(data.config.endDate);
+                adminHolidays = (data.config.holidays || []).filter(h => h.trim() !== ""); 
+                
+                renderAdminCalendar(); 
+                
                 let uBody = document.getElementById('admin-users-body'); uBody.innerHTML = "";
                 data.users.forEach((u, i) => { uBody.innerHTML += `<tr><td><input type="text" value="${u[0]}"></td><td><input type="text" value="${u[1]}"></td><td><select><option value="teacher" ${u[2]=='teacher'?'selected':''}>Teacher</option><option value="admin" ${u[2]=='admin'?'selected':''}>Admin</option><option value="executive" ${u[2]=='executive'?'selected':''}>Executive</option></select></td><td><input type="text" value="${u[3]}"></td><td><input type="text" value="${u[4]||''}"></td><td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td></tr>`; });
                 allAdminStudentsData = data.students; updateClassDropdown(); renderAdminStudents();
             }
         });
     }
+
     function renderAdminCalendar() {
         let container = document.getElementById('admin-calendar-container'); let startVal = document.getElementById('admin-start').value; let endVal = document.getElementById('admin-end').value;
         if(!startVal || !endVal) { container.innerHTML = "<div style='text-align:center; padding:20px; color:#94a3b8;'>กรุณาระบุวันเปิด-ปิดเทอมด้านบน เพื่อแสดงปฏิทินและคำนวณวันเรียน</div>"; document.getElementById('working-days-text').innerText = "0"; return; }
@@ -581,7 +651,9 @@
         }
         container.innerHTML = html; document.getElementById('working-days-text').innerText = totalWorkingDays;
     }
+    
     function toggleHoliday(dateStr, isWeekend) { if(isWeekend) { alert('📅 วันเสาร์-อาทิตย์ ถูกกำหนดเป็นวันหยุดอัตโนมัติแล้วครับ'); return; } let idx = adminHolidays.indexOf(dateStr); if(idx > -1) adminHolidays.splice(idx, 1); else adminHolidays.push(dateStr); renderAdminCalendar(); }
+    
     async function fetchPublicHolidays() {
         let startVal = document.getElementById('admin-start').value; if(!startVal) { alert('กรุณากำหนดวันเปิดเทอมก่อนครับ'); return; }
         let year = startVal.split('-')[0]; let btn = document.getElementById('fetch-holidays-btn'); btn.innerText = '⏳ กำลังดึงข้อมูล...'; btn.disabled = true;
@@ -591,16 +663,34 @@
             renderAdminCalendar(); btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false; alert(`✅ เพิ่มวันหยุด ${addedCount} วัน`);
         } catch(e) { btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false; alert('❌ ดึงข้อมูลออนไลน์ล้มเหลว'); }
     }
+    
     function updateClassDropdown() { let f = document.getElementById('admin-class-filter'); let s = new Set(); allAdminStudentsData.forEach(x => s.add(x[3])); f.innerHTML = '<option value="all">ทุกห้อง</option>'; [...s].sort().forEach(c => f.innerHTML += `<option value="${c}">${c}</option>`); }
     function renderAdminStudents() { let b = document.getElementById('admin-students-body'); b.innerHTML = ""; let f = document.getElementById('admin-class-filter').value; allAdminStudentsData.forEach((s, i) => { if (f==='all'||s[3]===f) b.innerHTML += `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td><td>${s[3]}</td><td><button style="background:red;" onclick="removeStudent(${i})">ลบ</button></td></tr>`; }); }
     function removeStudent(i) { if(confirm("ลบ?")) { allAdminStudentsData.splice(i,1); renderAdminStudents(); } }
     function addUserRow() { document.getElementById('admin-users-body').innerHTML += `<tr><td><input type="text"></td><td><input type="text"></td><td><select><option value="teacher">Teacher</option><option value="admin">Admin</option></select></td><td><input type="text"></td><td><input type="text"></td><td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td></tr>`; }
     function addStudentRow() { allAdminStudentsData.push(['','','',document.getElementById('admin-class-filter').value==='all'?'':document.getElementById('admin-class-filter').value]); renderAdminStudents(); }
+    
     function saveAdminData() {
         let btn = document.querySelector('#admin-page > button:last-child'); btn.innerText = "⏳ กำลังบันทึก..."; btn.disabled = true;
         let u = []; document.querySelectorAll('#admin-users-body tr').forEach(tr => { let i = tr.querySelectorAll('input, select'); u.push([i[0].value, i[1].value, i[2].value, i[3].value, i[4].value]); });
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "admin_update", settings: { startDate: document.getElementById('admin-start').value, endDate: document.getElementById('admin-end').value, holidays: adminHolidays }, users: u, students: allAdminStudentsData }) })
-        .then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกการเปลี่ยนแปลงทั้งหมด"; btn.disabled = false; if(data.status === "success") alert("✅ สำเร็จ"); });
+        
+        // 🌟 ส่งค่า Time Limit กลับไปเซฟที่หลังบ้าน
+        fetch(GAS_API_URL, { 
+            method: "POST", 
+            body: JSON.stringify({ 
+                action: "admin_update", 
+                settings: { 
+                    startDate: document.getElementById('admin-start').value, 
+                    endDate: document.getElementById('admin-end').value, 
+                    holidays: adminHolidays,
+                    timeLimitEnabled: document.getElementById('admin-time-limit-toggle').checked,
+                    startTime: document.getElementById('admin-start-time').value,
+                    endTime: document.getElementById('admin-end-time').value
+                }, 
+                users: u, 
+                students: allAdminStudentsData 
+            }) 
+        }).then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกการเปลี่ยนแปลงทั้งหมด"; btn.disabled = false; if(data.status === "success") alert("✅ สำเร็จ"); });
     }
 
     // --- 📊 EXECUTIVE ---
@@ -738,9 +828,7 @@
         });
     }
 
-    function logout() { 
-        if(confirm("ต้องการออกจากระบบใช่หรือไม่?")) location.reload(); 
-    }
+    function logout() { if(confirm("ต้องการออกจากระบบใช่หรือไม่?")) location.reload(); }
 </script>
 
 </body>
