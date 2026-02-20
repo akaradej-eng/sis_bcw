@@ -119,4 +119,107 @@
 <script>
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycby3zyx9w_k1jBHmROtBt9GdfkQtPfuxRLo4H_VZtVoaqFpkvbReVH6upPyV-qGY3kc5/exec";
     let lastScannedId = "";
-    let lastScan
+    let lastScanTime = 0;
+    let html5QrcodeScanner = null;
+
+    // --- 🔐 ระบบ Login จำลองด้วย JavaScript ---
+    function handleLogin() {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        const err = document.getElementById('login-error');
+        
+        // จำลองรหัสผ่าน (ในการใช้งานจริง ควรส่ง fetch ไปเช็คที่ Apps Script)
+        if (u === "admin" && p === "1234") {
+            // สิทธิ์ครู
+            err.style.display = 'none';
+            document.getElementById('user-display').innerText = "ครูอัครเดช (ออกจากระบบ)";
+            document.getElementById('bottom-nav').style.display = 'flex'; // โชว์เมนู
+            switchPage('scan-page', document.getElementById('nav-scan'));
+            startScanner(); // เปิดกล้องเมื่อเป็นครู
+        } else if (u === "6326" && p === "1234") {
+            // สิทธิ์นักเรียน
+            err.style.display = 'none';
+            document.getElementById('user-display').innerText = "ด.ช.จารุกร (ออกจากระบบ)";
+            document.getElementById('bottom-nav').style.display = 'none'; // ซ่อนเมนู
+            document.getElementById('st-name-display').innerText = "ด.ช.จารุกร หงส์สิงห์";
+            switchPage('student-page', null);
+            stopScanner();
+        } else {
+            err.style.display = 'block';
+        }
+    }
+
+    function logout() {
+        document.getElementById('user-display').innerText = "เข้าสู่ระบบ";
+        document.getElementById('bottom-nav').style.display = 'none';
+        document.getElementById('username').value = "";
+        document.getElementById('password').value = "";
+        stopScanner();
+        switchPage('login-page', null);
+    }
+
+    // --- 🧭 ระบบเปลี่ยนหน้า (Navigation) ---
+    function switchPage(pageId, element) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        if(element) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            element.classList.add('active');
+        }
+        document.getElementById(pageId).classList.add('active');
+    }
+
+    // --- 📸 ระบบกล้องสแกน ---
+    function startScanner() {
+        if(!html5QrcodeScanner) {
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+            html5QrcodeScanner.render(onScanSuccess);
+        }
+    }
+    function stopScanner() {
+        if(html5QrcodeScanner) {
+            html5QrcodeScanner.clear();
+            html5QrcodeScanner = null;
+        }
+    }
+
+    function onScanSuccess(decodedText) {
+        let now = Date.now();
+        if (decodedText === lastScannedId && (now - lastScanTime) < 5000) return;
+        
+        lastScannedId = decodedText;
+        lastScanTime = now;
+
+        document.getElementById('result-box').style.display = 'none';
+        document.getElementById('loading').style.display = 'block';
+
+        fetch(GAS_API_URL + "?id=" + encodeURIComponent(decodedText))
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+                if(data.status === "success" || data.status === "warning") {
+                    document.getElementById('student-name').innerText = data.name;
+                    document.getElementById('student-id').innerText = data.id;
+                    document.getElementById('student-class').innerText = data.className;
+                    document.getElementById('student-img').src = `https://ui-avatars.com/api/?name=${data.name}&background=random&color=fff&rounded=true`;
+                    document.getElementById('result-box').style.display = 'flex';
+                    addHistoryRow(data);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(err => {
+                document.getElementById('loading').style.display = 'none';
+                alert("เชื่อมต่อฐานข้อมูลไม่ได้");
+            });
+    }
+
+    function addHistoryRow(data) {
+        const tbody = document.getElementById('history-body');
+        const row = tbody.insertRow(0);
+        const time = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+        row.innerHTML = `<td>${time}</td><td>${data.name}</td><td>${data.className}</td>`;
+    }
+</script>
+
+</body>
+</html>
