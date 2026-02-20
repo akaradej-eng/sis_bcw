@@ -24,6 +24,7 @@
         input, select, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; width: 100%; box-sizing: border-box; margin-bottom: 10px;}
         button { padding: 10px 15px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: bold;}
         
+        /* ปุ่มออกจากระบบใหม่ */
         .btn-logout { background: #ef4444; color: white; border: 1px solid #dc2626; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-family: 'Prompt'; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s;}
         .btn-logout:hover { background: #dc2626; }
 
@@ -376,11 +377,16 @@
     </div>
 </div>
 
+<div class="nav-menu" id="bottom-nav">
+    <div class="nav-item active" onclick="switchPage('checklist-page', this)"><span>📝</span><br>เช็คชื่อ</div>
+    <div class="nav-item" onclick="switchPage('daily-page', this)"><span>📅</span><br>รายสัปดาห์</div>
+    <div class="nav-item" onclick="switchPage('summary-page', this)"><span>📊</span><br>รายงานสถิติ</div>
+</div>
+
 <script>
-    // 🔗 API (ใส่ URL ของท่านรองฯ)
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzQGWPoIxbBIHGnrfL_8oRVFWfVWXb2Td5dbjXSFElv1z3-kuRyMGX78t7lN5m1cc_l/exec";
+    // 🔗 วางลิงก์ Web App API ตรงนี้ครับ
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyR6a-JvJ-z6z-m3kP-j5lT4T_w0mBqF7_E9D-M2m4_D0vC8H1M0z5Y4E4yP1wV4wQz/exec";
     
-    // --- ⏰ ระบบความปลอดภัย & Session Management ---
     const IDLE_TIMEOUT = 5 * 60 * 1000; 
     let idleTimer = null;
 
@@ -441,7 +447,7 @@
 
     function handleLogin() {
         const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim(), btn = document.getElementById('login-btn');
-        if (!u || !p) { Swal.fire('ระบบ SIS', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
+        if (!u || !p) { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
         btn.innerText = "⏳ กำลังเข้าสู่ระบบ..."; btn.disabled = true;
         
         fetch(`${GAS_API_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`)
@@ -450,11 +456,10 @@
                 if (data.status === "success") {
                     data.userId = u; localStorage.setItem('sis_user', JSON.stringify(data)); localStorage.setItem('sis_last_activity', Date.now());
                     routeUser(data); setupActivityListeners(); resetIdleTimer();
-                } else Swal.fire('ระบบ SIS', '❌ รหัสผ่านไม่ถูกต้อง', 'error');
+                } else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '❌ รหัสผ่านไม่ถูกต้อง', 'error');
             }).catch((err) => { 
                 btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; 
-                console.error("Login Error:", err);
-                Swal.fire('ระบบ SIS', '❌ เชื่อมต่อล้มเหลว (อาจเปิดผ่านแอป LINE หรือเน็ตหลุด)\n\nรายละเอียด: ' + err.message, 'error'); 
+                Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '❌ เชื่อมต่อล้มเหลว (อาจเปิดผ่านแอป LINE หรือไม่มีเน็ต)\n\nโปรดเปิดใน Google Chrome หรือ Safari แทนครับ', 'error'); 
             });
     }
 
@@ -465,7 +470,6 @@
             document.getElementById('status-bar').style.display = 'flex';
             let savedPage = localStorage.getItem('sis_current_page');
             
-            // 🌟 ป้องกันบั๊กตัวพิมพ์ใหญ่-เล็ก หรือการเว้นวรรคผิดใน Google Sheets
             let role = data.role ? data.role.toString().trim().toLowerCase() : "";
 
             if (role === "teacher") { 
@@ -506,11 +510,11 @@
                 document.getElementById('st-name-display').innerText = data.name; 
                 loadStudentReport(data.userId); 
             } else {
-                Swal.fire('ระบบ SIS', '❌ ไม่พบสิทธิ์การเข้าถึงข้อมูล กรุณาติดต่อผู้ดูแลระบบ', 'error');
+                Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '❌ ไม่พบสิทธิ์การเข้าถึงข้อมูล กรุณาติดต่อผู้ดูแลระบบ', 'error');
             }
         } catch (err) {
             console.error("RouteUser Error:", err);
-            Swal.fire('ระบบ SIS', '❌ เกิดข้อผิดพลาดในการโหลดหน้าจอ: ' + err.message, 'error');
+            Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '❌ เกิดข้อผิดพลาดในการโหลดหน้าจอ: ' + err.message, 'error');
         }
     }
 
@@ -525,7 +529,6 @@
         if (pageId === 'summary-page' && currentClass) loadSummaryData();
     }
 
-    // 🌟 ระบบดึงนักเรียน + ตรวจสอบการลา พร้อม Popup แจ้งครู
     function fetchStudents() {
         let dateInput = document.getElementById('check-date');
         if(!dateInput.value) dateInput.valueAsDate = new Date();
@@ -535,14 +538,14 @@
         let isOutsideTerm = false;
         if (adminTermStart && adminTermEnd) { let sD = new Date(adminTermStart); sD.setHours(0,0,0,0); let eD = new Date(adminTermEnd); eD.setHours(23,59,59,999); if(dObj < sD || dObj > eD) isOutsideTerm = true; }
 
-        if (isOutsideTerm) { document.getElementById('student-list-container').innerHTML = `<div style="background:#f1f5f9; padding:20px; text-align:center;"><h3>📅 นอกช่วงเปิดเทอม</h3></div>`; document.getElementById('save-btn').style.display = 'none'; return; }
-        if (isWeekend || isHoliday) { document.getElementById('student-list-container').innerHTML = `<div style="background:#fee2e2; padding:20px; text-align:center;"><h3>⛔ ปิดระบบเช็คชื่อ (วันหยุด)</h3></div>`; document.getElementById('save-btn').style.display = 'none'; return; }
+        if (isOutsideTerm) { document.getElementById('student-list-container').innerHTML = `<div style="background:#f1f5f9; padding:20px; text-align:center; border-radius:10px;"><h3>📅 นอกช่วงเปิดเทอม</h3></div>`; document.getElementById('save-btn').style.display = 'none'; return; }
+        if (isWeekend || isHoliday) { document.getElementById('student-list-container').innerHTML = `<div style="background:#fee2e2; padding:20px; text-align:center; color:#b91c1c; border-radius:10px;"><h3>⛔ ปิดระบบเช็คชื่อ (วันหยุด)</h3></div>`; document.getElementById('save-btn').style.display = 'none'; return; }
         
         if (timeLimitConfig && timeLimitConfig.enabled && timeLimitConfig.start && timeLimitConfig.end) {
             let nowStr = new Date().toLocaleTimeString('th-TH', { hour12: false, hour: '2-digit', minute: '2-digit' });
             if (selectedDateStr === new Date().toISOString().split('T')[0]) {
                 if (nowStr < timeLimitConfig.start || nowStr > timeLimitConfig.end) {
-                    document.getElementById('student-list-container').innerHTML = `<div style="background:#fff7ed; padding:20px; text-align:center;"><h3>⏰ นอกเวลาเช็คชื่อ</h3><p>ระบบเปิดเวลา ${timeLimitConfig.start} - ${timeLimitConfig.end} น.</p></div>`;
+                    document.getElementById('student-list-container').innerHTML = `<div style="background:#fff7ed; padding:20px; text-align:center; color:#c2410c; border-radius:10px;"><h3>⏰ นอกเวลาเช็คชื่อ</h3><p>ระบบเปิดเวลา ${timeLimitConfig.start} - ${timeLimitConfig.end} น.</p></div>`;
                     document.getElementById('save-btn').style.display = 'none'; return;
                 }
             }
@@ -562,7 +565,6 @@
                     renderChecklist(existingData, check.recordedBy, leaveData);
                     loadQuickAIInsight(); 
                     
-                    // 🌟 แจ้งเตือน Popup อัตโนมัติเมื่อมีเด็กแจ้งลา (โชว์เฉพาะตอนยังไม่ได้บันทึกข้อมูล)
                     if (!existingData && Object.keys(leaveData).length > 0) {
                         let leaveListHTML = ""; let count = 0;
                         students.forEach(std => {
@@ -601,13 +603,13 @@
         students.forEach(std => {
             let st = 'มา'; let nt = ''; let hasLeave = false;
             if (existing && existing[std.id]) { st = existing[std.id].status; nt = existing[std.id].note;
-            } else if (leaveData && leaveData[std.id]) { st = leaveData[std.id].type; nt = "[ระบบแจ้งลา] " + leaveData[std.id].reason; hasLeave = true; }
+            } else if (leaveData && leaveData[std.id]) { st = leaveData[std.id].type; nt = "[แจ้งลา] " + leaveData[std.id].reason; hasLeave = true; }
             
             attendanceData[std.id] = { status: st, note: nt };
             const displayName = cleanName(std.name); const imgUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=1e56a0&color=fff&size=128&rounded=true`;
 
             let row = document.createElement('div'); row.className = `student-row row-${st}`; row.id = `row-${std.id}`; row.style.flexWrap = "wrap"; 
-            let leaveBadge = hasLeave ? `<br><span style="background:#fef3c7; border:1px solid #f59e0b; color:#ea580c; font-size:10px; padding:2px 6px; border-radius:10px;">มีแจ้งลาล่วงหน้า</span>` : '';
+            let leaveBadge = hasLeave ? `<br><span style="background:#fef3c7; border:1px solid #f59e0b; color:#ea580c; font-size:10px; padding:2px 6px; border-radius:10px;">แจ้งลาล่วงหน้า</span>` : '';
             let btnNoteColor = nt ? "background:#f59e0b; color:white; border:none;" : "background:none; border:1px solid #ccc; color:#666;";
 
             if (existing) {
@@ -654,7 +656,7 @@
         fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) })
         .then(res => res.json()).then(data => {
             btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false;
-            if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ บันทึกสำเร็จ!', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error');
+            if(data.status === "success") { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '✅ บันทึกข้อมูลสำเร็จ!', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error');
         });
     }
 
@@ -691,7 +693,7 @@
             results.forEach((res, dayIndex) => { if(res && res.status === 'success' && res.data) { res.data.forEach(d => { if(!weeklyData[d.id]) weeklyData[d.id] = { name: d.name, status: ['-', '-', '-', '-', '-'] }; let sText = d.status; let shortStat = '-'; if(sText === 'มา') shortStat = '<b style="color:#10b981;">ม</b>'; else if(sText === 'ลากิจ') shortStat = '<b style="color:#f97316;">ล</b>'; else if(sText === 'ลาป่วย') shortStat = '<b style="color:#f43f5e;">ป</b>'; else if(sText === 'ขาด') { shortStat = '<b style="color:#991b1b;">ข</b>'; totalAbs++; } else if(sText === 'สาย') shortStat = '<b style="color:#eab308;">ส</b>'; else if(sText === 'เรียนนอกโรงเรียน') shortStat = '<b style="color:#3b82f6;">น</b>'; weeklyData[d.id].status[dayIndex] = shortStat; }); } });
             tbody.innerHTML = ""; let index = 1; for(let id in weeklyData) { let st = weeklyData[id]; tbody.innerHTML += `<tr><td style="text-align:center;">${index++}</td><td>${cleanName(st.name)}</td><td style="text-align:center; background:#f8fafc;">${st.status[0]}</td><td style="text-align:center;">${st.status[1]}</td><td style="text-align:center; background:#f8fafc;">${st.status[2]}</td><td style="text-align:center;">${st.status[3]}</td><td style="text-align:center; background:#f8fafc;">${st.status[4]}</td></tr>`; }
             if(Object.keys(weeklyData).length === 0) tbody.innerHTML = `<tr><td colspan='7' style='text-align:center; padding:20px;'>❌ ไม่มีข้อมูลนักเรียนในห้องนี้</td></tr>`; 
-            if (totalAbs > 0) document.getElementById('teacher-daily-ai').innerHTML = `⚠️ <b>สัปดาห์นี้:</b> พบการขาดเรียนรวมสะสม <b>${totalAbs} ครั้ง</b>`; else document.getElementById('teacher-daily-ai').innerHTML = `🌟 <b>ยอดเยี่ยมมาก!</b> สัปดาห์นี้นักเรียนมาเรียนดีมาก`;
+            if (totalAbs > 0) document.getElementById('teacher-daily-ai').innerHTML = `⚠️ <b>สัปดาห์นี้:</b> พบการขาดเรียนรวมสะสม <b>${totalAbs} ครั้ง</b>`; else document.getElementById('teacher-daily-ai').innerHTML = `🌟 <b>ยอดเยี่ยมมาก!</b> สัปดาห์นี้นักเรียนมาเรียนดีมาก ไม่มีคนขาดเลยครับ`;
         });
     }
 
@@ -813,5 +815,3 @@
 
 </body>
 </html>
-
-
