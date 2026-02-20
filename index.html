@@ -123,6 +123,7 @@
                 <div style="flex:1"><label>วันสิ้นสุด</label><input type="date" id="admin-end"></div>
             </div>
         </div>
+        
         <div class="card">
             <h3>👥 จัดการผู้ใช้งาน (ครู/Admin)</h3>
             <p style="font-size:12px; color:#666;">* สามารถพิมพ์แก้ไขในตารางแล้วกดบันทึกได้เลย</p>
@@ -134,16 +135,23 @@
             </div>
             <button onclick="addUserRow()" style="margin-top:10px; background:#28a745;">+ เพิ่มผู้ใช้งาน</button>
         </div>
+
         <div class="card">
-            <h3>🎓 จัดการนักเรียน</h3>
-            <div style="overflow-x: auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap;">
+                <h3 style="margin:0;">🎓 จัดการนักเรียน</h3>
+                <select id="admin-class-filter" onchange="renderAdminStudents()" style="width:150px; margin:0; padding:8px;">
+                    <option value="all">แสดงทุกห้อง</option>
+                </select>
+            </div>
+            <div style="overflow-x: auto; max-height: 400px; overflow-y: auto; margin-top:15px; border-top: 1px solid #eee;">
                 <table id="admin-students-table">
                     <thead><tr><th>เลขที่</th><th>รหัสนักเรียน</th><th>ชื่อ-สกุล</th><th>ชั้นเรียน</th><th>จัดการ</th></tr></thead>
                     <tbody id="admin-students-body"></tbody>
                 </table>
             </div>
-            <button onclick="addStudentRow()" style="margin-top:10px; background:#28a745;">+ เพิ่มนักเรียน</button>
+            <button onclick="addStudentRow()" style="margin-top:15px; background:#28a745;">+ เพิ่มนักเรียน</button>
         </div>
+        
         <button onclick="saveAdminData()" style="width:100%; padding:15px; font-size:18px; margin-bottom: 20px;">💾 บันทึกการแก้ไขระบบทั้งหมด</button>
     </div>
 
@@ -176,7 +184,7 @@
 </div>
 
 <script>
-    // 🔗 API ของคุณ
+    // 🔗 API ของคุณ (ใช้ลิงก์ล่าสุดได้เลย)
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxDBIimksCjbqS--gvganUMDGNLVE3B55IYmDMOz7vK9zq4K8h9kxdgZzEsa9AVM6Jy/exec";
     
     document.getElementById('check-date').valueAsDate = new Date();
@@ -187,6 +195,9 @@
     let attendanceData = {}; 
     let currentTeacher = "";
     let currentClass = "";
+
+    // ตัวแปรเก็บข้อมูลรายชื่อนักเรียนสำหรับแอดมิน เพื่อกันข้อมูลห้องอื่นหายตอนฟิลเตอร์
+    let allAdminStudentsData = []; 
 
     document.getElementById('check-date').addEventListener('change', fetchStudents);
 
@@ -209,18 +220,18 @@
                     document.getElementById('user-display').innerText = `${data.name} - ออกจากระบบ`;
                     
                     if (data.role === "admin") {
-                        document.getElementById('bottom-nav').style.display = 'none'; // ซ่อนเมนูครู
+                        document.getElementById('bottom-nav').style.display = 'none'; 
                         switchPage('admin-page', null);
                         loadAdminData();
                     } else if (data.role === "executive" || data.role === "boss") {
-                        document.getElementById('bottom-nav').style.display = 'none'; // ซ่อนเมนูครู
+                        document.getElementById('bottom-nav').style.display = 'none'; 
                         switchPage('exec-page', null);
                         loadExecReport();
                     } else if (data.role === "teacher") {
                         currentTeacher = data.name;
                         currentClass = data.className || ""; 
                         document.getElementById('class-title').innerText = `(${currentClass})`;
-                        document.getElementById('bottom-nav').style.display = 'flex'; // โชว์เมนูครู
+                        document.getElementById('bottom-nav').style.display = 'flex'; 
                         switchPage('checklist-page', document.querySelectorAll('.nav-item')[0]);
                         fetchStudents(); 
                     }
@@ -389,7 +400,7 @@
     }
 
     // ==========================================
-    // ⚙️ โหมด ADMIN (ดึงและแก้ไขข้อมูล)
+    // ⚙️ โหมด ADMIN (อัปเดตระบบ Filter ห้องเรียน)
     // ==========================================
     function loadAdminData() {
         fetch(`${GAS_API_URL}?action=get_admin_data`)
@@ -398,6 +409,7 @@
                 if(data.status === "success") {
                     document.getElementById('admin-start').value = data.config.startDate;
                     document.getElementById('admin-end').value = data.config.endDate;
+                    
                     let uBody = document.getElementById('admin-users-body');
                     uBody.innerHTML = "";
                     data.users.forEach((u, i) => {
@@ -414,19 +426,64 @@
                             <td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td>
                         </tr>`;
                     });
-                    let sBody = document.getElementById('admin-students-body');
-                    sBody.innerHTML = "";
-                    data.students.forEach((s, i) => {
-                        sBody.innerHTML += `<tr>
-                            <td><input type="text" value="${s[0]}" id="s-num-${i}" style="width:50px;"></td>
-                            <td><input type="text" value="${s[1]}" id="s-id-${i}"></td>
-                            <td><input type="text" value="${s[2]}" id="s-name-${i}"></td>
-                            <td><input type="text" value="${s[3]}" id="s-class-${i}"></td>
-                            <td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td>
-                        </tr>`;
-                    });
+
+                    // นำข้อมูลนักเรียนทั้งหมดไปเก็บไว้ใน Array หลักก่อน
+                    allAdminStudentsData = data.students; 
+                    updateClassDropdown(); // อัปเดตรายชื่อห้องเรียนใน Dropdown
+                    renderAdminStudents(); // เรนเดอร์ตารางเฉพาะห้องที่เลือก
                 }
             });
+    }
+
+    // ดึงชื่อห้องที่ซ้ำกันออก แล้วนำไปใส่ใน Dropdown
+    function updateClassDropdown() {
+        let filter = document.getElementById('admin-class-filter');
+        let currentVal = filter.value;
+        let classes = new Set();
+        allAdminStudentsData.forEach(s => { if(s[3]) classes.add(s[3]); });
+        
+        filter.innerHTML = `<option value="all">แสดงทุกห้อง</option>`;
+        [...classes].sort().forEach(c => {
+            filter.innerHTML += `<option value="${c}">${c}</option>`;
+        });
+        
+        // จำค่าเดิมที่เคยเลือกไว้ ถ้ามี
+        let exists = Array.from(filter.options).some(opt => opt.value === currentVal);
+        if(exists) filter.value = currentVal;
+    }
+
+    // สร้างตารางเฉพาะห้องที่ถูกเลือกใน Dropdown
+    function renderAdminStudents() {
+        let sBody = document.getElementById('admin-students-body');
+        sBody.innerHTML = "";
+        let filterClass = document.getElementById('admin-class-filter').value;
+
+        allAdminStudentsData.forEach((s, index) => {
+            if (filterClass === 'all' || s[3] === filterClass) {
+                // ส่ง index ของ Array จริงๆ เข้าไปใน onchange
+                sBody.innerHTML += `<tr>
+                    <td><input type="text" value="${s[0]}" style="width:50px;" onchange="updateStudentData(${index}, 0, this.value)"></td>
+                    <td><input type="text" value="${s[1]}" onchange="updateStudentData(${index}, 1, this.value)"></td>
+                    <td><input type="text" value="${s[2]}" onchange="updateStudentData(${index}, 2, this.value)"></td>
+                    <td><input type="text" value="${s[3]}" onchange="updateStudentData(${index}, 3, this.value); updateClassDropdown();"></td>
+                    <td><button style="background:red;" onclick="removeStudent(${index})">ลบ</button></td>
+                </tr>`;
+            }
+        });
+    }
+
+    // ฟังก์ชันย่อยสำหรับอัปเดตข้อมูลใน Array หลัก เมื่อครูพิมพ์ข้อความ
+    function updateStudentData(index, col, val) {
+        allAdminStudentsData[index][col] = val;
+    }
+
+    // ฟังก์ชันลบนักเรียนออกจาก Array หลัก
+    function removeStudent(index) {
+        if(confirm("ต้องการลบนักเรียนคนนี้ออกจากฐานข้อมูลใช่หรือไม่?")) {
+            allAdminStudentsData.splice(index, 1);
+            updateClassDropdown();
+            renderAdminStudents();
+        }
     }
 
     function addUserRow() {
@@ -441,34 +498,35 @@
         </tr>`;
     }
 
+    // ฟังก์ชันเพิ่มนักเรียนเข้า Array หลัก
     function addStudentRow() {
-        let i = Date.now();
-        document.getElementById('admin-students-body').innerHTML += `<tr>
-            <td><input type="text" id="s-num-${i}" style="width:50px;"></td>
-            <td><input type="text" id="s-id-${i}"></td>
-            <td><input type="text" id="s-name-${i}"></td>
-            <td><input type="text" id="s-class-${i}"></td>
-            <td><button style="background:red;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td>
-        </tr>`;
+        let filterClass = document.getElementById('admin-class-filter').value;
+        let defaultClass = filterClass === 'all' ? '' : filterClass;
+        
+        allAdminStudentsData.push(['', '', '', defaultClass]);
+        updateClassDropdown();
+        renderAdminStudents();
+        
+        // เลื่อน Scrollbar ลงมาล่างสุดอัตโนมัติ
+        let container = document.querySelector('#admin-students-table').parentElement;
+        container.scrollTop = container.scrollHeight;
     }
 
     function saveAdminData() {
         let btn = document.querySelector('#admin-page > button');
         btn.innerText = "⏳ กำลังบันทึกข้อมูล...";
-        let users = [], students = [];
+        
+        let users = [];
         document.querySelectorAll('#admin-users-body tr').forEach(tr => {
             let inputs = tr.querySelectorAll('input, select');
             users.push([inputs[0].value, inputs[1].value, inputs[2].value, inputs[3].value, inputs[4].value]);
-        });
-        document.querySelectorAll('#admin-students-body tr').forEach(tr => {
-            let inputs = tr.querySelectorAll('input');
-            students.push([inputs[0].value, inputs[1].value, inputs[2].value, inputs[3].value]);
         });
 
         fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({
             action: "admin_update",
             settings: { startDate: document.getElementById('admin-start').value, endDate: document.getElementById('admin-end').value },
-            users: users, students: students
+            users: users, 
+            students: allAdminStudentsData // ส่ง Array หลักทั้งหมดกลับไปเซฟ ไม่ใช่แค่ที่โชว์บนจอ!
         }) })
         .then(res => res.json())
         .then(data => {
