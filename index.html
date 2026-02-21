@@ -106,6 +106,13 @@
         .footer-credit { text-align: center; padding: 25px; margin-top: 40px; color: #64748b; font-size: 13px; border-top: 1px dashed #ddd; line-height: 1.8; }
         .swal2-title, .swal2-html-container, .swal2-confirm, .swal2-cancel { font-family: 'Prompt', sans-serif !important; }
 
+        .live-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; display: inline-block; animation: pulseLive 1.5s infinite; }
+        @keyframes pulseLive { 
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 
+            70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); } 
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } 
+        }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -288,7 +295,7 @@
                 <span style="color:#cbd5e1;">|</span>
                 <span><b>ชั้น:</b> <span id="hdr-class" style="color:#f59e0b;">-</span></span>
             </div>
-            <div id="hdr-name" style="font-size: 18px; font-weight: bold; color: #0f172a;">กำลังโหลดชื่อนักเรียน...</div>
+            <div id="hdr-name" style="font-size: 18px; font-weight: bold; color: #0f172a;">กำลังโหลดข้อมูล...</div>
         </div>
 
         <div class="student-tabs">
@@ -361,10 +368,15 @@
         </div>
 
         <div id="tab-std-behavior" class="student-tab-content">
-            <h3 style="margin-top:0; color:#059669; display:flex; align-items:center; gap:8px;">💯 คะแนนพฤติกรรม</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0; color:#059669; display:flex; align-items:center; gap:8px;">💯 คะแนนพฤติกรรม</h3>
+                <span style="font-size: 11px; color: #10b981; background: #d1fae5; padding: 4px 10px; border-radius: 12px; font-weight:bold; display:flex; align-items:center; gap:4px; box-shadow: 0 2px 4px rgba(16,185,129,0.2);">
+                    <span class="live-dot"></span> ข้อมูลเชื่อมต่อสด (Live)
+                </span>
+            </div>
             
-            <div id="behavior-score-box" style="text-align:center; padding: 30px 20px; background: #ecfdf5; border-radius: 12px; border: 2px dashed #34d399; margin-bottom: 15px;">
-                <h1 id="behavior-score-text" style="font-size: 55px; color: #059669; margin: 0; line-height: 1;">100</h1>
+            <div id="behavior-score-box" style="text-align:center; padding: 30px 20px; background: #ecfdf5; border-radius: 12px; border: 2px dashed #34d399; margin-bottom: 15px; transition: 0.3s;">
+                <h1 id="behavior-score-text" style="font-size: 55px; color: #059669; margin: 0; line-height: 1; transition: 0.3s;">...</h1>
                 <p style="margin: 5px 0 0 0; color: #047857; font-weight: bold;">คะแนนคงเหลือ</p>
             </div>
             
@@ -375,18 +387,13 @@
                         <tr>
                             <th style="background:#f1f5f9;">วันที่</th>
                             <th style="background:#f1f5f9;">รายการ</th>
-                            <th style="background:#f1f5f9; color:#ef4444;">หัก</th>
+                            <th style="background:#f1f5f9; color:#ef4444;">หัก/เพิ่ม</th>
                         </tr>
                     </thead>
                     <tbody id="student-behavior-history-body">
-                        <tr><td colspan='3' style='text-align:center;'>กำลังดึงข้อมูล...</td></tr>
+                        <tr><td colspan='3' style='text-align:center;'>⏳ กำลังเชื่อมต่อข้อมูล...</td></tr>
                     </tbody>
                 </table>
-            </div>
-            
-            <div style="background:#f8fafc; padding:12px; border-radius:8px; font-size:11px; color:#64748b; line-height: 1.5; margin-top:15px; border-left: 3px solid #cbd5e1;">
-                * การขาดเรียนหัก 5 คะแนน / การมาสายหัก 2 คะแนน<br>
-                * หากครูแก้ไขข้อมูลการมาเรียนให้ ระบบจะคืนคะแนนให้อัตโนมัติ
             </div>
         </div>
     </div>
@@ -414,11 +421,42 @@
 </div>
 
 <script>
-    // 🔗 API (วาง URL ล่าสุดที่เพิ่ง Deploy เป็น New version ตรงนี้ครับ)
+    // 🔗 API (ใส่ URL ล่าสุดของท่านรองฯ ตรงนี้ครับ)
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzDZH5_rmlohPInSpNX-o5b-5wgRacx7xOYkRsNrnWF3dTlzsvVuZ7m7JW1EA6BJz9H/exec";
     
     const IDLE_TIMEOUT = 5 * 60 * 1000; 
     let idleTimer = null;
+
+    // 🌟 1. ฟังก์ชันแปลงวันที่เป็นภาษาไทยอัจฉริยะ (วัน เดือน ปี พ.ศ.)
+    function formatThaiDate(dateStr, useFullMonth = false) {
+        if (!dateStr || dateStr === "-") return "-";
+        
+        // ลบเครื่องหมาย ' ฝนทองออกให้สะอาด
+        dateStr = String(dateStr).replace(/'/g, '').trim(); 
+        
+        let d, m, y;
+        if (dateStr.includes('/')) {
+            let parts = dateStr.split('/');
+            d = parseInt(parts[0], 10);
+            m = parseInt(parts[1], 10);
+            y = parseInt(parts[2], 10);
+        } else if (dateStr.includes('-')) {
+            let parts = dateStr.split('-');
+            y = parseInt(parts[0], 10);
+            m = parseInt(parts[1], 10);
+            d = parseInt(parts[2], 10);
+        } else {
+            return dateStr;
+        }
+
+        const tShort = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+        const tFull = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        
+        // ถ้าเป็น ค.ศ. ให้บวก 543 เป็น พ.ศ.
+        if (y < 2500 && y > 1900) y += 543;
+        
+        return `${d} ${useFullMonth ? tFull[m] : tShort[m]} ${y}`;
+    }
 
     window.onload = function() { updateClock(); checkSession(); };
 
@@ -430,6 +468,7 @@
     }
 
     function autoLogout() {
+        if(studentDataTimer) clearInterval(studentDataTimer); 
         Swal.fire({ title: 'ระบบ SIS บ้านเชียงวิทยา', text: '⏱️ ระบบได้ออกจากระบบอัตโนมัติ เนื่องจากไม่มีการใช้งานเกิน 5 นาที', icon: 'warning', confirmButtonColor: '#1e56a0', confirmButtonText: 'ตกลง'
         }).then(() => { localStorage.removeItem('sis_user'); localStorage.removeItem('sis_last_activity'); localStorage.removeItem('sis_current_page'); location.reload(); });
     }
@@ -469,6 +508,7 @@
 
     let studentLeaveDates = [];
     let currentStudentCalendarDate = new Date();
+    let studentDataTimer = null;
 
     document.getElementById('admin-time-limit-toggle').addEventListener('change', function() {
         let inputs = document.getElementById('time-limit-inputs'); let text = document.getElementById('time-limit-status-text');
@@ -543,8 +583,12 @@
                 switchPage('exec-page', null); fetchFullExecData();
             } else if(role === "student") { 
                 switchPage('student-page', null); 
-                loadStudentReport(data.userId); 
+                loadStudentReport(data.userId, false); 
                 renderStudentCalendar(); 
+                
+                if(studentDataTimer) clearInterval(studentDataTimer);
+                studentDataTimer = setInterval(() => { loadStudentReport(data.userId, true); }, 10000); 
+
             } else {
                 Swal.fire('ระบบ SIS', '❌ ไม่พบสิทธิ์การเข้าถึงข้อมูล กรุณาติดต่อผู้ดูแลระบบ', 'error');
             }
@@ -770,7 +814,8 @@
         if(studentLeaveDates.length === 0) { display.style.display = 'none';
         } else {
             display.style.display = 'block';
-            let formattedDates = studentLeaveDates.map(d => { let p = d.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }).join(', ');
+            // 🌟 ใช้ฟังก์ชันวันที่ไทย
+            let formattedDates = studentLeaveDates.map(d => formatThaiDate(d, false)).join(', ');
             display.innerText = `📌 วันที่เลือกลา (${studentLeaveDates.length} วัน): ${formattedDates}`;
         }
     }
@@ -802,7 +847,11 @@
         let tbody = document.getElementById('daily-body'); tbody.innerHTML = `<tr><td colspan='7' style='text-align:center; padding:20px;'>⏳ กำลังดึงข้อมูลตลอดสัปดาห์...</td></tr>`; document.getElementById('teacher-daily-ai').innerHTML = "⏳ กำลังประมวลผลข้อมูลสัปดาห์นี้...";
         let curr = new Date(); let day = curr.getDay(); let diffToMon = curr.getDate() - day + (day === 0 ? -6 : 1); let monDate = new Date(curr.setDate(diffToMon)); monDate.setHours(0,0,0,0);
         let weekDates = []; let thElements = ['th-mon', 'th-tue', 'th-wed', 'th-thu', 'th-fri']; let dayNames = ['จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.'];
-        for(let i=0; i<5; i++) { let d = new Date(monDate); d.setDate(monDate.getDate() + i); let yyyy = d.getFullYear(); let mm = String(d.getMonth() + 1).padStart(2, '0'); let dd = String(d.getDate()).padStart(2, '0'); weekDates.push(`${yyyy}-${mm}-${dd}`); document.getElementById(thElements[i]).innerHTML = `${dayNames[i]}<br><span style="font-size:10px; font-weight:normal;">${dd}/${mm}</span>`; if(i===0) document.getElementById('weekly-date-range').innerText = `${dd}/${mm} - `; if(i===4) document.getElementById('weekly-date-range').innerText += `${dd}/${mm}/${yyyy}`; }
+        for(let i=0; i<5; i++) { let d = new Date(monDate); d.setDate(monDate.getDate() + i); let yyyy = d.getFullYear(); let mm = String(d.getMonth() + 1).padStart(2, '0'); let dd = String(d.getDate()).padStart(2, '0'); weekDates.push(`${yyyy}-${mm}-${dd}`); document.getElementById(thElements[i]).innerHTML = `${dayNames[i]}<br><span style="font-size:10px; font-weight:normal;">${dd}/${mm}</span>`; }
+        
+        // 🌟 แสดงหัวข้อสัปดาห์ปัจจุบันเป็นวันที่ไทย
+        document.getElementById('weekly-date-range').innerText = `${formatThaiDate(weekDates[0], true)} - ${formatThaiDate(weekDates[4], true)}`;
+        
         let fetches = weekDates.map(dateStr => fetch(`${GAS_API_URL}?action=get_daily&className=${encodeURIComponent(currentClass)}&date=${dateStr}`).then(res => res.json()).catch(e => ({ status: 'error' })));
         Promise.all(fetches).then(results => {
             let weeklyData = {}; if(students && students.length > 0) students.forEach(std => { weeklyData[std.id] = { name: std.name, status: ['-', '-', '-', '-', '-'] }; }); let totalAbs = 0;
@@ -915,11 +964,15 @@
         aiBox.innerHTML = html;
     }
 
-    function loadStudentReport(id) {
+    // 🌟 ระบบโหลดข้อมูลแบบ Real-time (ใช้ฟังก์ชันแปลงวันที่แบบไทย)
+    function loadStudentReport(id, isSilent = false) {
+        if(!isSilent) {
+            document.getElementById('hdr-name').innerText = "กำลังโหลดข้อมูล...";
+        }
+
         fetch(`${GAS_API_URL}?action=get_student_report&studentId=${id}`).then(res=>res.json()).then(data => {
             
             if(data.info) {
-                // อัปเดตข้อมูลบนบัตรดิจิทัล
                 document.getElementById('id-card-id').innerText = data.info.id;
                 document.getElementById('id-card-class').innerText = data.info.className;
                 document.getElementById('id-card-number').innerText = data.info.number;
@@ -928,14 +981,11 @@
                     document.getElementById('hdr-name').innerText = data.info.name;
                 }
                 document.getElementById('id-card-barcode').innerText = `*${data.info.id}*`;
-
-                // อัปเดตข้อมูลตรงส่วนแถบข้อมูลด้านบน
                 document.getElementById('hdr-id').innerText = data.info.id;
                 document.getElementById('hdr-num').innerText = data.info.number;
                 document.getElementById('hdr-class').innerText = data.info.className;
             }
 
-            // อัปเดตสถิติเช็คชื่อ
             document.getElementById('st-stat-present').innerText = data.stats.present; 
             document.getElementById('st-stat-absent').innerText = data.stats.absent; 
             document.getElementById('st-stat-leave').innerText = data.stats.personal_leave + data.stats.sick_leave;
@@ -943,16 +993,16 @@
             let p = data.stats.total > 0 ? (data.stats.present / data.stats.total * 100).toFixed(1) : 0; 
             document.getElementById('ai-assessment-text').innerHTML = p >= 80 ? `🌟 <b>ชื่นชม:</b> รักษามาตรฐานนี้นะครับ!` : `⚠️ <b>ระวัง:</b> ต่ำกว่าเกณฑ์ (${p}%) เสี่ยงหมดสิทธิ์สอบ`;
             
-            let b = document.getElementById('student-history-body'); b.innerHTML = ""; 
-            data.history.reverse().forEach(x => b.innerHTML += `<tr><td>${x.date}</td><td>${x.status}</td><td>${x.note||'-'}</td></tr>`);
+            let hHTML = ""; 
+            // 🌟 นำฟังก์ชัน formatThaiDate มาใช้กับตารางประวัติย้อนหลัง
+            data.history.reverse().forEach(x => hHTML += `<tr><td>${formatThaiDate(x.date)}</td><td>${x.status}</td><td>${x.note||'-'}</td></tr>`);
+            document.getElementById('student-history-body').innerHTML = hHTML;
 
-            // 🌟 อัปเดตข้อมูลคะแนนพฤติกรรม
             if(data.currentScore !== undefined) {
                 let scoreText = document.getElementById('behavior-score-text');
                 let scoreBox = document.getElementById('behavior-score-box');
                 scoreText.innerText = data.currentScore;
                 
-                // เปลี่ยนสีตามคะแนน
                 if(data.currentScore >= 80) {
                     scoreText.style.color = '#059669'; scoreBox.style.background = '#ecfdf5'; scoreBox.style.borderColor = '#34d399';
                 } else if(data.currentScore >= 60) {
@@ -961,22 +1011,24 @@
                     scoreText.style.color = '#dc2626'; scoreBox.style.background = '#fef2f2'; scoreBox.style.borderColor = '#f87171';
                 }
 
-                let hBody = document.getElementById('student-behavior-history-body');
-                hBody.innerHTML = "";
+                let behHTML = "";
                 if(data.behaviorHistory && data.behaviorHistory.length > 0) {
                     data.behaviorHistory.reverse().forEach(h => {
                         let ptsColor = h.points < 0 ? '#ef4444' : '#10b981';
                         let ptsSign = h.points > 0 ? '+' : '';
-                        hBody.innerHTML += `<tr><td style="border-bottom:1px solid #eee; padding:8px 5px;">${h.date}</td><td style="border-bottom:1px solid #eee; padding:8px 5px;">${h.action}<br><span style="font-size:10px; color:#94a3b8;">${h.teacher}</span></td><td style="border-bottom:1px solid #eee; padding:8px 5px; font-weight:bold; color:${ptsColor};">${ptsSign}${h.points}</td></tr>`;
+                        // 🌟 นำฟังก์ชัน formatThaiDate มาใช้กับตารางคะแนนพฤติกรรม
+                        behHTML += `<tr><td style="border-bottom:1px solid #eee; padding:8px 5px;">${formatThaiDate(h.date)}</td><td style="border-bottom:1px solid #eee; padding:8px 5px;">${h.action}<br><span style="font-size:10px; color:#94a3b8;">${h.teacher}</span></td><td style="border-bottom:1px solid #eee; padding:8px 5px; font-weight:bold; color:${ptsColor};">${ptsSign}${h.points}</td></tr>`;
                     });
                 } else {
-                    hBody.innerHTML = `<tr><td colspan='3' style='text-align:center; padding:15px; color:#64748b;'>ไม่มีประวัติการถูกหักคะแนน ยอดเยี่ยมมาก!</td></tr>`;
+                    behHTML = `<tr><td colspan='3' style='text-align:center; padding:15px; color:#64748b;'>ไม่มีประวัติการถูกหักคะแนน ยอดเยี่ยมมาก!</td></tr>`;
                 }
+                document.getElementById('student-behavior-history-body').innerHTML = behHTML;
             }
         });
     }
 
     function logout() { 
+        if(studentDataTimer) clearInterval(studentDataTimer); 
         Swal.fire({ title: 'ระบบ SIS บ้านเชียงวิทยา', text: "ท่านต้องการออกจากระบบใช่หรือไม่?", icon: 'question', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#cbd5e1', confirmButtonText: 'ออกจากระบบ', cancelButtonText: 'ยกเลิก'
         }).then((result) => { if(result.isConfirmed) { localStorage.removeItem('sis_user'); localStorage.removeItem('sis_last_activity'); localStorage.removeItem('sis_current_page'); location.reload(); } });
     }
@@ -984,4 +1036,3 @@
 
 </body>
 </html>
-
