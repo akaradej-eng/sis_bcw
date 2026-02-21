@@ -77,7 +77,7 @@
         .calendar-day { padding: 8px 0; border-radius: 6px; font-size: 12px; cursor: pointer; background: #f1f5f9; border: 1px solid #e2e8f0; transition: 0.2s; }
         .calendar-day:hover:not(.blank) { background: #cbd5e1; }
         .calendar-day.holiday { background: #ef4444; color: white; border-color: #ef4444; font-weight: bold; box-shadow: 0 2px 5px rgba(239,68,68,0.3);}
-        .calendar-day.selected-leave { background: #f59e0b; color: white; border-color: #d97706; font-weight: bold; box-shadow: 0 2px 5px rgba(245,158,11,0.3);} 
+        .calendar-day.selected-leave { background: #f59e0b; color: white; border-color: #d97706; font-weight: bold; box-shadow: 0 2px 5px rgba(245,158,11,0.3);}
         .calendar-day.blank { background: transparent; border: none; cursor: default; color: #cbd5e1; }
 
         .switch { position: relative; display: inline-block; width: 42px; height: 24px; }
@@ -93,7 +93,6 @@
         .admin-tab-content, .student-tab-content { display: none; background: #fff; border-radius: 0 12px 12px 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .admin-tab-content.active, .student-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
-        /* 🌟 สไตล์สำหรับบัตรนักเรียนดิจิทัล */
         .id-card-container { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #e2e8f0; border-radius: 12px; padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); max-width: 400px; margin: 0 auto 20px auto; position: relative; overflow: hidden; }
         .id-card-header { display: flex; align-items: center; border-bottom: 3px solid #1e56a0; padding-bottom: 10px; margin-bottom: 15px; justify-content: center; }
         .id-card-logo { width: 45px; height: auto; margin-right: 10px; }
@@ -229,7 +228,7 @@
             <h3 style="color:#ef4444; margin-top:0;">⏰ จำกัดเวลาเช็คชื่อประจำวัน</h3>
             <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
                 <label class="switch"><input type="checkbox" id="admin-time-limit-toggle"><span class="slider"></span></label>
-                <span id="time-limit-status-text" style="font-size:13px; font-weight:bold; color:#64748b;">ปิดใช้งาน</span>
+                <span id="time-limit-status-text" style="font-size:13px; font-weight:bold; color:#64748b;">ปิดใช้งาน (ครูบันทึกได้ตลอดเวลา)</span>
             </div>
             <div id="time-limit-inputs" style="display:none; gap:10px; background:#f0fdf4; padding:15px; border-radius:8px; border:1px solid #bbf7d0;">
                 <div style="flex:1"><label style="font-size:12px; font-weight:bold; color:#166534;">เวลาเริ่ม (น.)</label><input type="time" id="admin-start-time" value="07:30" style="margin-bottom:0;"></div>
@@ -303,8 +302,18 @@
     </div>
 
     <div id="student-page" class="page">
-        <h2 style="color: #1e56a0; margin-bottom: 15px;">🎓 ระบบนักเรียน</h2>
         
+        <div style="background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 5px solid #f59e0b;">
+            <div style="font-size: 14px; color: #475569; margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 10px;">
+                <span><b>เลขที่:</b> <span id="hdr-num" style="color:#1e56a0;">-</span></span>
+                <span style="color:#cbd5e1;">|</span>
+                <span><b>รหัสนักเรียน:</b> <span id="hdr-id" style="color:#1e56a0;">-</span></span>
+                <span style="color:#cbd5e1;">|</span>
+                <span><b>ชั้น:</b> <span id="hdr-class" style="color:#1e56a0;">-</span></span>
+            </div>
+            <div id="hdr-name" style="font-size: 18px; font-weight: bold; color: #0f172a;">ชื่อ-นามสกุล</div>
+        </div>
+
         <div class="student-tabs">
             <div class="student-tab-btn active" onclick="switchStudentTab('tab-std-card', this)">🪪 บัตรนักเรียน</div>
             <div class="student-tab-btn" onclick="switchStudentTab('tab-std-attendance', this)">📅 มาเรียน</div>
@@ -409,7 +418,7 @@
 </div>
 
 <script>
-    // 🔗 API (ใส่ URL ของท่านรองฯ ตัวล่าสุดที่เพิ่ง Deploy มา)
+    // 🔗 API (ใส่ URL ของท่านรองฯ)
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxc-HIoe0ZsKK_VZlsGnj8GHyHGM2GxT2YU3Z6RAX8dPj5HmCDqJvg7hsGN39oUBA1x/exec";
     
     const IDLE_TIMEOUT = 5 * 60 * 1000; 
@@ -559,7 +568,6 @@
         if (pageId === 'summary-page' && currentClass) loadSummaryData();
     }
 
-    // 🌟 ฟังก์ชันดึงนักเรียน ที่ปรับปรุงดัก Error แล้ว
     function fetchStudents() {
         let dateInput = document.getElementById('check-date');
         if(!dateInput.value) {
@@ -699,7 +707,7 @@
         fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) })
         .then(res => res.json()).then(data => {
             btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false;
-            if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ บันทึกสำเร็จ!', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error');
+            if(data.status === "success") { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '✅ บันทึกข้อมูลสำเร็จ!', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error');
         });
     }
 
@@ -910,26 +918,27 @@
         aiBox.innerHTML = html;
     }
 
-    // 🌟 ดึงข้อมูลส่วนตัวและอัปเดตบัตรนักเรียน + ประวัติ
     function loadStudentReport(id) {
         fetch(`${GAS_API_URL}?action=get_student_report&studentId=${id}`).then(res=>res.json()).then(data => {
             
+            // 🌟 นำข้อมูลชั้น เลขที่ รหัส มาแสดงผลทั้งในแถบด้านบนและในบัตรนักเรียน
             if(data.info) {
                 // อัปเดตข้อมูลบนบัตรดิจิทัล
                 document.getElementById('id-card-id').innerText = data.info.id;
                 document.getElementById('id-card-class').innerText = data.info.className;
                 document.getElementById('id-card-number').innerText = data.info.number;
                 if(data.info.name) {
-                    document.getElementById('st-name-display').innerText = data.info.name;
                     document.getElementById('id-card-name').innerText = data.info.name;
+                    document.getElementById('hdr-name').innerText = data.info.name;
                 }
-                // สุ่มสร้างบาร์โค้ดจากรหัสนักเรียน (ทำให้อยู่ตรงกลาง)
+                
+                // สุ่มสร้างบาร์โค้ดจากรหัสนักเรียน
                 document.getElementById('id-card-barcode').innerText = `*${data.info.id}*`;
 
-                // อัปเดตข้อมูลตรงส่วนหัว
-                document.getElementById('st-info-id').innerText = data.info.id;
-                document.getElementById('st-info-class').innerText = data.info.className;
-                document.getElementById('st-info-number').innerText = data.info.number;
+                // อัปเดตข้อมูลตรงส่วนแถบข้อมูลด้านบน
+                document.getElementById('hdr-id').innerText = data.info.id;
+                document.getElementById('hdr-num').innerText = data.info.number;
+                document.getElementById('hdr-class').innerText = data.info.className;
             }
 
             document.getElementById('st-stat-present').innerText = data.stats.present; 
