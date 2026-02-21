@@ -93,7 +93,6 @@
         .admin-tab-content, .student-tab-content { display: none; background: #fff; border-radius: 0 12px 12px 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .admin-tab-content.active, .student-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
-        /* 🌟 CSS บัตรนักเรียนดิจิทัล */
         .id-card-container { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #e2e8f0; border-radius: 12px; padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); max-width: 400px; margin: 0 auto 20px auto; position: relative; overflow: hidden; }
         .id-card-header { display: flex; align-items: center; border-bottom: 3px solid #1e56a0; padding-bottom: 10px; margin-bottom: 15px; justify-content: center; }
         .id-card-logo { width: 45px; height: auto; margin-right: 10px; }
@@ -114,6 +113,26 @@
         .ai-help-btn { display: block; width: 100%; text-align: left; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; font-family: 'Prompt'; font-size: 13px; color: #1e56a0; transition: 0.2s; font-weight: 500;}
         .ai-help-btn:hover { background: #e0f2fe; border-color: #38bdf8; }
 
+        /* 🌟 CSS แดชบอร์ดผู้บริหาร (Leaderboard) */
+        .exec-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .exec-tab-btn { flex: 1; text-align: center; padding: 12px; background: #e2e8f0; color: #475569; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .exec-tab-btn.active { background: #1e56a0; color: white; }
+        .exec-tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .exec-tab-content.active { display: block; }
+        
+        .leaderboard-row { display: flex; align-items: center; background: #fff; padding: 10px 12px; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; transition: transform 0.2s; gap: 10px;}
+        .leaderboard-row:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        .rank-badge { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; font-size: 14px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .rank-1 { background: linear-gradient(135deg, #fcd34d, #f59e0b); font-size: 18px; width: 40px; height: 40px;}
+        .rank-2 { background: linear-gradient(135deg, #e2e8f0, #94a3b8); font-size: 16px; width: 36px; height: 36px;}
+        .rank-3 { background: linear-gradient(135deg, #fecaca, #ef4444); font-size: 16px; width: 36px; height: 36px;}
+        .rank-other { background: #f1f5f9; color: #64748b; font-size: 13px; box-shadow: none; border: 1px solid #cbd5e1;}
+        .std-lb-info { flex: 1; display: flex; flex-direction: column; }
+        .std-lb-name { font-size: 14px; font-weight: bold; color: #1e293b; }
+        .std-lb-class { font-size: 11px; color: #64748b; }
+        .std-lb-score { font-size: 18px; font-weight: 900; color: #059669; }
+        .std-lb-merit { font-size: 12px; color: #f59e0b; background: #fffbeb; padding: 2px 6px; border-radius: 10px; border: 1px solid #fde68a;}
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -130,7 +149,6 @@
 </div>
 
 <div class="container">
-    
     <div id="status-bar" class="live-status-bar">
         <span id="display-date"></span>
         <span id="display-clock" style="color:var(--primary);"></span>
@@ -138,8 +156,7 @@
 
     <div id="login-page" class="page active">
         <div class="card" style="text-align: center; max-width: 400px; margin: 40px auto;">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgb1oewS_bG2frmr1y3aOrwykh-wBZiipEUv9BbTxGSQh2d-Ergv_Ez4MWoO4AO8_wdCG19Nrravj8iJCc33arzt3ZXi2lmQ2v1hKGvEIBcLdjcCkZdfdZF-p8DWehYl3lzSWhWSOI4NKeNhWRzWkUHRJnMs1KFVMW_BwwUq83DafDaQpwu3-hOs-Ieix0/s225/304789124_573612801071886_7852363760169451884_n.png" 
-                 alt="โลโก้โรงเรียน" style="width: 120px; height: auto; margin-bottom: 15px;">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgb1oewS_bG2frmr1y3aOrwykh-wBZiipEUv9BbTxGSQh2d-Ergv_Ez4MWoO4AO8_wdCG19Nrravj8iJCc33arzt3ZXi2lmQ2v1hKGvEIBcLdjcCkZdfdZF-p8DWehYl3lzSWhWSOI4NKeNhWRzWkUHRJnMs1KFVMW_BwwUq83DafDaQpwu3-hOs-Ieix0/s225/304789124_573612801071886_7852363760169451884_n.png" alt="โลโก้โรงเรียน" style="width: 120px; height: auto; margin-bottom: 15px;">
             <p id="login-clock" style="font-size:14px; font-weight:bold; color:#475569; margin-bottom:20px;"></p>
             <input type="text" id="username" placeholder="รหัสผู้ใช้งาน">
             <input type="password" id="password" placeholder="รหัสผ่าน">
@@ -176,7 +193,6 @@
                     <tbody id="daily-body"></tbody>
                 </table>
             </div>
-            <p style="font-size: 11px; color:#666; margin-top:10px;">*ตัวย่อ: ม=มา, ส=สาย, ล=ลากิจ, ป=ลาป่วย, ข=ขาด, น=นอกโรงเรียน</p>
         </div>
     </div>
 
@@ -292,25 +308,84 @@
 
     <div id="exec-page" class="page">
         <h2 style="color: #1e56a0; margin-bottom: 5px;">📊 แดชบอร์ดผู้บริหาร (Executive)</h2>
-        <button onclick="fetchFullExecData()" style="width:100%; margin-bottom:15px; background:#17a2b8;">🔄 อัปเดตข้อมูลล่าสุด</button>
-        <div class="exec-filters">
-            <div><label>📌 ระดับข้อมูล</label><select id="exec-view-type" onchange="updateExecViewDropdown()"><option value="school">ภาพรวมทั้งโรงเรียน</option><option value="grade">ระดับชั้น</option><option value="class">รายห้อง</option><option value="student">รายบุคคล</option></select></div>
-            <div id="exec-sub-filter-container" style="display:none;"><label>🔍 เลือกเป้าหมาย</label><select id="exec-sub-filter" onchange="processExecData()"></select><input type="text" id="exec-sub-input" placeholder="รหัสนักเรียน" style="display:none;" onkeyup="if(event.keyCode===13) processExecData()"></div>
-            <div><label>📅 ช่วงวันที่</label><div style="display:flex; gap:5px;"><input type="date" id="exec-date-start" onchange="processExecData()"><input type="date" id="exec-date-end" onchange="processExecData()"></div></div>
+        <button onclick="fetchFullExecData()" style="width:100%; margin-bottom:15px; background:#17a2b8; display:flex; justify-content:center; align-items:center; gap:5px; border-radius:8px;">🔄 อัปเดตข้อมูลล่าสุด</button>
+        
+        <div class="card" style="background:#f8fafc; border:1px solid #e2e8f0; margin-bottom:15px; padding:15px;">
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <div style="flex:1; min-width:140px;">
+                    <label style="font-size:12px; font-weight:bold; color:#1e56a0;">📌 ระดับข้อมูล</label>
+                    <select id="exec-view-type" onchange="updateExecViewDropdown()" style="margin-bottom:0; background:white;">
+                        <option value="school">ภาพรวมทั้งโรงเรียน</option>
+                        <option value="grade">ระดับชั้น</option>
+                        <option value="class">รายห้อง</option>
+                    </select>
+                </div>
+                <div id="exec-sub-filter-container" style="display:none; flex:1; min-width:140px;">
+                    <label style="font-size:12px; font-weight:bold; color:#1e56a0;">🔍 เลือกเป้าหมาย</label>
+                    <select id="exec-sub-filter" onchange="processExecData()" style="margin-bottom:0; background:white;"></select>
+                </div>
+            </div>
+            <div style="margin-top:10px; border-top:1px dashed #cbd5e1; padding-top:10px;">
+                <label style="font-size:12px; font-weight:bold; color:#1e56a0;">📅 ช่วงวันที่ (มีผลเฉพาะการเข้าเรียน)</label>
+                <div style="display:flex; gap:5px;">
+                    <input type="date" id="exec-date-start" onchange="processExecData()" style="margin-bottom:0; background:white;">
+                    <input type="date" id="exec-date-end" onchange="processExecData()" style="margin-bottom:0; background:white;">
+                </div>
+            </div>
         </div>
-        <div class="ai-exec-box">
-            <h3>🤖 สรุปวิเคราะห์ข้อมูลเชิงบริหาร</h3>
-            <div id="exec-ai-insight"><p style="text-align:center; color:#64748b;">กำลังประมวลผล...</p></div>
+
+        <div class="exec-tabs">
+            <div class="exec-tab-btn active" id="btn-exec-tab-att" onclick="switchExecTab('exec-tab-attendance', this)">📊 การเข้าเรียน</div>
+            <div class="exec-tab-btn" id="btn-exec-tab-beh" onclick="switchExecTab('exec-tab-behavior', this)">🏆 พฤติกรรม</div>
         </div>
-        <div class="stat-grid" style="margin-bottom: 10px;">
-            <div class="stat-card stat-blue"><h3>เช็คชื่อรวม (ข้อมูล)</h3><h2 id="exec-total">0</h2></div>
-            <div class="stat-card stat-green"><h3>อัตราการมาเรียนเฉลี่ย</h3><h2 id="exec-present-perc">0%</h2></div>
+
+        <div id="exec-tab-attendance" class="exec-tab-content active">
+            <div class="ai-exec-box">
+                <h3>🤖 สรุปวิเคราะห์สถิติการมาเรียน</h3>
+                <div id="exec-ai-insight"><p style="text-align:center; color:#64748b;">กำลังประมวลผลข้อมูลการเข้าเรียน...</p></div>
+            </div>
+            <div class="stat-grid" style="margin-bottom: 10px;">
+                <div class="stat-card stat-blue"><h3>ข้อมูลทั้งหมด (ครั้ง)</h3><h2 id="exec-total">0</h2></div>
+                <div class="stat-card stat-green"><h3>อัตราการมาเรียนเฉลี่ย</h3><h2 id="exec-present-perc">0%</h2></div>
+            </div>
+            <div class="card" style="height: 350px;"><canvas id="execChart"></canvas></div>
+            <div class="card">
+                <h3 style="margin-top:0; color:#1e56a0;">📋 สถิติเชิงลึก (รายกลุ่ม)</h3>
+                <div style="overflow-x: auto; max-height: 400px;">
+                    <table style="white-space: nowrap;">
+                        <thead id="exec-detail-head">
+                            <tr><th>กลุ่ม/บุคคล</th><th style="color:#10b981;">มา</th><th style="color:#eab308;">สาย</th><th style="color:#f97316;">ลากิจ</th><th style="color:#f43f5e;">ลาป่วย</th><th style="color:#991b1b;">ขาด</th><th style="color:#3b82f6;">นอก ร.ร.</th><th>อัตรามาเรียน</th></tr>
+                        </thead>
+                        <tbody id="exec-detail-body">
+                            <tr><td colspan='8' style='text-align:center;'>กำลังประมวลผล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div class="card" style="height: 350px;"><canvas id="execChart"></canvas></div>
+
+        <div id="exec-tab-behavior" class="exec-tab-content">
+            <div class="ai-exec-box" style="border-left-color:#059669; background:#ecfdf5;">
+                <h3 style="color:#059669;">🤖 สรุปภาพรวมพฤติกรรม</h3>
+                <div id="exec-ai-behavior-insight"><p style="text-align:center; color:#64748b;">กำลังประมวลผลคะแนนความดีและพฤติกรรม...</p></div>
+            </div>
+            
+            <div class="card" style="background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%); border: 2px solid #a7f3d0;">
+                <h3 style="margin-top:0; color:#059669; text-align:center;">🏆 TOP 10 นักเรียนพฤติกรรมดีเด่น</h3>
+                <p style="text-align:center; font-size:12px; color:#64748b; margin-top:-5px; margin-bottom:15px; font-weight:bold;" id="exec-leaderboard-subtitle">ภาพรวมทั้งโรงเรียน</p>
+                <div id="exec-leaderboard-container">
+                    </div>
+            </div>
+            
+            <div class="card" style="background: linear-gradient(180deg, #ffffff 0%, #fef2f2 100%); border: 2px solid #fecaca; margin-top:15px;">
+                <h3 style="margin-top:0; color:#dc2626; text-align:center;">⚠️ กลุ่มเสี่ยง (คะแนนต่ำสุด 10 อันดับ)</h3>
+                <div id="exec-risk-container">
+                    </div>
+            </div>
+        </div>
     </div>
 
     <div id="student-page" class="page">
-        
         <div style="background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 5px solid #1e56a0;">
             <div style="font-size: 14px; color: #475569; margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 10px;">
                 <span><b>เลขที่:</b> <span id="hdr-num" style="color:#ef4444;">-</span></span>
@@ -380,12 +455,11 @@
 
         <div id="tab-std-behavior" class="student-tab-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="margin:0; color:#059669; display:flex; align-items:center; gap:8px;">💯 คะแนนพฤติกรรมและความดี</h3>
+                <h3 style="margin:0; color:#059669; display:flex; align-items:center; gap:8px;">💯 คะแนนพฤติกรรม</h3>
                 <span style="font-size: 11px; color: #10b981; background: #d1fae5; padding: 4px 10px; border-radius: 12px; font-weight:bold; display:flex; align-items:center; gap:4px; box-shadow: 0 2px 4px rgba(16,185,129,0.2);">
                     <span class="live-dot"></span> เชื่อมต่อสด
                 </span>
             </div>
-            
             <div style="display:flex; gap:10px; margin-bottom:15px;">
                 <div id="behavior-score-box" style="flex:1; text-align:center; padding: 20px 10px; background: #ecfdf5; border-radius: 12px; border: 2px solid #34d399; transition: 0.3s;">
                     <h1 id="behavior-score-text" style="font-size: 40px; color: #059669; margin: 0; line-height: 1; transition: 0.3s;">100</h1>
@@ -396,7 +470,6 @@
                     <p style="margin: 5px 0 0 0; color: #b45309; font-weight: bold; font-size:13px;">🌟 ความดีสะสม</p>
                 </div>
             </div>
-            
             <h3 style="margin-top:20px; font-size:14px; color:#475569; border-bottom:1px solid #eee; padding-bottom:8px;">📋 ประวัติคะแนน</h3>
             <div style="overflow-x: auto;">
                 <table style="width:100%; border-collapse: collapse; font-size:12px;">
@@ -432,13 +505,13 @@
 <div class="nav-menu" id="bottom-nav">
     <div class="nav-item active" onclick="switchPage('checklist-page', this)"><span>📝</span><br>เช็คชื่อ</div>
     <div class="nav-item" onclick="switchPage('daily-page', this)"><span>📅</span><br>รายสัปดาห์</div>
-    <div class="nav-item" onclick="switchPage('summary-page', this)"><span>📊</span><br>สถิติ</div>
+    <div class="nav-item" onclick="switchPage('summary-page', this)"><span>📊</span><br>รายงานสถิติ</div>
     <div class="nav-item" onclick="switchPage('behavior-page', this)"><span>💯</span><br>พฤติกรรม</div>
 </div>
 
 <script>
-    // 🔗 API วาง URL ใหม่ล่าสุดตรงนี้ครับ
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxkiDv8qkfR06ptiPh_IzTmWIUPv_oFQ0JSSgdTlhKAxsfSStbiOPB5eqevSb94H-on/exec"; 
+    // 🔗 วางลิงก์ Web App ที่ทำ New version แล้ว ตรงนี้ครับ!
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwlOh3ZcY1zcYv42sdYhIvGbmEjxOBTZVrF-FKjwGgLmAeAkLX3cUjKlIWU83rR6X2h/exec"; 
     
     const IDLE_TIMEOUT = 5 * 60 * 1000; 
     let idleTimer = null;
@@ -496,7 +569,7 @@
     let students = [], attendanceData = {}, currentTeacher = "", currentClass = "";
     let allAdminStudentsData = [], adminHolidays = [], adminTermStart = "", adminTermEnd = "";
     let timeLimitConfig = { enabled: false, start: "", end: "" }; 
-    let execFullAttendance = [], execFullStudents = [], execChartInstance = null;
+    let execFullAttendance = [], execFullStudents = [], execFullBehavior = [], execChartInstance = null;
     let studentLeaveDates = []; let currentStudentCalendarDate = new Date(); let studentDataTimer = null;
 
     let toggleEl = document.getElementById('admin-time-limit-toggle');
@@ -510,6 +583,12 @@
 
     function switchAdminTab(tabId, element) { document.querySelectorAll('.admin-tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active')); let tab = document.getElementById(tabId); if(tab) tab.classList.add('active'); if(element) element.classList.add('active'); }
     function switchStudentTab(tabId, element) { document.querySelectorAll('.student-tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.student-tab-btn').forEach(btn => btn.classList.remove('active')); let tab = document.getElementById(tabId); if(tab) tab.classList.add('active'); if(element) element.classList.add('active'); }
+    function switchExecTab(tabId, element) {
+        document.querySelectorAll('.exec-tab-content').forEach(t => t.style.display = 'none');
+        document.querySelectorAll('.exec-tab-btn').forEach(btn => { btn.style.background = '#e2e8f0'; btn.style.color = '#475569'; });
+        document.getElementById(tabId).style.display = 'block';
+        if(element) { element.style.background = '#1e56a0'; element.style.color = 'white'; }
+    }
 
     function handleLogin() {
         const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim(), btn = document.getElementById('login-btn');
@@ -707,7 +786,7 @@
     function saveAttendance() {
         const btn = document.getElementById('save-btn'); btn.innerText = "⏳ ระบบกำลังส่งข้อมูล..."; btn.disabled = true;
         let records = []; students.forEach(s => records.push({ id: s.id, name: s.name, className: currentClass, status: attendanceData[s.id].status, note: document.getElementById(`note-${s.id}`).value }));
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) }).then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false; if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบได้หักคะแนนพฤติกรรมเรียบร้อยแล้ว)', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error'); });
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) }).then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false; if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบหักคะแนนอัตโนมัติแล้ว)', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error'); });
     }
 
     function loadQuickAIInsight() {
@@ -834,19 +913,85 @@
         .then(res => res.json()).then(data => { btn.innerText = originalText; btn.disabled = false; if(data.status === "success") Swal.fire('ระบบ SIS', '✅ บันทึกสำเร็จ', 'success'); }).catch(err => { btn.innerText = originalText; btn.disabled = false; Swal.fire('ระบบ SIS', '❌ ล้มเหลว', 'error'); });
     }
 
-    function fetchFullExecData() { document.getElementById('exec-ai-insight').innerHTML = "<p style='text-align:center;'>⏳ กำลังดาวน์โหลดฐานข้อมูล...</p>"; fetch(`${GAS_API_URL}?action=get_full_exec_data`).then(res=>res.json()).then(data=>{execFullAttendance=data.attendance; execFullStudents=data.students; updateExecViewDropdown();}); }
+    function fetchFullExecData() { document.getElementById('exec-ai-insight').innerHTML = "<p style='text-align:center;'>⏳ กำลังดาวน์โหลดฐานข้อมูล...</p>"; fetch(`${GAS_API_URL}?action=get_full_exec_data`).then(res=>res.json()).then(data=>{execFullAttendance=data.attendance; execFullStudents=data.students; execFullBehavior=data.behavior || []; updateExecViewDropdown();}); }
     function updateExecViewDropdown() { let v = document.getElementById('exec-view-type').value, c = document.getElementById('exec-sub-filter-container'), s = document.getElementById('exec-sub-filter'), i = document.getElementById('exec-sub-input'); s.style.display = 'none'; i.style.display = 'none'; c.style.display = v === 'school' ? 'none' : 'block'; if(v === 'grade') { s.style.display='block'; let g = new Set(); execFullStudents.forEach(x=>g.add(x[3].split('/')[0])); s.innerHTML='<option value="all">ทุกชั้น</option>'; [...g].sort().forEach(x=>s.innerHTML+=`<option value="${x}">${x}</option>`); } else if(v === 'class') { s.style.display='block'; let cl = new Set(); execFullStudents.forEach(x=>cl.add(x[3])); s.innerHTML='<option value="all">ทุกห้อง</option>'; [...cl].sort().forEach(x=>s.innerHTML+=`<option value="${x}">${x}</option>`); } else if(v === 'student') i.style.display='block'; processExecData(); }
+    
     function processExecData() {
-        let v = document.getElementById('exec-view-type').value, sub = v==='student'?document.getElementById('exec-sub-input').value:document.getElementById('exec-sub-filter').value; let st = document.getElementById('exec-date-start').valueAsDate||new Date(0), en = document.getElementById('exec-date-end').valueAsDate||new Date(); let stats = {p:0, late:0, pleave:0, sleave:0, abs:0, out:0, total:0}, gStat = {};
-        execFullAttendance.forEach(row => { let dArr = row[0].split('/'); let rD = new Date(dArr[2], dArr[1]-1, dArr[0]); if(rD >= st && rD <= en) { let match = (v==='school')||(v==='grade'&&(sub==='all'||row[3].startsWith(sub)))||(v==='class'&&(sub==='all'||row[3]===sub))||(v==='student'&&row[1]===sub); if(match) { stats.total++; let key = v==='school'?row[3]:(v==='class'?row[2]:row[0]); if(!gStat[key]) gStat[key] = {มา:0, สาย:0, ลากิจ:0, ลาป่วย:0, นอกร_ร:0, ขาด:0, total:0}; let statText = row[4]; gStat[key].total++; if(statText === 'มา') { stats.p++; gStat[key].มา++; } else if(statText === 'สาย') { stats.late++; gStat[key].สาย++; } else if(statText === 'ลากิจ') { stats.pleave++; gStat[key].ลากิจ++; } else if(statText === 'ลาป่วย') { stats.sleave++; gStat[key].ลาป่วย++; } else if(statText === 'เรียนนอกโรงเรียน') { stats.out++; gStat[key].นอกร_ร++; } else { stats.abs++; gStat[key].ขาด++; } } } });
+        let v = document.getElementById('exec-view-type').value, sub = v==='student'?document.getElementById('exec-sub-input').value:document.getElementById('exec-sub-filter').value; let st = document.getElementById('exec-date-start').valueAsDate||new Date(0), en = document.getElementById('exec-date-end').valueAsDate||new Date(); 
+        
+        let stats = {p:0, late:0, pleave:0, sleave:0, abs:0, out:0, total:0}, gStat = {};
+        let studentsMap = {}; // สำหรับเก็บคะแนนพฤติกรรม
+
+        execFullStudents.forEach(std => {
+            let stdGrade = std[3].split('/')[0]; let stdClass = std[3];
+            let match = (v==='school')||(v==='grade'&&(sub==='all'||stdClass.startsWith(sub)))||(v==='class'&&(sub==='all'||stdClass===sub))||(v==='student'&&std[1]===sub);
+            if(match) {
+                let cleanId = String(std[1]).trim().replace(/'/g, '').replace(/^0+/, '');
+                studentsMap[cleanId] = { id: std[1], name: std[2], className: std[3], behaviorScore: 100, meritScore: 0 };
+            }
+        });
+
+        execFullAttendance.forEach(row => { 
+            let dArr = row[0].split('/'); let rD = new Date(dArr[2], dArr[1]-1, dArr[0]); 
+            if(rD >= st && rD <= en) { 
+                let match = (v==='school')||(v==='grade'&&(sub==='all'||row[3].startsWith(sub)))||(v==='class'&&(sub==='all'||row[3]===sub))||(v==='student'&&row[1]===sub); 
+                if(match) { 
+                    stats.total++; let key = v==='school'?row[3]:(v==='class'?row[2]:row[0]); if(!gStat[key]) gStat[key] = {มา:0, สาย:0, ลากิจ:0, ลาป่วย:0, นอกร_ร:0, ขาด:0, total:0}; 
+                    let statText = row[4]; gStat[key].total++; if(statText === 'มา') { stats.p++; gStat[key].มา++; } else if(statText === 'สาย') { stats.late++; gStat[key].สาย++; } else if(statText === 'ลากิจ') { stats.pleave++; gStat[key].ลากิจ++; } else if(statText === 'ลาป่วย') { stats.sleave++; gStat[key].ลาป่วย++; } else if(statText === 'เรียนนอกโรงเรียน') { stats.out++; gStat[key].นอกร_ร++; } else { stats.abs++; gStat[key].ขาด++; } 
+                } 
+            } 
+        });
+
+        execFullBehavior.forEach(log => {
+            let cleanId = String(log[1]).trim().replace(/'/g, '').replace(/^0+/, '');
+            if(studentsMap[cleanId]) {
+                let actionTxt = String(log[4]); let pts = parseInt(log[5]) || 0;
+                if(actionTxt.indexOf('[ความดี]') > -1) { studentsMap[cleanId].meritScore += pts; } 
+                else { studentsMap[cleanId].behaviorScore += pts; if(studentsMap[cleanId].behaviorScore > 100) studentsMap[cleanId].behaviorScore = 100; }
+            }
+        });
+
+        // อัปเดตสถิติเข้าเรียน
         let exTot = document.getElementById('exec-total'); if(exTot) exTot.innerText = stats.total; 
         let overallPerc = stats.total > 0 ? ((stats.p / stats.total) * 100).toFixed(1) : 0; 
         let exPerc = document.getElementById('exec-present-perc'); if(exPerc) exPerc.innerText = overallPerc + '%';
         let ctx = document.getElementById('execChart').getContext('2d'); if(execChartInstance) execChartInstance.destroy(); let labels = Object.keys(gStat).sort(); let d1 = labels.map(k=>gStat[k].มา), d2 = labels.map(k=>gStat[k].สาย), d3 = labels.map(k=>gStat[k].ลากิจ), d4 = labels.map(k=>gStat[k].ลาป่วย), d5 = labels.map(k=>gStat[k].นอกร_ร), d6 = labels.map(k=>gStat[k].ขาด);
         execChartInstance = new Chart(ctx, { type:'bar', data:{ labels:labels, datasets:[{label:'มา', data:d1, backgroundColor:'#10b981'},{label:'สาย', data:d2, backgroundColor:'#eab308'},{label:'ลากิจ', data:d3, backgroundColor:'#f97316'},{label:'ลาป่วย', data:d4, backgroundColor:'#f43f5e'},{label:'นอก ร.ร.', data:d5, backgroundColor:'#3b82f6'},{label:'ขาด', data:d6, backgroundColor:'#991b1b'}] }, options:{ responsive:true, maintainAspectRatio:false, scales:{x:{stacked:true},y:{stacked:true}} } });
-        let tBody = document.getElementById('exec-detail-body'); if(!tBody) return; tBody.innerHTML = ""; if(labels.length === 0) { tBody.innerHTML = "<tr><td colspan='8' style='text-align:center;'>ไม่พบข้อมูล</td></tr>"; } else { labels.forEach(k => { let g = gStat[k]; let p = g.total > 0 ? ((g.มา / g.total) * 100).toFixed(1) : 0; let color = p >= 80 ? '#10b981' : '#ef4444'; tBody.innerHTML += `<tr><td style="text-align:left; font-weight:bold;">${k}</td><td style="color:#10b981;">${g.มา}</td><td style="color:#eab308;">${g.สาย}</td><td style="color:#f97316;">${g.ลากิจ}</td><td style="color:#f43f5e;">${g.ลาป่วย}</td><td style="color:#991b1b; font-weight:bold;">${g.ขาด}</td><td style="color:#3b82f6;">${g.นอกร_ร}</td><td style="color:${color}; font-weight:bold;">${p}%</td></tr>`; }); }
+        let tBody = document.getElementById('exec-detail-body'); if(tBody) { tBody.innerHTML = ""; if(labels.length === 0) { tBody.innerHTML = "<tr><td colspan='8' style='text-align:center;'>ไม่พบข้อมูล</td></tr>"; } else { labels.forEach(k => { let g = gStat[k]; let p = g.total > 0 ? ((g.มา / g.total) * 100).toFixed(1) : 0; let color = p >= 80 ? '#10b981' : '#ef4444'; tBody.innerHTML += `<tr><td style="text-align:left; font-weight:bold;">${k}</td><td style="color:#10b981;">${g.มา}</td><td style="color:#eab308;">${g.สาย}</td><td style="color:#f97316;">${g.ลากิจ}</td><td style="color:#f43f5e;">${g.ลาป่วย}</td><td style="color:#991b1b; font-weight:bold;">${g.ขาด}</td><td style="color:#3b82f6;">${g.นอกร_ร}</td><td style="color:${color}; font-weight:bold;">${p}%</td></tr>`; }); } }
         generateExecutiveAIInsight(stats, gStat, v, overallPerc);
+
+        // อัปเดตตารางพฤติกรรม Top 10 / Bottom 10
+        let studentsArray = Object.values(studentsMap);
+        let topStudents = [...studentsArray].sort((a,b) => { if(b.behaviorScore !== a.behaviorScore) return b.behaviorScore - a.behaviorScore; return b.meritScore - a.meritScore; }).slice(0, 10);
+        let riskStudents = [...studentsArray].filter(s => s.behaviorScore < 100).sort((a,b) => { if(a.behaviorScore !== b.behaviorScore) return a.behaviorScore - b.behaviorScore; return a.meritScore - b.meritScore; }).slice(0, 10);
+
+        let lbHTML = "";
+        topStudents.forEach((std, index) => {
+            let rankClass = index === 0 ? 'rank-1' : (index === 1 ? 'rank-2' : (index === 2 ? 'rank-3' : 'rank-other'));
+            let rankText = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : (index + 1)));
+            lbHTML += `<div class="leaderboard-row"><div class="rank-badge ${rankClass}">${rankText}</div><div class="std-lb-info"><span class="std-lb-name">${cleanName(std.name)}</span><span class="std-lb-class">ชั้น: ${std.className} | รหัส: ${std.id.replace(/'/g,'')}</span></div>${std.meritScore > 0 ? `<div class="std-lb-merit">+${std.meritScore} ดี</div>` : ''}<div class="std-lb-score">${std.behaviorScore}</div></div>`;
+        });
+        if(topStudents.length === 0) lbHTML = "<p style='text-align:center; color:#64748b;'>ยังไม่มีข้อมูลนักเรียนในกลุ่มที่เลือก</p>";
+        let elLbCtn = document.getElementById('exec-leaderboard-container'); if(elLbCtn) elLbCtn.innerHTML = lbHTML;
+
+        let riskHTML = "";
+        riskStudents.forEach((std, index) => {
+            riskHTML += `<div class="leaderboard-row" style="border-color:#fecaca; background:#fff5f5;"><div class="rank-badge" style="background:#ef4444;">${index + 1}</div><div class="std-lb-info"><span class="std-lb-name">${cleanName(std.name)}</span><span class="std-lb-class">ชั้น: ${std.className}</span></div><div class="std-lb-score" style="color:#ef4444;">${std.behaviorScore}</div></div>`;
+        });
+        if(riskStudents.length === 0) riskHTML = "<p style='text-align:center; color:#10b981; font-weight:bold; padding:15px 0;'>🎉 ยอดเยี่ยม! ไม่มีนักเรียนที่โดนหักคะแนนพฤติกรรม</p>";
+        let elRskCtn = document.getElementById('exec-risk-container'); if(elRskCtn) elRskCtn.innerHTML = riskHTML;
+
+        let avgBeh = studentsArray.length > 0 ? (studentsArray.reduce((acc, s) => acc + s.behaviorScore, 0) / studentsArray.length).toFixed(1) : 0;
+        let totalMerits = studentsArray.reduce((acc, s) => acc + s.meritScore, 0);
+        let aiBehHTML = `<p><b>🎯 คะแนนพฤติกรรมเฉลี่ย:</b> <span style="font-size:16px; font-weight:bold; color:${avgBeh >= 80 ? '#10b981' : '#ef4444'};">${avgBeh} / 100</span></p><ul><li>🌟 <b>คะแนนความดีรวม:</b> ${totalMerits} แต้ม</li>`;
+        if(riskStudents.length > 0) aiBehHTML += `<li>⚠️ <b>นักเรียนกลุ่มเสี่ยง (โดนหักคะแนน):</b> ${studentsArray.filter(s => s.behaviorScore < 100).length} คน (ควรให้ครูที่ปรึกษาติดตามพฤติกรรม)</li></ul>`;
+        else aiBehHTML += `<li>✅ <b>ยอดเยี่ยม:</b> นักเรียนทุกคนรักษาพฤติกรรมได้ดี 100% เต็ม</li></ul>`;
+        let elAiBeh = document.getElementById('exec-ai-behavior-insight'); if(elAiBeh) elAiBeh.innerHTML = aiBehHTML;
+
+        let targetText = v === 'school' ? 'ภาพรวมทั้งโรงเรียน' : (v === 'grade' ? `ระดับชั้น ${sub}` : `ห้อง ${sub}`);
+        let elLbSub = document.getElementById('exec-leaderboard-subtitle'); if(elLbSub) elLbSub.innerText = targetText;
     }
+
     function generateExecutiveAIInsight(totalStats, groupStats, viewType, overallPerc) {
         let aiBox = document.getElementById('exec-ai-insight'); if(!aiBox) return; if (totalStats.total === 0) { aiBox.innerHTML = "<p style='color:#ef4444;'>ไม่มีข้อมูลสถิติ</p>"; return; }
         let html = `<p><b>📊 ภาพรวม:</b> มาเรียนเฉลี่ย <span style="color:${overallPerc >= 80 ? '#10b981' : '#ef4444'}; font-weight:bold; font-size:16px;">${overallPerc}%</span> (ข้อมูล ${totalStats.total} รายการ)</p>`;
