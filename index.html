@@ -113,6 +113,19 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } 
         }
 
+        /* 🌟 CSS สำหรับ Mascot น้องไหบ้านเชียง */
+        @keyframes floatMascot {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        @keyframes popupScale {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .ai-help-btn { display: block; width: 100%; text-align: left; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; font-family: 'Prompt'; font-size: 13px; color: #1e56a0; transition: 0.2s; font-weight: 500;}
+        .ai-help-btn:hover { background: #e0f2fe; border-color: #38bdf8; }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -401,18 +414,30 @@
     <div class="footer-credit">จัดทำโดย<br><b>นายอัครเดช โพธิญาณ์</b><br>รองผู้อำนวยการสถานศึกษา โรงเรียนบ้านเชียงวิทยา</div>
 </div>
 
-<div id="teacher-instruction-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
-    <div style="background: white; border-radius: 12px; padding: 25px; max-width: 400px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease;">
-        <h3 style="color: #1e56a0; margin-top: 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">📢 คำชี้แจงการบันทึกเวลาเรียน</h3>
-        <div style="font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
-            <p><b>1. วิธีการบันทึก:</b> เลือกสถานะของนักเรียน แล้วกดปุ่ม <b>"💾 บันทึกข้อมูล"</b> ด้านล่างสุด</p>
-            <p id="modal-time-limit-text"><b>2. เวลาบันทึก:</b> กำลังดึงข้อมูล...</p>
-            <p><b>3. การแก้ไข:</b> หากบันทึกไปแล้วพบว่าข้อมูลผิด ให้กดปุ่ม <b>"✏️ แก้ไข"</b> ที่ท้ายชื่อ ระบบจะคืนคะแนนพฤติกรรมให้เด็กอัตโนมัติ</p>
-            <p><b>4. ระบบแจ้งลา:</b> หากนักเรียนแจ้งลาออนไลน์ สถานะจะถูกเปลี่ยนเป็นลาอัตโนมัติ ให้อ่านหมายเหตุก่อนบันทึกครับ</p>
+<div id="ai-mascot-container" style="position: fixed; bottom: 85px; right: 15px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end;">
+    <div id="ai-help-popup" style="display: none; background: #fff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 260px; margin-bottom: 15px; border: 2px solid #f59e0b; overflow: hidden; transform-origin: bottom right; animation: popupScale 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <div style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 12px; font-weight: bold; font-size: 14px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:20px;">🏺</span> น้องไหบ้านเชียง AI
+            </div>
+            <span style="cursor: pointer; font-size:18px; padding:0 5px;" onclick="toggleAiPopup()">✖</span>
         </div>
-        <button onclick="closeTeacherModal()" style="width: 100%; background: #10b981; color: white; border: none; border-radius: 8px; padding: 12px; font-size: 15px; font-family: 'Prompt'; font-weight: bold; cursor: pointer;">✅ รับทราบและเข้าใช้งาน</button>
+        <div style="padding: 15px; font-size: 13px; color: #334155; max-height: 300px; overflow-y: auto; background: #fffbeb;">
+            <p style="margin-top:0; font-weight:bold; color:#92400e;">สวัสดีครับ! ให้ผมช่วยเรื่องอะไรดีครับ?</p>
+            <button class="ai-help-btn" onclick="showAiHelp('attendance')">📝 วิธีบันทึกการเข้าเรียน</button>
+            <button class="ai-help-btn" onclick="showAiHelp('leave')">📨 การแจ้งขออนุญาตลาหยุด</button>
+            <button class="ai-help-btn" onclick="showAiHelp('behavior')">💯 ระบบคะแนนพฤติกรรม</button>
+            <button class="ai-help-btn" onclick="showAiHelp('admin')">⚙️ สำหรับผู้ดูแลระบบ</button>
+        </div>
+    </div>
+
+    <div onclick="toggleAiPopup()" style="width: 65px; height: 65px; background: #fff; border-radius: 50%; box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); cursor: pointer; display: flex; justify-content: center; align-items: center; border: 3px solid #f59e0b; animation: floatMascot 3s ease-in-out infinite; overflow: hidden;">
+        <span style="font-size: 38px;">🏺</span>
     </div>
 </div>
+
+<div id="teacher-instruction-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+    </div>
 
 <div class="nav-menu" id="bottom-nav">
     <div class="nav-item active" onclick="switchPage('checklist-page', this)"><span>📝</span><br>เช็คชื่อ</div>
@@ -427,34 +452,49 @@
     const IDLE_TIMEOUT = 5 * 60 * 1000; 
     let idleTimer = null;
 
-    // 🌟 1. ฟังก์ชันแปลงวันที่เป็นภาษาไทยอัจฉริยะ (วัน เดือน ปี พ.ศ.)
+    // 🌟 ระบบควบคุม AI Mascot "น้องไหบ้านเชียง"
+    function toggleAiPopup() {
+        let popup = document.getElementById('ai-help-popup');
+        if (popup.style.display === 'none' || popup.style.display === '') {
+            popup.style.display = 'block';
+        } else {
+            popup.style.display = 'none';
+        }
+    }
+
+    function showAiHelp(topic) {
+        toggleAiPopup(); // ปิดหน้าต่างแชทเพื่อหลีกทางให้ SweetAlert
+        let title = ""; let text = ""; let icon = 'info';
+        
+        if (topic === 'attendance') {
+            title = "📝 วิธีบันทึกการเข้าเรียน";
+            text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>สำหรับคุณครูประจำชั้น:</b><br>1. เข้าเมนู 'เช็คชื่อ'<br>2. วันที่ระบบจะตั้งเป็นวันนี้ให้อัตโนมัติ (เปลี่ยนวันย้อนหลังได้)<br>3. กดเลือกสถานะ (มา, สาย, ขาด, ลา)<br>4. กดปุ่ม <b>'💾 บันทึกข้อมูล'</b> ด้านล่างสุดเพียงครั้งเดียวจบครับ!</div>";
+        } else if (topic === 'leave') {
+            title = "📨 การแจ้งขออนุญาตลาหยุด";
+            text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>ฝั่งนักเรียน:</b> เข้าไปที่แท็บ 'แจ้งลา' > คลิกเลือกวันที่ในปฏิทิน (เลือกข้ามวันได้) > เลือกประเภทและใส่เหตุผล > กดส่งคำร้อง<br><br><b>ฝั่งครู:</b> เมื่อครูเปิดหน้าเช็คชื่อ ระบบจะดึงข้อมูลเด็กที่แจ้งลา มาใส่ในหน้าฟอร์มให้อัตโนมัติ พร้อมขึ้นป้ายสีส้มแจ้งเตือนครับ</div>";
+        } else if (topic === 'behavior') {
+            title = "💯 ระบบคะแนนพฤติกรรม";
+            text = "<div style='text-align:left; font-size:14px; line-height:1.6;'>ระบบจะตั้งคะแนนเริ่มต้นให้นักเรียนทุกคนที่ <b>100 คะแนน</b><br><br>🔴 <b>หากครูเช็คว่า 'ขาด':</b> ระบบหัก 5 คะแนนอัตโนมัติ<br>🟡 <b>หากครูเช็คว่า 'สาย':</b> ระบบหัก 2 คะแนนอัตโนมัติ<br><br><i>*หากครูคีย์ผิด แล้วมากด 'แก้ไข' ทีหลัง ระบบจะตามไปคืนคะแนนให้เด็กอัตโนมัติครับ ฉลาดสุดๆ!</i></div>";
+        } else if (topic === 'admin') {
+            title = "⚙️ สำหรับผู้ดูแลระบบ";
+            text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>สิ่งที่แอดมินทำได้:</b><br>1. ตั้งค่าปิด-เปิดระบบล็อกเวลาเช็คชื่อ<br>2. กำหนดวันหยุดนักขัตฤกษ์ (จิ้มจากปฏิทินได้เลย ระบบจะไม่ให้ครูเช็คชื่อในวันนั้น)<br>3. จัดการรายชื่อครูและนักเรียน<br>4. ดู Dashboard วิเคราะห์ข้อมูลระดับบริหารได้ทั้งหมดครับ</div>";
+        }
+
+        Swal.fire({ title: title, html: text, icon: icon, confirmButtonText: 'เข้าใจแล้ว', confirmButtonColor: '#f59e0b' });
+    }
+
     function formatThaiDate(dateStr, useFullMonth = false) {
         if (!dateStr || dateStr === "-") return "-";
-        
-        // ลบเครื่องหมาย ' ฝนทองออกให้สะอาด
         dateStr = String(dateStr).replace(/'/g, '').trim(); 
-        
         let d, m, y;
-        if (dateStr.includes('/')) {
-            let parts = dateStr.split('/');
-            d = parseInt(parts[0], 10);
-            m = parseInt(parts[1], 10);
-            y = parseInt(parts[2], 10);
-        } else if (dateStr.includes('-')) {
-            let parts = dateStr.split('-');
-            y = parseInt(parts[0], 10);
-            m = parseInt(parts[1], 10);
-            d = parseInt(parts[2], 10);
-        } else {
-            return dateStr;
-        }
+        if (dateStr.includes('/')) { let parts = dateStr.split('/'); d = parseInt(parts[0], 10); m = parseInt(parts[1], 10); y = parseInt(parts[2], 10); } 
+        else if (dateStr.includes('-')) { let parts = dateStr.split('-'); y = parseInt(parts[0], 10); m = parseInt(parts[1], 10); d = parseInt(parts[2], 10); } 
+        else { return dateStr; }
 
         const tShort = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
         const tFull = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         
-        // ถ้าเป็น ค.ศ. ให้บวก 543 เป็น พ.ศ.
         if (y < 2500 && y > 1900) y += 543;
-        
         return `${d} ${useFullMonth ? tFull[m] : tShort[m]} ${y}`;
     }
 
@@ -585,10 +625,8 @@
                 switchPage('student-page', null); 
                 loadStudentReport(data.userId, false); 
                 renderStudentCalendar(); 
-                
                 if(studentDataTimer) clearInterval(studentDataTimer);
                 studentDataTimer = setInterval(() => { loadStudentReport(data.userId, true); }, 10000); 
-
             } else {
                 Swal.fire('ระบบ SIS', '❌ ไม่พบสิทธิ์การเข้าถึงข้อมูล กรุณาติดต่อผู้ดูแลระบบ', 'error');
             }
@@ -747,8 +785,8 @@
         fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) })
         .then(res => res.json()).then(data => {
             btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false;
-            if(data.status === "success") { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบได้หักคะแนนพฤติกรรมเรียบร้อยแล้ว)', 'success'); fetchStudents(); } 
-            else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error');
+            if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบได้หักคะแนนพฤติกรรมเรียบร้อยแล้ว)', 'success'); fetchStudents(); } 
+            else Swal.fire('ระบบ SIS', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error');
         });
     }
 
@@ -768,7 +806,7 @@
     function renderStudentCalendar() {
         let container = document.getElementById('student-leave-calendar-container');
         let d = new Date(currentStudentCalendarDate.getFullYear(), currentStudentCalendarDate.getMonth(), 1);
-        document.getElementById('student-calendar-month-label').innerText = d.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+        document.getElementById('student-calendar-month-label').innerText = formatThaiDate(d.toLocaleDateString('en-US'), true).replace(/^[0-9]+\s/, ''); 
         
         let html = `<div class="calendar-grid">`;
         const thDays = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
@@ -814,7 +852,6 @@
         if(studentLeaveDates.length === 0) { display.style.display = 'none';
         } else {
             display.style.display = 'block';
-            // 🌟 ใช้ฟังก์ชันวันที่ไทย
             let formattedDates = studentLeaveDates.map(d => formatThaiDate(d, false)).join(', ');
             display.innerText = `📌 วันที่เลือกลา (${studentLeaveDates.length} วัน): ${formattedDates}`;
         }
@@ -849,7 +886,6 @@
         let weekDates = []; let thElements = ['th-mon', 'th-tue', 'th-wed', 'th-thu', 'th-fri']; let dayNames = ['จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.'];
         for(let i=0; i<5; i++) { let d = new Date(monDate); d.setDate(monDate.getDate() + i); let yyyy = d.getFullYear(); let mm = String(d.getMonth() + 1).padStart(2, '0'); let dd = String(d.getDate()).padStart(2, '0'); weekDates.push(`${yyyy}-${mm}-${dd}`); document.getElementById(thElements[i]).innerHTML = `${dayNames[i]}<br><span style="font-size:10px; font-weight:normal;">${dd}/${mm}</span>`; }
         
-        // 🌟 แสดงหัวข้อสัปดาห์ปัจจุบันเป็นวันที่ไทย
         document.getElementById('weekly-date-range').innerText = `${formatThaiDate(weekDates[0], true)} - ${formatThaiDate(weekDates[4], true)}`;
         
         let fetches = weekDates.map(dateStr => fetch(`${GAS_API_URL}?action=get_daily&className=${encodeURIComponent(currentClass)}&date=${dateStr}`).then(res => res.json()).catch(e => ({ status: 'error' })));
@@ -964,7 +1000,6 @@
         aiBox.innerHTML = html;
     }
 
-    // 🌟 ระบบโหลดข้อมูลแบบ Real-time (ใช้ฟังก์ชันแปลงวันที่แบบไทย)
     function loadStudentReport(id, isSilent = false) {
         if(!isSilent) {
             document.getElementById('hdr-name').innerText = "กำลังโหลดข้อมูล...";
@@ -994,7 +1029,6 @@
             document.getElementById('ai-assessment-text').innerHTML = p >= 80 ? `🌟 <b>ชื่นชม:</b> รักษามาตรฐานนี้นะครับ!` : `⚠️ <b>ระวัง:</b> ต่ำกว่าเกณฑ์ (${p}%) เสี่ยงหมดสิทธิ์สอบ`;
             
             let hHTML = ""; 
-            // 🌟 นำฟังก์ชัน formatThaiDate มาใช้กับตารางประวัติย้อนหลัง
             data.history.reverse().forEach(x => hHTML += `<tr><td>${formatThaiDate(x.date)}</td><td>${x.status}</td><td>${x.note||'-'}</td></tr>`);
             document.getElementById('student-history-body').innerHTML = hHTML;
 
@@ -1016,7 +1050,6 @@
                     data.behaviorHistory.reverse().forEach(h => {
                         let ptsColor = h.points < 0 ? '#ef4444' : '#10b981';
                         let ptsSign = h.points > 0 ? '+' : '';
-                        // 🌟 นำฟังก์ชัน formatThaiDate มาใช้กับตารางคะแนนพฤติกรรม
                         behHTML += `<tr><td style="border-bottom:1px solid #eee; padding:8px 5px;">${formatThaiDate(h.date)}</td><td style="border-bottom:1px solid #eee; padding:8px 5px;">${h.action}<br><span style="font-size:10px; color:#94a3b8;">${h.teacher}</span></td><td style="border-bottom:1px solid #eee; padding:8px 5px; font-weight:bold; color:${ptsColor};">${ptsSign}${h.points}</td></tr>`;
                     });
                 } else {
