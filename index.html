@@ -19,7 +19,7 @@
         .card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
         
         .nav-menu { position: fixed; bottom: 0; width: 100%; background: white; display: none; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; z-index: 1000;}
-        .nav-item { text-align: center; font-size: 13px; color: #64748b; cursor: pointer; flex: 1; }
+        .nav-item { text-align: center; font-size: 13px; color: #64748b; cursor: pointer; flex: 1; padding: 5px 0;}
         .nav-item.active { color: var(--primary); font-weight: bold; }
         
         input, select, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; width: 100%; box-sizing: border-box; margin-bottom: 10px;}
@@ -93,6 +93,7 @@
         .admin-tab-content, .student-tab-content { display: none; background: #fff; border-radius: 0 12px 12px 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .admin-tab-content.active, .student-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
+        /* 🌟 CSS บัตรนักเรียนดิจิทัล */
         .id-card-container { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #e2e8f0; border-radius: 12px; padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); max-width: 400px; margin: 0 auto 20px auto; position: relative; overflow: hidden; }
         .id-card-header { display: flex; align-items: center; border-bottom: 3px solid #1e56a0; padding-bottom: 10px; margin-bottom: 15px; justify-content: center; }
         .id-card-logo { width: 45px; height: auto; margin-right: 10px; }
@@ -240,6 +241,16 @@
         </div>
     </div>
 
+    <div id="notifications-page" class="page">
+        <h2 style="color: #1e56a0; margin-bottom: 10px; margin-top:0;">🔔 รายการแจ้งลาหยุด <span id="notif-class-title" style="color:var(--primary);"></span></h2>
+        <div class="card" style="background: #fffbeb; border: 1px solid #fcd34d;">
+            <h3 style="margin-top:0; color: #b45309; display:flex; align-items:center; gap:8px;">📨 ข้อมูลการแจ้งลาของนักเรียนในห้อง</h3>
+            <div id="leave-notifications-container">
+                <div style="text-align:center; padding:20px;">⏳ กำลังโหลดข้อมูล...</div>
+            </div>
+        </div>
+    </div>
+
     <div id="admin-page" class="page">
         <h2 style="color: #1e56a0; margin-bottom: 15px;">⚙️ ระบบผู้ดูแล (Admin)</h2>
         <div class="admin-tabs">
@@ -373,14 +384,12 @@
             <div class="card" style="background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%); border: 2px solid #a7f3d0;">
                 <h3 style="margin-top:0; color:#059669; text-align:center;">🏆 TOP 10 นักเรียนพฤติกรรมดีเด่น</h3>
                 <p style="text-align:center; font-size:12px; color:#64748b; margin-top:-5px; margin-bottom:15px; font-weight:bold;" id="exec-leaderboard-subtitle">ภาพรวมทั้งโรงเรียน</p>
-                <div id="exec-leaderboard-container">
-                    </div>
+                <div id="exec-leaderboard-container"></div>
             </div>
             
             <div class="card" style="background: linear-gradient(180deg, #ffffff 0%, #fef2f2 100%); border: 2px solid #fecaca; margin-top:15px;">
                 <h3 style="margin-top:0; color:#dc2626; text-align:center;">⚠️ กลุ่มเสี่ยง (คะแนนต่ำสุด 10 อันดับ)</h3>
-                <div id="exec-risk-container">
-                    </div>
+                <div id="exec-risk-container"></div>
             </div>
         </div>
     </div>
@@ -450,24 +459,22 @@
             <select id="student-leave-type" style="border-color:#fcd34d;"><option value="ลากิจ">ลากิจ (มีธุระจำเป็น)</option><option value="ลาป่วย">ลาป่วย (ไม่สบาย/พบแพทย์)</option></select>
             <label style="font-size:12px; font-weight:bold; color:#92400e;">เหตุผล (อธิบายให้ครูทราบ)</label>
             <textarea id="student-leave-reason" placeholder="เช่น ไปทำธุระต่างจังหวัด หรือ มีไข้สูง..." rows="2" style="border-color:#fcd34d;"></textarea>
-            <button onclick="submitLeaveRequest(this)" style="width:100%; background:#f59e0b; font-size:14px;">📤 ส่งคำร้องให้ครูประจำชั้น</button>
+            <button onclick="submitLeaveRequest(this)" style="width:100%; background:#f59e0b; font-size:14px;">📤 ส่งคำร้อง</button>
         </div>
 
         <div id="tab-std-behavior" class="student-tab-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                 <h3 style="margin:0; color:#059669; display:flex; align-items:center; gap:8px;">💯 คะแนนพฤติกรรม</h3>
-                <span style="font-size: 11px; color: #10b981; background: #d1fae5; padding: 4px 10px; border-radius: 12px; font-weight:bold; display:flex; align-items:center; gap:4px; box-shadow: 0 2px 4px rgba(16,185,129,0.2);">
-                    <span class="live-dot"></span> เชื่อมต่อสด
-                </span>
+                <span style="font-size: 11px; color: #10b981; background: #d1fae5; padding: 4px 10px; border-radius: 12px; font-weight:bold; display:flex; align-items:center; gap:4px; box-shadow: 0 2px 4px rgba(16,185,129,0.2);"><span class="live-dot"></span> สด</span>
             </div>
             <div style="display:flex; gap:10px; margin-bottom:15px;">
                 <div id="behavior-score-box" style="flex:1; text-align:center; padding: 20px 10px; background: #ecfdf5; border-radius: 12px; border: 2px solid #34d399; transition: 0.3s;">
                     <h1 id="behavior-score-text" style="font-size: 40px; color: #059669; margin: 0; line-height: 1; transition: 0.3s;">100</h1>
-                    <p style="margin: 5px 0 0 0; color: #047857; font-weight: bold; font-size:13px;">คะแนนพฤติกรรม</p>
+                    <p style="margin: 5px 0 0 0; color: #047857; font-weight: bold; font-size:13px;">พฤติกรรม</p>
                 </div>
                 <div style="flex:1; text-align:center; padding: 20px 10px; background: #fffbeb; border-radius: 12px; border: 2px solid #fcd34d;">
                     <h1 id="merit-score-text" style="font-size: 40px; color: #d97706; margin: 0; line-height: 1;">0</h1>
-                    <p style="margin: 5px 0 0 0; color: #b45309; font-weight: bold; font-size:13px;">🌟 ความดีสะสม</p>
+                    <p style="margin: 5px 0 0 0; color: #b45309; font-weight: bold; font-size:13px;">🌟 ความดี</p>
                 </div>
             </div>
             <h3 style="margin-top:20px; font-size:14px; color:#475569; border-bottom:1px solid #eee; padding-bottom:8px;">📋 ประวัติคะแนน</h3>
@@ -504,14 +511,15 @@
 
 <div class="nav-menu" id="bottom-nav">
     <div class="nav-item active" onclick="switchPage('checklist-page', this)"><span>📝</span><br>เช็คชื่อ</div>
-    <div class="nav-item" onclick="switchPage('daily-page', this)"><span>📅</span><br>รายสัปดาห์</div>
-    <div class="nav-item" onclick="switchPage('summary-page', this)"><span>📊</span><br>รายงานสถิติ</div>
+    <div class="nav-item" onclick="switchPage('daily-page', this)"><span>📅</span><br>สัปดาห์</div>
+    <div class="nav-item" onclick="switchPage('summary-page', this)"><span>📊</span><br>สถิติ</div>
     <div class="nav-item" onclick="switchPage('behavior-page', this)"><span>💯</span><br>พฤติกรรม</div>
+    <div class="nav-item" onclick="switchPage('notifications-page', this)"><span>🔔</span><br>แจ้งลา</div>
 </div>
 
 <script>
     // 🔗 วางลิงก์ Web App ที่ทำ New version แล้ว ตรงนี้ครับ!
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwlOh3ZcY1zcYv42sdYhIvGbmEjxOBTZVrF-FKjwGgLmAeAkLX3cUjKlIWU83rR6X2h/exec"; 
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyn_sFhEidU_U9nH1N_xrRroRwydBzT0qmxgx2fBn9aKy2GfdkMZ4yFyKTD3gUpvK2R/exec"; 
     
     const IDLE_TIMEOUT = 5 * 60 * 1000; 
     let idleTimer = null;
@@ -521,7 +529,7 @@
         toggleAiPopup(); 
         let title = ""; let text = ""; let icon = 'info';
         if (topic === 'attendance') { title = "📝 วิธีบันทึกการเข้าเรียน"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>สำหรับคุณครูประจำชั้น:</b><br>1. เข้าเมนู 'เช็คชื่อ'<br>2. วันที่ระบบจะตั้งเป็นวันนี้ให้อัตโนมัติ<br>3. กดเลือกสถานะ (มา, สาย, ขาด, ลา)<br>4. กดปุ่ม <b>'💾 บันทึกข้อมูล'</b> จบครับ!</div>"; } 
-        else if (topic === 'leave') { title = "📨 การแจ้งขออนุญาตลาหยุด"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>ฝั่งนักเรียน:</b> เข้าเมนู 'แจ้งลา' > เลือกวันที่ในปฏิทิน > กดส่งคำร้อง<br><br><b>ฝั่งครู:</b> ระบบจะดึงข้อมูลเด็กที่แจ้งลา มาใส่ในหน้าฟอร์มให้อัตโนมัติ พร้อมขึ้นป้ายเตือนสีส้มครับ</div>"; } 
+        else if (topic === 'leave') { title = "📨 การแจ้งขออนุญาตลาหยุด"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>ฝั่งนักเรียน:</b> เข้าเมนู 'แจ้งลา' > เลือกวันที่ในปฏิทิน > กดส่งคำร้อง<br><br><b>ฝั่งครู:</b> ระบบจะดึงข้อมูลเด็กที่แจ้งลา มาใส่ในหน้าฟอร์มให้อัตโนมัติ และแสดงรายการในแท็บ 'แจ้งลา' ครับ</div>"; } 
         else if (topic === 'behavior') { title = "💯 ระบบคะแนนพฤติกรรม"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'>คะแนนพฤติกรรมเริ่ม 100 และมีคะแนนความดีแยกสะสมครับ<br>🔴 <b>'ขาด':</b> หัก 5 คะแนน<br>🟡 <b>'สาย':</b> หัก 2 คะแนน<br>🌟 ครูสามารถกด <b>'จัดการ'</b> ในแท็บพฤติกรรม เพื่อเพิ่มคะแนนความดี หรือหักคะแนนพฤติกรรมเด็กรายบุคคลได้เลยครับ</div>"; } 
         else if (topic === 'admin') { title = "⚙️ สำหรับผู้ดูแลระบบ"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>แอดมินทำได้:</b><br>1. ปิด-เปิดระบบล็อกเวลาเช็คชื่อ<br>2. กำหนดวันหยุดนักขัตฤกษ์<br>3. จัดการรายชื่อครูและนักเรียน<br>4. ดู Dashboard วิเคราะห์ข้อมูลระดับบริหาร</div>"; }
         Swal.fire({ title: title, html: text, icon: icon, confirmButtonText: 'เข้าใจแล้ว', confirmButtonColor: '#f59e0b' });
@@ -610,12 +618,14 @@
                 currentTeacher = data.name; currentClass = data.className || ""; 
                 let cTitle = document.getElementById('class-title'); if(cTitle) cTitle.innerText = `(${currentClass})`; 
                 let bTitle = document.getElementById('beh-class-title'); if(bTitle) bTitle.innerText = `(${currentClass})`; 
+                let nTitle = document.getElementById('notif-class-title'); if(nTitle) nTitle.innerText = `(${currentClass})`; 
                 let bNav = document.getElementById('bottom-nav'); if(bNav) bNav.style.display = 'flex';
                 
                 let navItems = document.querySelectorAll('.nav-item');
                 if(savedPage === 'daily-page' && navItems.length > 1) switchPage('daily-page', navItems[1]); 
                 else if(savedPage === 'summary-page' && navItems.length > 2) switchPage('summary-page', navItems[2]); 
                 else if(savedPage === 'behavior-page' && navItems.length > 3) switchPage('behavior-page', navItems[3]); 
+                else if(savedPage === 'notifications-page' && navItems.length > 4) switchPage('notifications-page', navItems[4]); 
                 else if(navItems.length > 0) switchPage('checklist-page', navItems[0]);
                 else switchPage('checklist-page', null);
                 
@@ -658,6 +668,57 @@
         if (pageId === 'daily-page' && currentClass) loadWeeklyData(); 
         if (pageId === 'summary-page' && currentClass) loadSummaryData();
         if (pageId === 'behavior-page' && currentClass) loadClassBehaviorData(); 
+        if (pageId === 'notifications-page' && currentClass) loadLeaveNotifications(); // 🌟 โหลดข้อมูลเมื่อกดแท็บแจ้งลา
+    }
+
+    // 🌟 ฟังก์ชันดึงข้อมูลการแจ้งลาของห้องนี้
+    function loadLeaveNotifications() {
+        let container = document.getElementById('leave-notifications-container');
+        if(!container) return;
+        container.innerHTML = `<div style="text-align:center; padding:20px;">⏳ กำลังดึงข้อมูลการแจ้งลา...</div>`;
+
+        fetch(`${GAS_API_URL}?action=get_class_leaves&className=${encodeURIComponent(currentClass)}`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "success") {
+                if(data.data.length === 0) {
+                    container.innerHTML = `<div style="text-align:center; padding:20px; color:#64748b;">✅ ไม่มีข้อมูลการแจ้งลาในขณะนี้</div>`;
+                    return;
+                }
+
+                // เรียงจากใหม่ไปเก่า (อิงจาก Timestamp)
+                data.data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                let html = "";
+                data.data.forEach(leave => {
+                    let badgeColor = leave.leaveType.includes("ป่วย") ? "#f43f5e" : "#f59e0b";
+                    let badgeBg = leave.leaveType.includes("ป่วย") ? "#fff1f2" : "#fffbeb";
+                    
+                    html += `
+                    <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                            <div>
+                                <b style="color:#1e293b; font-size:14px;">${cleanName(leave.studentName)}</b>
+                                <div style="font-size:11px; color:#64748b;">รหัส: ${leave.studentId}</div>
+                            </div>
+                            <span style="background:${badgeBg}; color:${badgeColor}; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:12px; border:1px solid ${badgeColor}40;">${leave.leaveType}</span>
+                        </div>
+                        <div style="background:#f8fafc; padding:8px; border-radius:6px; font-size:13px; color:#475569; margin-bottom:8px;">
+                            📅 <b>วันที่ลา:</b> <span style="color:#1e56a0;">${formatThaiDate(leave.leaveDate, true)}</span><br>
+                            📝 <b>เหตุผล:</b> ${leave.reason}
+                        </div>
+                        <div style="font-size:10px; color:#94a3b8; text-align:right;">
+                            ⏱ แจ้งเมื่อ: ${formatThaiDate(leave.timestamp.split(' ')[0])} ${leave.timestamp.split(' ')[1] || ''}
+                        </div>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ โหลดข้อมูลไม่สำเร็จ</div>`;
+            }
+        }).catch(err => {
+            container.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้</div>`;
+        });
     }
 
     function loadClassBehaviorData() {
@@ -786,7 +847,7 @@
     function saveAttendance() {
         const btn = document.getElementById('save-btn'); btn.innerText = "⏳ ระบบกำลังส่งข้อมูล..."; btn.disabled = true;
         let records = []; students.forEach(s => records.push({ id: s.id, name: s.name, className: currentClass, status: attendanceData[s.id].status, note: document.getElementById(`note-${s.id}`).value }));
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) }).then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false; if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบหักคะแนนอัตโนมัติแล้ว)', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error'); });
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) }).then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false; if(data.status === "success") { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบหักคะแนนอัตโนมัติแล้ว)', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error'); });
     }
 
     function loadQuickAIInsight() {
@@ -920,7 +981,7 @@
         let v = document.getElementById('exec-view-type').value, sub = v==='student'?document.getElementById('exec-sub-input').value:document.getElementById('exec-sub-filter').value; let st = document.getElementById('exec-date-start').valueAsDate||new Date(0), en = document.getElementById('exec-date-end').valueAsDate||new Date(); 
         
         let stats = {p:0, late:0, pleave:0, sleave:0, abs:0, out:0, total:0}, gStat = {};
-        let studentsMap = {}; // สำหรับเก็บคะแนนพฤติกรรม
+        let studentsMap = {}; 
 
         execFullStudents.forEach(std => {
             let stdGrade = std[3].split('/')[0]; let stdClass = std[3];
@@ -951,7 +1012,6 @@
             }
         });
 
-        // อัปเดตสถิติเข้าเรียน
         let exTot = document.getElementById('exec-total'); if(exTot) exTot.innerText = stats.total; 
         let overallPerc = stats.total > 0 ? ((stats.p / stats.total) * 100).toFixed(1) : 0; 
         let exPerc = document.getElementById('exec-present-perc'); if(exPerc) exPerc.innerText = overallPerc + '%';
@@ -960,7 +1020,6 @@
         let tBody = document.getElementById('exec-detail-body'); if(tBody) { tBody.innerHTML = ""; if(labels.length === 0) { tBody.innerHTML = "<tr><td colspan='8' style='text-align:center;'>ไม่พบข้อมูล</td></tr>"; } else { labels.forEach(k => { let g = gStat[k]; let p = g.total > 0 ? ((g.มา / g.total) * 100).toFixed(1) : 0; let color = p >= 80 ? '#10b981' : '#ef4444'; tBody.innerHTML += `<tr><td style="text-align:left; font-weight:bold;">${k}</td><td style="color:#10b981;">${g.มา}</td><td style="color:#eab308;">${g.สาย}</td><td style="color:#f97316;">${g.ลากิจ}</td><td style="color:#f43f5e;">${g.ลาป่วย}</td><td style="color:#991b1b; font-weight:bold;">${g.ขาด}</td><td style="color:#3b82f6;">${g.นอกร_ร}</td><td style="color:${color}; font-weight:bold;">${p}%</td></tr>`; }); } }
         generateExecutiveAIInsight(stats, gStat, v, overallPerc);
 
-        // อัปเดตตารางพฤติกรรม Top 10 / Bottom 10
         let studentsArray = Object.values(studentsMap);
         let topStudents = [...studentsArray].sort((a,b) => { if(b.behaviorScore !== a.behaviorScore) return b.behaviorScore - a.behaviorScore; return b.meritScore - a.meritScore; }).slice(0, 10);
         let riskStudents = [...studentsArray].filter(s => s.behaviorScore < 100).sort((a,b) => { if(a.behaviorScore !== b.behaviorScore) return a.behaviorScore - b.behaviorScore; return a.meritScore - b.meritScore; }).slice(0, 10);
@@ -1070,4 +1129,3 @@
 
 </body>
 </html>
-
