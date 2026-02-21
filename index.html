@@ -393,7 +393,7 @@
 
 <script>
     // 🔗 API (ใส่ URL ของท่านรองฯ)
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzGYNsqfNQRoAOQA57HHae87rMr9CvrtWUcke5nQ7ByVl42KYhCBKYekmA0ybGFnf4f/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxIXYr2dQ_Squo-IETnjVQsDXfpGtvx_nOEqWmUZ0St5ttSmG9nFeuLHZmLydQreEK6/exec";
     
     const IDLE_TIMEOUT = 5 * 60 * 1000; 
     let idleTimer = null;
@@ -548,9 +548,17 @@
         if (pageId === 'summary-page' && currentClass) loadSummaryData();
     }
 
+// 🌟 ระบบดึงนักเรียน + ตรวจสอบการลา (เพิ่มระบบดักจับ Error กันหน้าจอค้าง)
     function fetchStudents() {
         let dateInput = document.getElementById('check-date');
-        if(!dateInput.value) dateInput.valueAsDate = new Date();
+        if(!dateInput.value) {
+            // บังคับสร้างวันที่ปัจจุบันให้ถูกต้องเสมอ
+            let d = new Date();
+            let month = '' + (d.getMonth() + 1), day = '' + d.getDate(), year = d.getFullYear();
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+            dateInput.value = [year, month, day].join('-');
+        }
         let selectedDateStr = dateInput.value;
         
         let dObj = new Date(selectedDateStr); let isWeekend = (dObj.getDay() === 0 || dObj.getDay() === 6); let isHoliday = adminHolidays.includes(selectedDateStr);
@@ -570,14 +578,19 @@
             }
         }
 
-        document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px;">⏳ โหลดรายชื่อ...</div>`; document.getElementById('save-btn').style.display = 'none'; 
+        document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px;">⏳ กำลังโหลดรายชื่อ...</div>`; document.getElementById('save-btn').style.display = 'none'; 
         
-        fetch(`${GAS_API_URL}?action=get_students&className=${encodeURIComponent(currentClass)}`).then(res => res.json()).then(data => {
+        fetch(`${GAS_API_URL}?action=get_students&className=${encodeURIComponent(currentClass)}`)
+        .then(res => res.json())
+        .then(data => {
             if(data.status === "success") {
                 students = data.data;
+                // 🌟 ดึงข้อมูลด้วย Promise แบบมี .catch ป้องกันโค้ดพัง
                 Promise.all([
-                    fetch(`${GAS_API_URL}?action=check_existing&className=${encodeURIComponent(currentClass)}&date=${selectedDateStr}`).then(r => r.json()),
-                    fetch(`${GAS_API_URL}?action=get_leaves_for_date&className=${encodeURIComponent(currentClass)}&date=${selectedDateStr}`).then(r => r.json())
+                    fetch(`${GAS_API_URL}?action=check_existing&className=${encodeURIComponent(currentClass)}&date=${selectedDateStr}`)
+                        .then(r => r.json()).catch(e => ({status: "not_found"})),
+                    fetch(`${GAS_API_URL}?action=get_leaves_for_date&className=${encodeURIComponent(currentClass)}&date=${selectedDateStr}`)
+                        .then(r => r.json()).catch(e => ({status: "error", data: {}}))
                 ]).then(([check, leaves]) => {
                     let existingData = check.status === "found" ? check.data : null;
                     let leaveData = leaves.status === "success" ? leaves.data : {};
@@ -595,8 +608,17 @@
                             });
                         }
                     }
+                }).catch(err => {
+                    // ถ้าระบบดึงข้อมูลการลาพัง ก็ยังบังคับให้โชว์รายชื่อเด็กปกติ
+                    console.log("Secondary fetch error, rendering empty check:", err);
+                    renderChecklist(null, "", {});
+                    loadQuickAIInsight();
                 });
+            } else {
+                document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ ไม่พบรายชื่อนักเรียนในห้องนี้ (โปรดตรวจสอบฐานข้อมูล)</div>`;
             }
+        }).catch(err => {
+            document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ เชื่อมต่อฐานข้อมูลล้มเหลว กรุณารีเฟรชหน้าจอ</div>`;
         });
     }
 
@@ -918,5 +940,6 @@
 
 </body>
 </html>
+
 
 
