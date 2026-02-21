@@ -108,7 +108,6 @@
 
         .live-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; display: inline-block; animation: pulseLive 1.5s infinite; }
         @keyframes pulseLive { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
-
         @keyframes floatMascot { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
         @keyframes popupScale { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .ai-help-btn { display: block; width: 100%; text-align: left; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; font-family: 'Prompt'; font-size: 13px; color: #1e56a0; transition: 0.2s; font-weight: 500;}
@@ -199,7 +198,7 @@
     </div>
 
     <div id="behavior-page" class="page">
-        <h2 style="color: #1e56a0; margin-bottom: 10px; margin-top:0;">💯 รายงานพฤติกรรม <span id="beh-class-title" style="color:var(--primary);"></span></h2>
+        <h2 style="color: #1e56a0; margin-bottom: 10px; margin-top:0;">💯 จัดการคะแนนพฤติกรรม <span id="beh-class-title" style="color:var(--primary);"></span></h2>
         <div class="card" style="padding-top:10px;">
             <div style="overflow-x:auto;">
                 <table style="margin-top:0; border: 1px solid #eee; white-space: nowrap;">
@@ -207,13 +206,14 @@
                         <tr>
                             <th style="width: 30px;">ที่</th>
                             <th>ชื่อ-นามสกุล</th>
-                            <th style="color:#ef4444;">🔴 หักคะแนน</th>
-                            <th style="color:#10b981;">🟢 ความดี</th>
-                            <th style="color:#1e56a0;">🏆 คะแนนรวม</th>
+                            <th style="color:#ef4444;">🔴 โดนหัก</th>
+                            <th style="color:#10b981;">🌟 ความดี</th>
+                            <th style="color:#1e56a0;">🏆 คงเหลือ</th>
+                            <th style="width: 60px;">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="behavior-body">
-                        <tr><td colspan='5' style='text-align:center;'>⏳ กำลังดึงข้อมูลคะแนนพฤติกรรม...</td></tr>
+                        <tr><td colspan='6' style='text-align:center;'>⏳ กำลังดึงข้อมูลคะแนนพฤติกรรม...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -351,7 +351,6 @@
                 <div class="stat-card" style="background:#f59e0b;"><h3>ลาอื่นๆ</h3><h2 id="st-stat-leave">0</h2></div>
             </div>
             <div class="ai-box" style="margin-bottom: 15px;"><p id="ai-assessment-text" style="font-size:13px; margin:0;"></p></div>
-            
             <h3 style="margin-top:0; color:#1e56a0; border-bottom:1px solid #eee; padding-bottom:8px;">📅 ประวัติย้อนหลัง</h3>
             <div style="overflow-x: auto;">
                 <table><thead><tr><th>วันที่</th><th>สถานะ</th><th>หมายเหตุ</th></tr></thead><tbody id="student-history-body"></tbody></table>
@@ -377,19 +376,27 @@
 
         <div id="tab-std-behavior" class="student-tab-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="margin:0; color:#059669; display:flex; align-items:center; gap:8px;">💯 คะแนนพฤติกรรม</h3>
+                <h3 style="margin:0; color:#059669; display:flex; align-items:center; gap:8px;">💯 คะแนนพฤติกรรมและความดี</h3>
                 <span style="font-size: 11px; color: #10b981; background: #d1fae5; padding: 4px 10px; border-radius: 12px; font-weight:bold; display:flex; align-items:center; gap:4px; box-shadow: 0 2px 4px rgba(16,185,129,0.2);">
-                    <span class="live-dot"></span> ข้อมูลเชื่อมต่อสด (Live)
+                    <span class="live-dot"></span> เชื่อมต่อสด
                 </span>
             </div>
-            <div id="behavior-score-box" style="text-align:center; padding: 30px 20px; background: #ecfdf5; border-radius: 12px; border: 2px dashed #34d399; margin-bottom: 15px; transition: 0.3s;">
-                <h1 id="behavior-score-text" style="font-size: 55px; color: #059669; margin: 0; line-height: 1; transition: 0.3s;">...</h1>
-                <p style="margin: 5px 0 0 0; color: #047857; font-weight: bold;">คะแนนคงเหลือ</p>
+            
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <div id="behavior-score-box" style="flex:1; text-align:center; padding: 20px 10px; background: #ecfdf5; border-radius: 12px; border: 2px solid #34d399; transition: 0.3s;">
+                    <h1 id="behavior-score-text" style="font-size: 40px; color: #059669; margin: 0; line-height: 1; transition: 0.3s;">100</h1>
+                    <p style="margin: 5px 0 0 0; color: #047857; font-weight: bold; font-size:13px;">คะแนนพฤติกรรม</p>
+                </div>
+                <div style="flex:1; text-align:center; padding: 20px 10px; background: #fffbeb; border-radius: 12px; border: 2px solid #fcd34d;">
+                    <h1 id="merit-score-text" style="font-size: 40px; color: #d97706; margin: 0; line-height: 1;">0</h1>
+                    <p style="margin: 5px 0 0 0; color: #b45309; font-weight: bold; font-size:13px;">🌟 ความดีสะสม</p>
+                </div>
             </div>
-            <h3 style="margin-top:20px; font-size:14px; color:#475569; border-bottom:1px solid #eee; padding-bottom:8px;">📋 ประวัติการถูกหักคะแนน</h3>
+            
+            <h3 style="margin-top:20px; font-size:14px; color:#475569; border-bottom:1px solid #eee; padding-bottom:8px;">📋 ประวัติคะแนน</h3>
             <div style="overflow-x: auto;">
                 <table style="width:100%; border-collapse: collapse; font-size:12px;">
-                    <thead><tr><th style="background:#f1f5f9;">วันที่</th><th style="background:#f1f5f9;">รายการ</th><th style="background:#f1f5f9; color:#ef4444;">หัก/เพิ่ม</th></tr></thead>
+                    <thead><tr><th style="background:#f1f5f9;">วันที่</th><th style="background:#f1f5f9;">รายการ</th><th style="background:#f1f5f9; color:#1e56a0;">คะแนน</th></tr></thead>
                     <tbody id="student-behavior-history-body"><tr><td colspan='3' style='text-align:center;'>⏳ กำลังเชื่อมต่อข้อมูล...</td></tr></tbody>
                 </table>
             </div>
@@ -418,32 +425,20 @@
     </div>
 </div>
 
-<div class="nav-menu" id="bottom-nav">
-    <div class="nav-item active" onclick="switchPage('checklist-page', this)"><span>📝</span><br>เช็คชื่อ</div>
-    <div class="nav-item" onclick="switchPage('daily-page', this)"><span>📅</span><br>รายสัปดาห์</div>
-    <div class="nav-item" onclick="switchPage('summary-page', this)"><span>📊</span><br>รายงานสถิติ</div>
-    <div class="nav-item" onclick="switchPage('behavior-page', this)"><span>💯</span><br>พฤติกรรม</div>
-</div>
-
 <script>
-    // 🔗 วางลิงก์ URL Web App (New version) ของท่านรองฯ ตรงนี้ครับ
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxwS4lH7grTn2J1R9-vBnAb8M_hebn4na4nu5SJdvhrorOkh-HJNenVGsmmhDp7eyKB/exec"; 
+    // 🔗 API วาง URL ใหม่ล่าสุดตรงนี้ครับ
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxkiDv8qkfR06ptiPh_IzTmWIUPv_oFQ0JSSgdTlhKAxsfSStbiOPB5eqevSb94H-on/exec"; 
     
     const IDLE_TIMEOUT = 5 * 60 * 1000; 
     let idleTimer = null;
 
-    function toggleAiPopup() {
-        let popup = document.getElementById('ai-help-popup');
-        if (popup.style.display === 'none' || popup.style.display === '') popup.style.display = 'block';
-        else popup.style.display = 'none';
-    }
-
+    function toggleAiPopup() { let popup = document.getElementById('ai-help-popup'); if (popup.style.display === 'none' || popup.style.display === '') popup.style.display = 'block'; else popup.style.display = 'none'; }
     function showAiHelp(topic) {
         toggleAiPopup(); 
         let title = ""; let text = ""; let icon = 'info';
         if (topic === 'attendance') { title = "📝 วิธีบันทึกการเข้าเรียน"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>สำหรับคุณครูประจำชั้น:</b><br>1. เข้าเมนู 'เช็คชื่อ'<br>2. วันที่ระบบจะตั้งเป็นวันนี้ให้อัตโนมัติ<br>3. กดเลือกสถานะ (มา, สาย, ขาด, ลา)<br>4. กดปุ่ม <b>'💾 บันทึกข้อมูล'</b> จบครับ!</div>"; } 
         else if (topic === 'leave') { title = "📨 การแจ้งขออนุญาตลาหยุด"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>ฝั่งนักเรียน:</b> เข้าเมนู 'แจ้งลา' > เลือกวันที่ในปฏิทิน > กดส่งคำร้อง<br><br><b>ฝั่งครู:</b> ระบบจะดึงข้อมูลเด็กที่แจ้งลา มาใส่ในหน้าฟอร์มให้อัตโนมัติ พร้อมขึ้นป้ายเตือนสีส้มครับ</div>"; } 
-        else if (topic === 'behavior') { title = "💯 ระบบคะแนนพฤติกรรม"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'>ระบบจะตั้งคะแนนเริ่มต้นให้นักเรียนทุกคนที่ <b>100 คะแนน</b><br>🔴 <b>'ขาด':</b> หัก 5 คะแนน<br>🟡 <b>'สาย':</b> หัก 2 คะแนน<br><i>*หากครูคีย์ผิด แล้วมากด 'แก้ไข' กลับมาเป็น 'มา' ระบบจะคืนคะแนนให้อัตโนมัติครับ</i></div>"; } 
+        else if (topic === 'behavior') { title = "💯 ระบบคะแนนพฤติกรรม"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'>คะแนนพฤติกรรมเริ่ม 100 และมีคะแนนความดีแยกสะสมครับ<br>🔴 <b>'ขาด':</b> หัก 5 คะแนน<br>🟡 <b>'สาย':</b> หัก 2 คะแนน<br>🌟 ครูสามารถกด <b>'จัดการ'</b> ในแท็บพฤติกรรม เพื่อเพิ่มคะแนนความดี หรือหักคะแนนพฤติกรรมเด็กรายบุคคลได้เลยครับ</div>"; } 
         else if (topic === 'admin') { title = "⚙️ สำหรับผู้ดูแลระบบ"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>แอดมินทำได้:</b><br>1. ปิด-เปิดระบบล็อกเวลาเช็คชื่อ<br>2. กำหนดวันหยุดนักขัตฤกษ์<br>3. จัดการรายชื่อครูและนักเรียน<br>4. ดู Dashboard วิเคราะห์ข้อมูลระดับบริหาร</div>"; }
         Swal.fire({ title: title, html: text, icon: icon, confirmButtonText: 'เข้าใจแล้ว', confirmButtonColor: '#f59e0b' });
     }
@@ -523,40 +518,108 @@
         localStorage.setItem('sis_current_page', pageId);
         if (pageId === 'daily-page' && currentClass) loadWeeklyData(); 
         if (pageId === 'summary-page' && currentClass) loadSummaryData();
-        // 🌟 ถ้าครูกดแท็บ "พฤติกรรม" ให้ดึงข้อมูลมาแสดง
         if (pageId === 'behavior-page' && currentClass) loadClassBehaviorData(); 
     }
 
-    // 🌟 ฟังก์ชันดึงคะแนนพฤติกรรมทั้งห้อง (สำหรับครู)
+    // 🌟 ระบบจัดการคะแนนของครูประจำชั้น
     function loadClassBehaviorData() {
         let tbody = document.getElementById('behavior-body');
-        tbody.innerHTML = `<tr><td colspan='5' style='text-align:center;'>⏳ กำลังดึงข้อมูลคะแนนพฤติกรรม...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan='6' style='text-align:center;'>⏳ กำลังดึงข้อมูลคะแนนพฤติกรรม...</td></tr>`;
 
         fetch(`${GAS_API_URL}?action=get_class_behavior&className=${encodeURIComponent(currentClass)}`)
         .then(res => res.json())
         .then(data => {
             if(data.status === "success") {
                 let html = "";
-                // เรียงตามเลขที่
                 data.data.sort((a,b) => parseInt(a.number) - parseInt(b.number));
-
                 data.data.forEach(std => {
-                    let netColor = std.netScore >= 80 ? '#10b981' : (std.netScore >= 60 ? '#f59e0b' : '#ef4444');
+                    let netColor = std.behaviorScore >= 80 ? '#10b981' : (std.behaviorScore >= 60 ? '#f59e0b' : '#ef4444');
+                    let totalDeduction = std.behaviorScore - 100; // คำนวณยอดหักสุทธิ
                     html += `<tr>
                         <td style="text-align:center;">${std.number}</td>
                         <td>${cleanName(std.name)}</td>
-                        <td style="text-align:center; color:#ef4444; font-weight:bold;">${std.deduction < 0 ? std.deduction : '-'}</td>
-                        <td style="text-align:center; color:#10b981; font-weight:bold;">${std.bonus > 0 ? '+' + std.bonus : '-'}</td>
-                        <td style="text-align:center; color:${netColor}; font-weight:bold; font-size:14px;">${std.netScore}</td>
+                        <td style="text-align:center; color:#ef4444; font-weight:bold;">${totalDeduction < 0 ? totalDeduction : '-'}</td>
+                        <td style="text-align:center; color:#10b981; font-weight:bold;">${std.meritScore > 0 ? '+' + std.meritScore : '-'}</td>
+                        <td style="text-align:center; color:${netColor}; font-weight:bold; font-size:14px;">${std.behaviorScore}</td>
+                        <td style="text-align:center;">
+                            <button onclick="openBehaviorModal('${std.id}', '${cleanName(std.name)}')" style="background:#f59e0b; padding:4px 8px; font-size:11px; border-radius:6px; box-shadow: 0 2px 4px rgba(245,158,11,0.2);">จัดการ</button>
+                        </td>
                     </tr>`;
                 });
-                
-                if (data.data.length === 0) {
-                    html = `<tr><td colspan='5' style='text-align:center; color:#ef4444;'>❌ ไม่พบข้อมูลนักเรียน</td></tr>`;
-                }
+                if (data.data.length === 0) html = `<tr><td colspan='6' style='text-align:center; color:#ef4444;'>❌ ไม่พบข้อมูลนักเรียน</td></tr>`;
                 tbody.innerHTML = html;
             }
         });
+    }
+
+    // 🌟 หน้าต่างให้ครูบันทึกความดี/พฤติกรรม
+    async function openBehaviorModal(stdId, stdName) {
+        const { value: formValues } = await Swal.fire({
+            title: `จัดการคะแนน: ${stdName}`,
+            html: `
+                <div style="text-align:left; font-family:'Prompt';">
+                    <label style="font-size:12px; font-weight:bold; color:#1e56a0;">ประเภทคะแนน</label>
+                    <select id="b-type" class="swal2-select" style="display:flex; width:100%; margin:0 0 15px 0; font-family:'Prompt'; font-size:14px;">
+                        <option value="merit">🌟 เพิ่มคะแนนความดี (+)</option>
+                        <option value="deduct">🔴 หักคะแนนพฤติกรรม (-)</option>
+                        <option value="restore">🟢 คืนคะแนนพฤติกรรม (+)</option>
+                    </select>
+                    
+                    <label style="font-size:12px; font-weight:bold; color:#1e56a0;">เหตุผล / รายการ</label>
+                    <input id="b-reason" class="swal2-input" placeholder="เช่น เก็บของได้, ทะเลาะวิวาท..." style="display:flex; width:100%; margin:0 0 15px 0; font-family:'Prompt'; font-size:14px; box-sizing:border-box;">
+                    
+                    <label style="font-size:12px; font-weight:bold; color:#1e56a0;">จำนวนคะแนน (ใส่เฉพาะตัวเลขบวก)</label>
+                    <input id="b-points" type="number" min="1" class="swal2-input" placeholder="เช่น 5, 10, 20" style="display:flex; width:100%; margin:0; font-family:'Prompt'; font-size:14px; box-sizing:border-box;">
+                </div>
+            `,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'บันทึกคะแนน',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#10b981',
+            preConfirm: () => {
+                const type = document.getElementById('b-type').value;
+                const reason = document.getElementById('b-reason').value;
+                let points = parseInt(document.getElementById('b-points').value);
+                
+                if (!reason || isNaN(points) || points <= 0) {
+                    Swal.showValidationMessage('กรุณากรอกเหตุผลและระบุคะแนนให้ถูกต้อง (ตัวเลขมากกว่า 0)');
+                    return false;
+                }
+                
+                // แปลงคะแนนถ้าเป็นการหักลบ
+                if (type === 'deduct') points = -points;
+                
+                return { stdId: stdId, stdName: stdName, type: type, reason: reason, points: points };
+            }
+        });
+
+        if (formValues) {
+            Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            
+            fetch(GAS_API_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "submit_manual_behavior",
+                    studentId: formValues.stdId,
+                    studentName: formValues.stdName,
+                    className: currentClass,
+                    bType: formValues.type,
+                    reason: formValues.reason,
+                    points: formValues.points,
+                    teacherName: currentTeacher
+                })
+            }).then(res => res.json()).then(data => {
+                if (data.status === "success") {
+                    Swal.fire('สำเร็จ!', 'บันทึกคะแนนเรียบร้อยแล้ว', 'success');
+                    loadClassBehaviorData(); // โหลดตารางใหม่
+                } else {
+                    Swal.fire('ข้อผิดพลาด', data.message, 'error');
+                }
+            }).catch(err => {
+                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+            });
+        }
     }
 
     function fetchStudents() {
@@ -610,7 +673,7 @@
     function saveAttendance() {
         const btn = document.getElementById('save-btn'); btn.innerText = "⏳ ระบบกำลังส่งข้อมูล..."; btn.disabled = true;
         let records = []; students.forEach(s => records.push({ id: s.id, name: s.name, className: currentClass, status: attendanceData[s.id].status, note: document.getElementById(`note-${s.id}`).value }));
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) }).then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false; if(data.status === "success") { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบได้หักคะแนนพฤติกรรมเรียบร้อยแล้ว)', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error'); });
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) }).then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false; if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ บันทึกข้อมูลสำเร็จ!', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error'); });
     }
 
     function loadQuickAIInsight() {
@@ -764,12 +827,22 @@
             let p = data.stats.total > 0 ? (data.stats.present / data.stats.total * 100).toFixed(1) : 0; document.getElementById('ai-assessment-text').innerHTML = p >= 80 ? `🌟 <b>ชื่นชม:</b> รักษามาตรฐานนี้นะครับ!` : `⚠️ <b>ระวัง:</b> ต่ำกว่าเกณฑ์ (${p}%) เสี่ยงหมดสิทธิ์สอบ`;
             let hHTML = ""; data.history.reverse().forEach(x => hHTML += `<tr><td>${formatThaiDate(x.date)}</td><td>${x.status}</td><td>${x.note||'-'}</td></tr>`); document.getElementById('student-history-body').innerHTML = hHTML;
 
-            if(data.currentScore !== undefined) {
-                let scoreText = document.getElementById('behavior-score-text'); let scoreBox = document.getElementById('behavior-score-box'); scoreText.innerText = data.currentScore;
-                if(data.currentScore >= 80) { scoreText.style.color = '#059669'; scoreBox.style.background = '#ecfdf5'; scoreBox.style.borderColor = '#34d399'; } else if(data.currentScore >= 60) { scoreText.style.color = '#d97706'; scoreBox.style.background = '#fffbeb'; scoreBox.style.borderColor = '#fbbf24'; } else { scoreText.style.color = '#dc2626'; scoreBox.style.background = '#fef2f2'; scoreBox.style.borderColor = '#f87171'; }
+            if(data.behaviorScore !== undefined) {
+                let behText = document.getElementById('behavior-score-text'); let behBox = document.getElementById('behavior-score-box');
+                behText.innerText = data.behaviorScore;
+                document.getElementById('merit-score-text').innerText = data.meritScore;
+                
+                if(data.behaviorScore >= 80) { behText.style.color = '#059669'; behBox.style.background = '#ecfdf5'; behBox.style.borderColor = '#34d399'; } 
+                else if(data.behaviorScore >= 60) { behText.style.color = '#d97706'; behBox.style.background = '#fffbeb'; behBox.style.borderColor = '#fbbf24'; } 
+                else { behText.style.color = '#dc2626'; behBox.style.background = '#fef2f2'; behBox.style.borderColor = '#f87171'; }
+                
                 let behHTML = "";
                 if(data.behaviorHistory && data.behaviorHistory.length > 0) {
-                    data.behaviorHistory.reverse().forEach(h => { let ptsColor = h.points < 0 ? '#ef4444' : '#10b981'; let ptsSign = h.points > 0 ? '+' : ''; behHTML += `<tr><td style="border-bottom:1px solid #eee; padding:8px 5px;">${formatThaiDate(h.date)}</td><td style="border-bottom:1px solid #eee; padding:8px 5px;">${h.action}<br><span style="font-size:10px; color:#94a3b8;">${h.teacher}</span></td><td style="border-bottom:1px solid #eee; padding:8px 5px; font-weight:bold; color:${ptsColor};">${ptsSign}${h.points}</td></tr>`; });
+                    data.behaviorHistory.reverse().forEach(h => { 
+                        let ptsColor = h.isMerit ? '#10b981' : (h.points < 0 ? '#ef4444' : '#10b981'); 
+                        let ptsSign = h.points > 0 ? '+' : ''; 
+                        behHTML += `<tr><td style="border-bottom:1px solid #eee; padding:8px 5px;">${formatThaiDate(h.date)}</td><td style="border-bottom:1px solid #eee; padding:8px 5px;">${h.action.replace('[ความดี] ', '').replace('[พฤติกรรม] ', '')}<br><span style="font-size:10px; color:#94a3b8;">${h.teacher}</span></td><td style="border-bottom:1px solid #eee; padding:8px 5px; font-weight:bold; color:${ptsColor}; text-align:center;">${ptsSign}${h.points}</td></tr>`; 
+                    });
                 } else { behHTML = `<tr><td colspan='3' style='text-align:center; padding:15px; color:#64748b;'>ไม่มีประวัติการถูกหักคะแนน ยอดเยี่ยมมาก!</td></tr>`; }
                 document.getElementById('student-behavior-history-body').innerHTML = behHTML;
             }
