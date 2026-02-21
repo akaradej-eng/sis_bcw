@@ -425,14 +425,28 @@
         }
     }
 
+   // --- ⏰ อัปเดตนาฬิกาให้เดินแบบ Real-time (มีวินาที) ---
     function updateClock() {
         const now = new Date();
         const dateStr = now.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        const timeStr = now.toLocaleTimeString('th-TH', { hour12: false });
-        if(document.getElementById('login-clock')) document.getElementById('login-clock').innerHTML = `${dateStr}<br>${timeStr} น.`;
-        if(document.getElementById('display-date')) document.getElementById('display-date').innerText = dateStr;
-        if(document.getElementById('display-clock')) document.getElementById('display-clock').innerText = `🕒 ${timeStr} น.`;
+        
+        // 🌟 บังคับให้แสดง ชั่วโมง:นาที:วินาที แบบ 2 หลักเสมอ
+        const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+        
+        if(document.getElementById('login-clock')) {
+            // ทำให้ตัวเลขเวลาในหน้าล็อกอินใหญ่และโดดเด่นขึ้น
+            document.getElementById('login-clock').innerHTML = `${dateStr}<br><span style="font-size: 1.3em; color: #1e56a0; letter-spacing: 1px;">${timeStr} น.</span>`;
+        }
+        if(document.getElementById('display-date')) {
+            document.getElementById('display-date').innerText = dateStr;
+        }
+        if(document.getElementById('display-clock')) {
+            // นาฬิกาตรงมุมขวาบนของแถบสถานะ
+            document.getElementById('display-clock').innerText = `🕒 ${timeStr} น.`;
+        }
     }
+    // ตัวสั่งการให้ฟังก์ชันข้างบนทำงานซ้ำทุกๆ 1 วินาที (1000 มิลลิวินาที)
+    setInterval(updateClock, 1000);
 
     function cleanName(fullName) { return fullName ? fullName.replace(/^(เด็กชาย|เด็กหญิง|นาย|นางสาว|ด\.ช\.|ด\.ญ\.)\s*/g, "").trim() : ""; }
 
@@ -889,3 +903,4 @@
 
 </body>
 </html>
+
