@@ -131,8 +131,7 @@
     <div id="login-page" class="page active">
         <div class="card" style="text-align: center; max-width: 400px; margin: 40px auto;">
             <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgb1oewS_bG2frmr1y3aOrwykh-wBZiipEUv9BbTxGSQh2d-Ergv_Ez4MWoO4AO8_wdCG19Nrravj8iJCc33arzt3ZXi2lmQ2v1hKGvEIBcLdjcCkZdfdZF-p8DWehYl3lzSWhWSOI4NKeNhWRzWkUHRJnMs1KFVMW_BwwUq83DafDaQpwu3-hOs-Ieix0/s225/304789124_573612801071886_7852363760169451884_n.png" 
-                 alt="โลโก้โรงเรียน" 
-                 style="width: 120px; height: auto; margin-bottom: 15px;">
+                 alt="โลโก้โรงเรียน" style="width: 120px; height: auto; margin-bottom: 15px;">
             <p id="login-clock" style="font-size:14px; font-weight:bold; color:#475569; margin-bottom:20px;"></p>
             <input type="text" id="username" placeholder="รหัสผู้ใช้งาน">
             <input type="password" id="password" placeholder="รหัสผ่าน">
@@ -165,17 +164,7 @@
             </div>
             <div style="overflow-x:auto;">
                 <table style="margin-top:0;">
-                    <thead>
-                        <tr>
-                            <th style="width:30px;">ที่</th>
-                            <th>ชื่อ-สกุล</th>
-                            <th id="th-mon" style="width:40px;">จ.</th>
-                            <th id="th-tue" style="width:40px;">อ.</th>
-                            <th id="th-wed" style="width:40px;">พ.</th>
-                            <th id="th-thu" style="width:40px;">พฤ.</th>
-                            <th id="th-fri" style="width:40px;">ศ.</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th style="width:30px;">ที่</th><th>ชื่อ-สกุล</th><th id="th-mon" style="width:40px;">จ.</th><th id="th-tue" style="width:40px;">อ.</th><th id="th-wed" style="width:40px;">พ.</th><th id="th-thu" style="width:40px;">พฤ.</th><th id="th-fri" style="width:40px;">ศ.</th></tr></thead>
                     <tbody id="daily-body"></tbody>
                 </table>
             </div>
@@ -197,19 +186,7 @@
             </div>
             <div style="overflow-x:auto;">
                 <table style="margin-top:0; border: 1px solid #eee; white-space: nowrap;">
-                    <thead>
-                        <tr>
-                            <th style="width: 30px;">ที่</th>
-                            <th>ชื่อ-นามสกุล</th>
-                            <th style="color:#10b981;">มา</th>
-                            <th style="color:#eab308;">สาย</th>
-                            <th style="color:#f97316;">ลากิจ</th>
-                            <th style="color:#f43f5e;">ป่วย</th>
-                            <th style="color:#991b1b;">ขาด</th>
-                            <th style="color:#3b82f6;">นอกร.ร.</th>
-                            <th>%</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th style="width: 30px;">ที่</th><th>ชื่อ-นามสกุล</th><th style="color:#10b981;">มา</th><th style="color:#eab308;">สาย</th><th style="color:#f97316;">ลากิจ</th><th style="color:#f43f5e;">ป่วย</th><th style="color:#991b1b;">ขาด</th><th style="color:#3b82f6;">นอกร.ร.</th><th>%</th></tr></thead>
                     <tbody id="summary-body"></tbody>
                 </table>
             </div>
@@ -228,7 +205,7 @@
             <h3 style="color:#ef4444; margin-top:0;">⏰ จำกัดเวลาเช็คชื่อประจำวัน</h3>
             <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
                 <label class="switch"><input type="checkbox" id="admin-time-limit-toggle"><span class="slider"></span></label>
-                <span id="time-limit-status-text" style="font-size:13px; font-weight:bold; color:#64748b;">ปิดใช้งาน (ครูบันทึกได้ตลอดเวลา)</span>
+                <span id="time-limit-status-text" style="font-size:13px; font-weight:bold; color:#64748b;">ปิดใช้งาน</span>
             </div>
             <div id="time-limit-inputs" style="display:none; gap:10px; background:#f0fdf4; padding:15px; border-radius:8px; border:1px solid #bbf7d0;">
                 <div style="flex:1"><label style="font-size:12px; font-weight:bold; color:#166534;">เวลาเริ่ม (น.)</label><input type="time" id="admin-start-time" value="07:30" style="margin-bottom:0;"></div>
@@ -303,15 +280,15 @@
 
     <div id="student-page" class="page">
         
-        <div style="background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 5px solid #f59e0b;">
+        <div style="background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 5px solid #1e56a0;">
             <div style="font-size: 14px; color: #475569; margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 10px;">
-                <span><b>เลขที่:</b> <span id="hdr-num" style="color:#1e56a0;">-</span></span>
+                <span><b>เลขที่:</b> <span id="hdr-num" style="color:#ef4444;">-</span></span>
                 <span style="color:#cbd5e1;">|</span>
-                <span><b>รหัสนักเรียน:</b> <span id="hdr-id" style="color:#1e56a0;">-</span></span>
+                <span><b>รหัสนักเรียน:</b> <span id="hdr-id" style="color:#10b981;">-</span></span>
                 <span style="color:#cbd5e1;">|</span>
-                <span><b>ชั้น:</b> <span id="hdr-class" style="color:#1e56a0;">-</span></span>
+                <span><b>ชั้น:</b> <span id="hdr-class" style="color:#f59e0b;">-</span></span>
             </div>
-            <div id="hdr-name" style="font-size: 18px; font-weight: bold; color: #0f172a;">ชื่อ-นามสกุล</div>
+            <div id="hdr-name" style="font-size: 18px; font-weight: bold; color: #0f172a;">กำลังโหลดชื่อนักเรียน...</div>
         </div>
 
         <div class="student-tabs">
@@ -385,12 +362,31 @@
 
         <div id="tab-std-behavior" class="student-tab-content">
             <h3 style="margin-top:0; color:#059669; display:flex; align-items:center; gap:8px;">💯 คะแนนพฤติกรรม</h3>
-            <div style="text-align:center; padding: 30px 20px; background: #ecfdf5; border-radius: 12px; border: 2px dashed #34d399; margin-bottom: 15px;">
-                <h1 style="font-size: 48px; color: #059669; margin: 0;">100</h1>
-                <p style="margin: 5px 0 0 0; color: #047857; font-weight: bold;">คะแนนเริ่มต้น</p>
+            
+            <div id="behavior-score-box" style="text-align:center; padding: 30px 20px; background: #ecfdf5; border-radius: 12px; border: 2px dashed #34d399; margin-bottom: 15px;">
+                <h1 id="behavior-score-text" style="font-size: 55px; color: #059669; margin: 0; line-height: 1;">100</h1>
+                <p style="margin: 5px 0 0 0; color: #047857; font-weight: bold;">คะแนนคงเหลือ</p>
             </div>
-            <div style="background:#f8fafc; padding:15px; border-radius:8px; font-size:13px; color:#475569; line-height: 1.6;">
-                <b style="color:#334155;">📌 หมายเหตุ:</b> <br>หน้านี้เป็นการเตรียมความพร้อมสำหรับระบบฐานข้อมูลใหม่ โดยระบบจะทำการหักคะแนนพฤติกรรมอัตโนมัติหากนักเรียนมีสถานะ <b>"ขาด"</b> หรือ <b>"สาย"</b> ในอนาคตครับ
+            
+            <h3 style="margin-top:20px; font-size:14px; color:#475569; border-bottom:1px solid #eee; padding-bottom:8px;">📋 ประวัติการถูกหักคะแนน</h3>
+            <div style="overflow-x: auto;">
+                <table style="width:100%; border-collapse: collapse; font-size:12px;">
+                    <thead>
+                        <tr>
+                            <th style="background:#f1f5f9;">วันที่</th>
+                            <th style="background:#f1f5f9;">รายการ</th>
+                            <th style="background:#f1f5f9; color:#ef4444;">หัก</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-behavior-history-body">
+                        <tr><td colspan='3' style='text-align:center;'>กำลังดึงข้อมูล...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="background:#f8fafc; padding:12px; border-radius:8px; font-size:11px; color:#64748b; line-height: 1.5; margin-top:15px; border-left: 3px solid #cbd5e1;">
+                * การขาดเรียนหัก 5 คะแนน / การมาสายหัก 2 คะแนน<br>
+                * หากครูแก้ไขข้อมูลการมาเรียนให้ ระบบจะคืนคะแนนให้อัตโนมัติ
             </div>
         </div>
     </div>
@@ -404,7 +400,7 @@
         <div style="font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
             <p><b>1. วิธีการบันทึก:</b> เลือกสถานะของนักเรียน แล้วกดปุ่ม <b>"💾 บันทึกข้อมูล"</b> ด้านล่างสุด</p>
             <p id="modal-time-limit-text"><b>2. เวลาบันทึก:</b> กำลังดึงข้อมูล...</p>
-            <p><b>3. การแก้ไข:</b> หากบันทึกไปแล้วพบว่าข้อมูลผิด ให้กดปุ่ม <b>"✏️ แก้ไข"</b> ที่ท้ายชื่อ</p>
+            <p><b>3. การแก้ไข:</b> หากบันทึกไปแล้วพบว่าข้อมูลผิด ให้กดปุ่ม <b>"✏️ แก้ไข"</b> ที่ท้ายชื่อ ระบบจะคืนคะแนนพฤติกรรมให้เด็กอัตโนมัติ</p>
             <p><b>4. ระบบแจ้งลา:</b> หากนักเรียนแจ้งลาออนไลน์ สถานะจะถูกเปลี่ยนเป็นลาอัตโนมัติ ให้อ่านหมายเหตุก่อนบันทึกครับ</p>
         </div>
         <button onclick="closeTeacherModal()" style="width: 100%; background: #10b981; color: white; border: none; border-radius: 8px; padding: 12px; font-size: 15px; font-family: 'Prompt'; font-weight: bold; cursor: pointer;">✅ รับทราบและเข้าใช้งาน</button>
@@ -418,8 +414,8 @@
 </div>
 
 <script>
-    // 🔗 API (ใส่ URL ของท่านรองฯ)
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxc-HIoe0ZsKK_VZlsGnj8GHyHGM2GxT2YU3Z6RAX8dPj5HmCDqJvg7hsGN39oUBA1x/exec";
+    // 🔗 API (วาง URL ล่าสุดที่เพิ่ง Deploy เป็น New version ตรงนี้ครับ)
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzJWZvaK7EHZMWmv2LFhpOuu6eZQ8dvlPpXs4SemiijerisqptoxY2AHbz726wbxe2-/exec";
     
     const IDLE_TIMEOUT = 5 * 60 * 1000; 
     let idleTimer = null;
@@ -707,7 +703,8 @@
         fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) })
         .then(res => res.json()).then(data => {
             btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false;
-            if(data.status === "success") { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '✅ บันทึกข้อมูลสำเร็จ!', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error');
+            if(data.status === "success") { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบได้หักคะแนนพฤติกรรมเรียบร้อยแล้ว)', 'success'); fetchStudents(); } 
+            else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error');
         });
     }
 
@@ -921,7 +918,6 @@
     function loadStudentReport(id) {
         fetch(`${GAS_API_URL}?action=get_student_report&studentId=${id}`).then(res=>res.json()).then(data => {
             
-            // 🌟 นำข้อมูลชั้น เลขที่ รหัส มาแสดงผลทั้งในแถบด้านบนและในบัตรนักเรียน
             if(data.info) {
                 // อัปเดตข้อมูลบนบัตรดิจิทัล
                 document.getElementById('id-card-id').innerText = data.info.id;
@@ -931,8 +927,6 @@
                     document.getElementById('id-card-name').innerText = data.info.name;
                     document.getElementById('hdr-name').innerText = data.info.name;
                 }
-                
-                // สุ่มสร้างบาร์โค้ดจากรหัสนักเรียน
                 document.getElementById('id-card-barcode').innerText = `*${data.info.id}*`;
 
                 // อัปเดตข้อมูลตรงส่วนแถบข้อมูลด้านบน
@@ -941,6 +935,7 @@
                 document.getElementById('hdr-class').innerText = data.info.className;
             }
 
+            // อัปเดตสถิติเช็คชื่อ
             document.getElementById('st-stat-present').innerText = data.stats.present; 
             document.getElementById('st-stat-absent').innerText = data.stats.absent; 
             document.getElementById('st-stat-leave').innerText = data.stats.personal_leave + data.stats.sick_leave;
@@ -950,6 +945,34 @@
             
             let b = document.getElementById('student-history-body'); b.innerHTML = ""; 
             data.history.reverse().forEach(x => b.innerHTML += `<tr><td>${x.date}</td><td>${x.status}</td><td>${x.note||'-'}</td></tr>`);
+
+            // 🌟 อัปเดตข้อมูลคะแนนพฤติกรรม
+            if(data.currentScore !== undefined) {
+                let scoreText = document.getElementById('behavior-score-text');
+                let scoreBox = document.getElementById('behavior-score-box');
+                scoreText.innerText = data.currentScore;
+                
+                // เปลี่ยนสีตามคะแนน
+                if(data.currentScore >= 80) {
+                    scoreText.style.color = '#059669'; scoreBox.style.background = '#ecfdf5'; scoreBox.style.borderColor = '#34d399';
+                } else if(data.currentScore >= 60) {
+                    scoreText.style.color = '#d97706'; scoreBox.style.background = '#fffbeb'; scoreBox.style.borderColor = '#fbbf24';
+                } else {
+                    scoreText.style.color = '#dc2626'; scoreBox.style.background = '#fef2f2'; scoreBox.style.borderColor = '#f87171';
+                }
+
+                let hBody = document.getElementById('student-behavior-history-body');
+                hBody.innerHTML = "";
+                if(data.behaviorHistory && data.behaviorHistory.length > 0) {
+                    data.behaviorHistory.reverse().forEach(h => {
+                        let ptsColor = h.points < 0 ? '#ef4444' : '#10b981';
+                        let ptsSign = h.points > 0 ? '+' : '';
+                        hBody.innerHTML += `<tr><td style="border-bottom:1px solid #eee; padding:8px 5px;">${h.date}</td><td style="border-bottom:1px solid #eee; padding:8px 5px;">${h.action}<br><span style="font-size:10px; color:#94a3b8;">${h.teacher}</span></td><td style="border-bottom:1px solid #eee; padding:8px 5px; font-weight:bold; color:${ptsColor};">${ptsSign}${h.points}</td></tr>`;
+                    });
+                } else {
+                    hBody.innerHTML = `<tr><td colspan='3' style='text-align:center; padding:15px; color:#64748b;'>ไม่มีประวัติการถูกหักคะแนน ยอดเยี่ยมมาก!</td></tr>`;
+                }
+            }
         });
     }
 
