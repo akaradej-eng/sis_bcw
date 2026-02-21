@@ -393,7 +393,7 @@
 
 <script>
     // 🔗 API (ใส่ URL ของท่านรองฯ)
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxAS63nmcgD7SAUE3vG_aoY2OJQKU4VE_LkiRIdSt0-2sa7xlghVfqq276veV9uI02b/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzGYNsqfNQRoAOQA57HHae87rMr9CvrtWUcke5nQ7ByVl42KYhCBKYekmA0ybGFnf4f/exec";
     
     const IDLE_TIMEOUT = 5 * 60 * 1000; 
     let idleTimer = null;
@@ -889,9 +889,24 @@
 
     function loadStudentReport(id) {
         fetch(`${GAS_API_URL}?action=get_student_report&studentId=${id}`).then(res=>res.json()).then(data => {
-            document.getElementById('st-stat-present').innerText = data.stats.present; document.getElementById('st-stat-absent').innerText = data.stats.absent; document.getElementById('st-stat-leave').innerText = data.stats.personal_leave + data.stats.sick_leave;
-            let p = data.stats.total > 0 ? (data.stats.present / data.stats.total * 100).toFixed(1) : 0; document.getElementById('ai-assessment-text').innerHTML = p >= 80 ? `🌟 <b>ชื่นชม:</b> รักษามาตรฐานนี้นะครับ!` : `⚠️ <b>ระวัง:</b> ต่ำกว่าเกณฑ์ (${p}%) เสี่ยงหมดสิทธิ์สอบ`;
-            let b = document.getElementById('student-history-body'); b.innerHTML = ""; data.history.reverse().forEach(x => b.innerHTML += `<tr><td>${x.date}</td><td>${x.status}</td><td>${x.note||'-'}</td></tr>`);
+            
+            // 🌟 นำข้อมูลชั้น เลขที่ รหัส มาแสดงผล
+            if(data.info) {
+                document.getElementById('st-info-id').innerText = data.info.id;
+                document.getElementById('st-info-class').innerText = data.info.className;
+                document.getElementById('st-info-number').innerText = data.info.number;
+                if(data.info.name) document.getElementById('st-name-display').innerText = data.info.name;
+            }
+
+            document.getElementById('st-stat-present').innerText = data.stats.present; 
+            document.getElementById('st-stat-absent').innerText = data.stats.absent; 
+            document.getElementById('st-stat-leave').innerText = data.stats.personal_leave + data.stats.sick_leave;
+            
+            let p = data.stats.total > 0 ? (data.stats.present / data.stats.total * 100).toFixed(1) : 0; 
+            document.getElementById('ai-assessment-text').innerHTML = p >= 80 ? `🌟 <b>ชื่นชม:</b> รักษามาตรฐานนี้นะครับ!` : `⚠️ <b>ระวัง:</b> ต่ำกว่าเกณฑ์ (${p}%) เสี่ยงหมดสิทธิ์สอบ`;
+            
+            let b = document.getElementById('student-history-body'); b.innerHTML = ""; 
+            data.history.reverse().forEach(x => b.innerHTML += `<tr><td>${x.date}</td><td>${x.status}</td><td>${x.note||'-'}</td></tr>`);
         });
     }
 
@@ -903,4 +918,5 @@
 
 </body>
 </html>
+
 
