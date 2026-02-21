@@ -107,22 +107,10 @@
         .swal2-title, .swal2-html-container, .swal2-confirm, .swal2-cancel { font-family: 'Prompt', sans-serif !important; }
 
         .live-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; display: inline-block; animation: pulseLive 1.5s infinite; }
-        @keyframes pulseLive { 
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 
-            70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); } 
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } 
-        }
+        @keyframes pulseLive { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
 
-        /* 🌟 CSS สำหรับ Mascot น้องไหบ้านเชียง */
-        @keyframes floatMascot {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        @keyframes popupScale {
-            from { transform: scale(0); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
+        @keyframes floatMascot { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        @keyframes popupScale { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .ai-help-btn { display: block; width: 100%; text-align: left; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; font-family: 'Prompt'; font-size: 13px; color: #1e56a0; transition: 0.2s; font-weight: 500;}
         .ai-help-btn:hover { background: #e0f2fe; border-color: #38bdf8; }
 
@@ -142,7 +130,6 @@
 </div>
 
 <div class="container">
-    
     <div id="status-bar" class="live-status-bar">
         <span id="display-date"></span>
         <span id="display-clock" style="color:var(--primary);"></span>
@@ -150,8 +137,7 @@
 
     <div id="login-page" class="page active">
         <div class="card" style="text-align: center; max-width: 400px; margin: 40px auto;">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgb1oewS_bG2frmr1y3aOrwykh-wBZiipEUv9BbTxGSQh2d-Ergv_Ez4MWoO4AO8_wdCG19Nrravj8iJCc33arzt3ZXi2lmQ2v1hKGvEIBcLdjcCkZdfdZF-p8DWehYl3lzSWhWSOI4NKeNhWRzWkUHRJnMs1KFVMW_BwwUq83DafDaQpwu3-hOs-Ieix0/s225/304789124_573612801071886_7852363760169451884_n.png" 
-                 alt="โลโก้โรงเรียน" style="width: 120px; height: auto; margin-bottom: 15px;">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgb1oewS_bG2frmr1y3aOrwykh-wBZiipEUv9BbTxGSQh2d-Ergv_Ez4MWoO4AO8_wdCG19Nrravj8iJCc33arzt3ZXi2lmQ2v1hKGvEIBcLdjcCkZdfdZF-p8DWehYl3lzSWhWSOI4NKeNhWRzWkUHRJnMs1KFVMW_BwwUq83DafDaQpwu3-hOs-Ieix0/s225/304789124_573612801071886_7852363760169451884_n.png" alt="โลโก้โรงเรียน" style="width: 120px; height: auto; margin-bottom: 15px;">
             <p id="login-clock" style="font-size:14px; font-weight:bold; color:#475569; margin-bottom:20px;"></p>
             <input type="text" id="username" placeholder="รหัสผู้ใช้งาน">
             <input type="password" id="password" placeholder="รหัสผ่าน">
@@ -188,7 +174,6 @@
                     <tbody id="daily-body"></tbody>
                 </table>
             </div>
-            <p style="font-size: 11px; color:#666; margin-top:10px;">*ตัวย่อ: ม=มา, ส=สาย, ล=ลากิจ, ป=ลาป่วย, ข=ขาด, น=นอกโรงเรียน</p>
         </div>
     </div>
 
@@ -208,6 +193,28 @@
                 <table style="margin-top:0; border: 1px solid #eee; white-space: nowrap;">
                     <thead><tr><th style="width: 30px;">ที่</th><th>ชื่อ-นามสกุล</th><th style="color:#10b981;">มา</th><th style="color:#eab308;">สาย</th><th style="color:#f97316;">ลากิจ</th><th style="color:#f43f5e;">ป่วย</th><th style="color:#991b1b;">ขาด</th><th style="color:#3b82f6;">นอกร.ร.</th><th>%</th></tr></thead>
                     <tbody id="summary-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="behavior-page" class="page">
+        <h2 style="color: #1e56a0; margin-bottom: 10px; margin-top:0;">💯 รายงานพฤติกรรม <span id="beh-class-title" style="color:var(--primary);"></span></h2>
+        <div class="card" style="padding-top:10px;">
+            <div style="overflow-x:auto;">
+                <table style="margin-top:0; border: 1px solid #eee; white-space: nowrap;">
+                    <thead>
+                        <tr>
+                            <th style="width: 30px;">ที่</th>
+                            <th>ชื่อ-นามสกุล</th>
+                            <th style="color:#ef4444;">🔴 หักคะแนน</th>
+                            <th style="color:#10b981;">🟢 ความดี</th>
+                            <th style="color:#1e56a0;">🏆 คะแนนรวม</th>
+                        </tr>
+                    </thead>
+                    <tbody id="behavior-body">
+                        <tr><td colspan='5' style='text-align:center;'>⏳ กำลังดึงข้อมูลคะแนนพฤติกรรม...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -325,9 +332,7 @@
                     <div class="id-card-title">โรงเรียนบ้านเชียงวิทยา<br><span style="font-size:12px; color:#64748b; font-weight:normal;">บัตรประจำตัวนักเรียน</span></div>
                 </div>
                 <div class="id-card-body">
-                    <div class="id-card-photo">
-                        รอเพิ่มรูปภาพ<br>ในระบบ
-                    </div>
+                    <div class="id-card-photo">รอเพิ่มรูปภาพ<br>ในระบบ</div>
                     <div class="id-card-info">
                         <div><b>ชื่อ-สกุล</b> <span id="id-card-name">-</span></div>
                         <div><b>รหัส</b> <span id="id-card-id">-</span></div>
@@ -335,9 +340,7 @@
                         <div><b>เลขที่</b> <span id="id-card-number">-</span></div>
                     </div>
                 </div>
-                <div class="id-card-footer">
-                    <span id="id-card-barcode">123456789</span>
-                </div>
+                <div class="id-card-footer"><span id="id-card-barcode">123456789</span></div>
             </div>
         </div>
 
@@ -357,7 +360,6 @@
 
         <div id="tab-std-leave" class="student-tab-content" style="background:#fffbeb; border:1px solid #fcd34d;">
             <h3 style="margin-top:0; color:#b45309; display:flex; align-items:center; gap:8px;">📝 แจ้งขออนุญาตลาหยุด</h3>
-            
             <label style="font-size:12px; font-weight:bold; color:#92400e;">เลือกวันที่ขอลา (กดคลิกปฏิทินได้หลายวัน)</label>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                 <button onclick="changeStudentMonth(-1)" style="padding:5px 10px; background:#f59e0b; font-size:12px;">◀ ก่อนหน้า</button>
@@ -365,16 +367,9 @@
                 <button onclick="changeStudentMonth(1)" style="padding:5px 10px; background:#f59e0b; font-size:12px;">ถัดไป ▶</button>
             </div>
             <div id="student-leave-calendar-container" style="background:#fff; border-radius:8px; padding:10px; margin-bottom:10px; border:1px solid #fde68a;"></div>
-            
-            <div id="selected-leave-dates-display" style="font-size:12px; color:#b91c1c; margin-bottom:10px; font-weight:bold; background:#fee2e2; padding:8px; border-radius:6px; display:none;">
-                วันที่เลือก: 
-            </div>
-
+            <div id="selected-leave-dates-display" style="font-size:12px; color:#b91c1c; margin-bottom:10px; font-weight:bold; background:#fee2e2; padding:8px; border-radius:6px; display:none;">วันที่เลือก: </div>
             <label style="font-size:12px; font-weight:bold; color:#92400e;">ประเภทการลา</label>
-            <select id="student-leave-type" style="border-color:#fcd34d;">
-                <option value="ลากิจ">ลากิจ (มีธุระจำเป็น)</option>
-                <option value="ลาป่วย">ลาป่วย (ไม่สบาย/พบแพทย์)</option>
-            </select>
+            <select id="student-leave-type" style="border-color:#fcd34d;"><option value="ลากิจ">ลากิจ (มีธุระจำเป็น)</option><option value="ลาป่วย">ลาป่วย (ไม่สบาย/พบแพทย์)</option></select>
             <label style="font-size:12px; font-weight:bold; color:#92400e;">เหตุผล (อธิบายให้ครูทราบ)</label>
             <textarea id="student-leave-reason" placeholder="เช่น ไปทำธุระต่างจังหวัด หรือ มีไข้สูง..." rows="2" style="border-color:#fcd34d;"></textarea>
             <button onclick="submitLeaveRequest(this)" style="width:100%; background:#f59e0b; font-size:14px;">📤 ส่งคำร้องให้ครูประจำชั้น</button>
@@ -387,25 +382,15 @@
                     <span class="live-dot"></span> ข้อมูลเชื่อมต่อสด (Live)
                 </span>
             </div>
-            
             <div id="behavior-score-box" style="text-align:center; padding: 30px 20px; background: #ecfdf5; border-radius: 12px; border: 2px dashed #34d399; margin-bottom: 15px; transition: 0.3s;">
                 <h1 id="behavior-score-text" style="font-size: 55px; color: #059669; margin: 0; line-height: 1; transition: 0.3s;">...</h1>
                 <p style="margin: 5px 0 0 0; color: #047857; font-weight: bold;">คะแนนคงเหลือ</p>
             </div>
-            
             <h3 style="margin-top:20px; font-size:14px; color:#475569; border-bottom:1px solid #eee; padding-bottom:8px;">📋 ประวัติการถูกหักคะแนน</h3>
             <div style="overflow-x: auto;">
                 <table style="width:100%; border-collapse: collapse; font-size:12px;">
-                    <thead>
-                        <tr>
-                            <th style="background:#f1f5f9;">วันที่</th>
-                            <th style="background:#f1f5f9;">รายการ</th>
-                            <th style="background:#f1f5f9; color:#ef4444;">หัก/เพิ่ม</th>
-                        </tr>
-                    </thead>
-                    <tbody id="student-behavior-history-body">
-                        <tr><td colspan='3' style='text-align:center;'>⏳ กำลังเชื่อมต่อข้อมูล...</td></tr>
-                    </tbody>
+                    <thead><tr><th style="background:#f1f5f9;">วันที่</th><th style="background:#f1f5f9;">รายการ</th><th style="background:#f1f5f9; color:#ef4444;">หัก/เพิ่ม</th></tr></thead>
+                    <tbody id="student-behavior-history-body"><tr><td colspan='3' style='text-align:center;'>⏳ กำลังเชื่อมต่อข้อมูล...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -417,9 +402,7 @@
 <div id="ai-mascot-container" style="position: fixed; bottom: 85px; right: 15px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end;">
     <div id="ai-help-popup" style="display: none; background: #fff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 260px; margin-bottom: 15px; border: 2px solid #f59e0b; overflow: hidden; transform-origin: bottom right; animation: popupScale 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
         <div style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 12px; font-weight: bold; font-size: 14px; display: flex; justify-content: space-between; align-items: center;">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:20px;">🏺</span> น้องไหบ้านเชียง AI
-            </div>
+            <div style="display:flex; align-items:center; gap:8px;"><span style="font-size:20px;">🏺</span> น้องไหบ้านเชียง AI</div>
             <span style="cursor: pointer; font-size:18px; padding:0 5px;" onclick="toggleAiPopup()">✖</span>
         </div>
         <div style="padding: 15px; font-size: 13px; color: #334155; max-height: 300px; overflow-y: auto; background: #fffbeb;">
@@ -430,56 +413,38 @@
             <button class="ai-help-btn" onclick="showAiHelp('admin')">⚙️ สำหรับผู้ดูแลระบบ</button>
         </div>
     </div>
-
     <div onclick="toggleAiPopup()" style="width: 65px; height: 65px; background: #fff; border-radius: 50%; box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); cursor: pointer; display: flex; justify-content: center; align-items: center; border: 3px solid #f59e0b; animation: floatMascot 3s ease-in-out infinite; overflow: hidden;">
         <span style="font-size: 38px;">🏺</span>
     </div>
 </div>
 
-<div id="teacher-instruction-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
-    </div>
-
 <div class="nav-menu" id="bottom-nav">
     <div class="nav-item active" onclick="switchPage('checklist-page', this)"><span>📝</span><br>เช็คชื่อ</div>
     <div class="nav-item" onclick="switchPage('daily-page', this)"><span>📅</span><br>รายสัปดาห์</div>
     <div class="nav-item" onclick="switchPage('summary-page', this)"><span>📊</span><br>รายงานสถิติ</div>
+    <div class="nav-item" onclick="switchPage('behavior-page', this)"><span>💯</span><br>พฤติกรรม</div>
 </div>
 
 <script>
-    // 🔗 API (ใส่ URL ล่าสุดของท่านรองฯ ตรงนี้ครับ)
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzDZH5_rmlohPInSpNX-o5b-5wgRacx7xOYkRsNrnWF3dTlzsvVuZ7m7JW1EA6BJz9H/exec";
+    // 🔗 วางลิงก์ URL Web App (New version) ของท่านรองฯ ตรงนี้ครับ
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxwS4lH7grTn2J1R9-vBnAb8M_hebn4na4nu5SJdvhrorOkh-HJNenVGsmmhDp7eyKB/exec"; 
     
     const IDLE_TIMEOUT = 5 * 60 * 1000; 
     let idleTimer = null;
 
-    // 🌟 ระบบควบคุม AI Mascot "น้องไหบ้านเชียง"
     function toggleAiPopup() {
         let popup = document.getElementById('ai-help-popup');
-        if (popup.style.display === 'none' || popup.style.display === '') {
-            popup.style.display = 'block';
-        } else {
-            popup.style.display = 'none';
-        }
+        if (popup.style.display === 'none' || popup.style.display === '') popup.style.display = 'block';
+        else popup.style.display = 'none';
     }
 
     function showAiHelp(topic) {
-        toggleAiPopup(); // ปิดหน้าต่างแชทเพื่อหลีกทางให้ SweetAlert
+        toggleAiPopup(); 
         let title = ""; let text = ""; let icon = 'info';
-        
-        if (topic === 'attendance') {
-            title = "📝 วิธีบันทึกการเข้าเรียน";
-            text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>สำหรับคุณครูประจำชั้น:</b><br>1. เข้าเมนู 'เช็คชื่อ'<br>2. วันที่ระบบจะตั้งเป็นวันนี้ให้อัตโนมัติ (เปลี่ยนวันย้อนหลังได้)<br>3. กดเลือกสถานะ (มา, สาย, ขาด, ลา)<br>4. กดปุ่ม <b>'💾 บันทึกข้อมูล'</b> ด้านล่างสุดเพียงครั้งเดียวจบครับ!</div>";
-        } else if (topic === 'leave') {
-            title = "📨 การแจ้งขออนุญาตลาหยุด";
-            text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>ฝั่งนักเรียน:</b> เข้าไปที่แท็บ 'แจ้งลา' > คลิกเลือกวันที่ในปฏิทิน (เลือกข้ามวันได้) > เลือกประเภทและใส่เหตุผล > กดส่งคำร้อง<br><br><b>ฝั่งครู:</b> เมื่อครูเปิดหน้าเช็คชื่อ ระบบจะดึงข้อมูลเด็กที่แจ้งลา มาใส่ในหน้าฟอร์มให้อัตโนมัติ พร้อมขึ้นป้ายสีส้มแจ้งเตือนครับ</div>";
-        } else if (topic === 'behavior') {
-            title = "💯 ระบบคะแนนพฤติกรรม";
-            text = "<div style='text-align:left; font-size:14px; line-height:1.6;'>ระบบจะตั้งคะแนนเริ่มต้นให้นักเรียนทุกคนที่ <b>100 คะแนน</b><br><br>🔴 <b>หากครูเช็คว่า 'ขาด':</b> ระบบหัก 5 คะแนนอัตโนมัติ<br>🟡 <b>หากครูเช็คว่า 'สาย':</b> ระบบหัก 2 คะแนนอัตโนมัติ<br><br><i>*หากครูคีย์ผิด แล้วมากด 'แก้ไข' ทีหลัง ระบบจะตามไปคืนคะแนนให้เด็กอัตโนมัติครับ ฉลาดสุดๆ!</i></div>";
-        } else if (topic === 'admin') {
-            title = "⚙️ สำหรับผู้ดูแลระบบ";
-            text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>สิ่งที่แอดมินทำได้:</b><br>1. ตั้งค่าปิด-เปิดระบบล็อกเวลาเช็คชื่อ<br>2. กำหนดวันหยุดนักขัตฤกษ์ (จิ้มจากปฏิทินได้เลย ระบบจะไม่ให้ครูเช็คชื่อในวันนั้น)<br>3. จัดการรายชื่อครูและนักเรียน<br>4. ดู Dashboard วิเคราะห์ข้อมูลระดับบริหารได้ทั้งหมดครับ</div>";
-        }
-
+        if (topic === 'attendance') { title = "📝 วิธีบันทึกการเข้าเรียน"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>สำหรับคุณครูประจำชั้น:</b><br>1. เข้าเมนู 'เช็คชื่อ'<br>2. วันที่ระบบจะตั้งเป็นวันนี้ให้อัตโนมัติ<br>3. กดเลือกสถานะ (มา, สาย, ขาด, ลา)<br>4. กดปุ่ม <b>'💾 บันทึกข้อมูล'</b> จบครับ!</div>"; } 
+        else if (topic === 'leave') { title = "📨 การแจ้งขออนุญาตลาหยุด"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>ฝั่งนักเรียน:</b> เข้าเมนู 'แจ้งลา' > เลือกวันที่ในปฏิทิน > กดส่งคำร้อง<br><br><b>ฝั่งครู:</b> ระบบจะดึงข้อมูลเด็กที่แจ้งลา มาใส่ในหน้าฟอร์มให้อัตโนมัติ พร้อมขึ้นป้ายเตือนสีส้มครับ</div>"; } 
+        else if (topic === 'behavior') { title = "💯 ระบบคะแนนพฤติกรรม"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'>ระบบจะตั้งคะแนนเริ่มต้นให้นักเรียนทุกคนที่ <b>100 คะแนน</b><br>🔴 <b>'ขาด':</b> หัก 5 คะแนน<br>🟡 <b>'สาย':</b> หัก 2 คะแนน<br><i>*หากครูคีย์ผิด แล้วมากด 'แก้ไข' กลับมาเป็น 'มา' ระบบจะคืนคะแนนให้อัตโนมัติครับ</i></div>"; } 
+        else if (topic === 'admin') { title = "⚙️ สำหรับผู้ดูแลระบบ"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>แอดมินทำได้:</b><br>1. ปิด-เปิดระบบล็อกเวลาเช็คชื่อ<br>2. กำหนดวันหยุดนักขัตฤกษ์<br>3. จัดการรายชื่อครูและนักเรียน<br>4. ดู Dashboard วิเคราะห์ข้อมูลระดับบริหาร</div>"; }
         Swal.fire({ title: title, html: text, icon: icon, confirmButtonText: 'เข้าใจแล้ว', confirmButtonColor: '#f59e0b' });
     }
 
@@ -490,53 +455,18 @@
         if (dateStr.includes('/')) { let parts = dateStr.split('/'); d = parseInt(parts[0], 10); m = parseInt(parts[1], 10); y = parseInt(parts[2], 10); } 
         else if (dateStr.includes('-')) { let parts = dateStr.split('-'); y = parseInt(parts[0], 10); m = parseInt(parts[1], 10); d = parseInt(parts[2], 10); } 
         else { return dateStr; }
-
         const tShort = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
         const tFull = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        
         if (y < 2500 && y > 1900) y += 543;
         return `${d} ${useFullMonth ? tFull[m] : tShort[m]} ${y}`;
     }
 
     window.onload = function() { updateClock(); checkSession(); };
-
-    function resetIdleTimer() {
-        if (!localStorage.getItem('sis_user')) return;
-        localStorage.setItem('sis_last_activity', Date.now());
-        clearTimeout(idleTimer);
-        idleTimer = setTimeout(autoLogout, IDLE_TIMEOUT);
-    }
-
-    function autoLogout() {
-        if(studentDataTimer) clearInterval(studentDataTimer); 
-        Swal.fire({ title: 'ระบบ SIS บ้านเชียงวิทยา', text: '⏱️ ระบบได้ออกจากระบบอัตโนมัติ เนื่องจากไม่มีการใช้งานเกิน 5 นาที', icon: 'warning', confirmButtonColor: '#1e56a0', confirmButtonText: 'ตกลง'
-        }).then(() => { localStorage.removeItem('sis_user'); localStorage.removeItem('sis_last_activity'); localStorage.removeItem('sis_current_page'); location.reload(); });
-    }
-
+    function resetIdleTimer() { if (!localStorage.getItem('sis_user')) return; localStorage.setItem('sis_last_activity', Date.now()); clearTimeout(idleTimer); idleTimer = setTimeout(autoLogout, IDLE_TIMEOUT); }
+    function autoLogout() { if(studentDataTimer) clearInterval(studentDataTimer); Swal.fire({ title: 'ระบบ SIS บ้านเชียงวิทยา', text: '⏱️ ระบบได้ออกจากระบบอัตโนมัติ เนื่องจากไม่มีการใช้งานเกิน 5 นาที', icon: 'warning', confirmButtonColor: '#1e56a0', confirmButtonText: 'ตกลง' }).then(() => { localStorage.removeItem('sis_user'); localStorage.removeItem('sis_last_activity'); localStorage.removeItem('sis_current_page'); location.reload(); }); }
     function setupActivityListeners() { ['mousemove', 'keydown', 'scroll', 'touchstart', 'click'].forEach(evt => document.addEventListener(evt, resetIdleTimer)); }
-
-    function checkSession() {
-        let userData = localStorage.getItem('sis_user'); let lastActivity = localStorage.getItem('sis_last_activity');
-        if (userData && lastActivity) {
-            if (Date.now() - parseInt(lastActivity) > IDLE_TIMEOUT) {
-                localStorage.removeItem('sis_user'); localStorage.removeItem('sis_last_activity'); localStorage.removeItem('sis_current_page');
-            } else {
-                let data = JSON.parse(userData); routeUser(data); setupActivityListeners(); resetIdleTimer();
-            }
-        }
-    }
-
-    function updateClock() {
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-        
-        if(document.getElementById('login-clock')) {
-            document.getElementById('login-clock').innerHTML = `${dateStr}<br><span style="font-size: 1.3em; color: #1e56a0; letter-spacing: 1px;">${timeStr} น.</span>`;
-        }
-        if(document.getElementById('display-date')) document.getElementById('display-date').innerText = dateStr;
-        if(document.getElementById('display-clock')) document.getElementById('display-clock').innerText = `🕒 ${timeStr} น.`;
-    }
+    function checkSession() { let userData = localStorage.getItem('sis_user'); let lastActivity = localStorage.getItem('sis_last_activity'); if (userData && lastActivity) { if (Date.now() - parseInt(lastActivity) > IDLE_TIMEOUT) { localStorage.removeItem('sis_user'); localStorage.removeItem('sis_last_activity'); localStorage.removeItem('sis_current_page'); } else { let data = JSON.parse(userData); routeUser(data); setupActivityListeners(); resetIdleTimer(); } } }
+    function updateClock() { const now = new Date(); const dateStr = now.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }); if(document.getElementById('login-clock')) { document.getElementById('login-clock').innerHTML = `${dateStr}<br><span style="font-size: 1.3em; color: #1e56a0; letter-spacing: 1px;">${timeStr} น.</span>`; } if(document.getElementById('display-date')) document.getElementById('display-date').innerText = dateStr; if(document.getElementById('display-clock')) document.getElementById('display-clock').innerText = `🕒 ${timeStr} น.`; }
     setInterval(updateClock, 1000);
 
     function cleanName(fullName) { return fullName ? fullName.replace(/^(เด็กชาย|เด็กหญิง|นาย|นางสาว|ด\.ช\.|ด\.ญ\.)\s*/g, "").trim() : ""; }
@@ -545,97 +475,46 @@
     let allAdminStudentsData = [], adminHolidays = [], adminTermStart = "", adminTermEnd = "";
     let timeLimitConfig = { enabled: false, start: "", end: "" }; 
     let execFullAttendance = [], execFullStudents = [], execChartInstance = null;
+    let studentLeaveDates = []; let currentStudentCalendarDate = new Date(); let studentDataTimer = null;
 
-    let studentLeaveDates = [];
-    let currentStudentCalendarDate = new Date();
-    let studentDataTimer = null;
-
-    document.getElementById('admin-time-limit-toggle').addEventListener('change', function() {
-        let inputs = document.getElementById('time-limit-inputs'); let text = document.getElementById('time-limit-status-text');
-        if(this.checked) { inputs.style.display = 'flex'; text.innerText = 'เปิดใช้งาน (ล็อกเวลาเช็คชื่อ)'; text.style.color = '#10b981';
-        } else { inputs.style.display = 'none'; text.innerText = 'ปิดใช้งาน (ครูบันทึกได้ตลอดเวลา)'; text.style.color = '#64748b'; }
-    });
-
-    function switchAdminTab(tabId, element) {
-        document.querySelectorAll('.admin-tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active'); element.classList.add('active');
-    }
-
-    function switchStudentTab(tabId, element) {
-        document.querySelectorAll('.student-tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.student-tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active'); element.classList.add('active');
-    }
+    document.getElementById('admin-time-limit-toggle').addEventListener('change', function() { let inputs = document.getElementById('time-limit-inputs'); let text = document.getElementById('time-limit-status-text'); if(this.checked) { inputs.style.display = 'flex'; text.innerText = 'เปิดใช้งาน (ล็อกเวลาเช็คชื่อ)'; text.style.color = '#10b981'; } else { inputs.style.display = 'none'; text.innerText = 'ปิดใช้งาน (ครูบันทึกได้ตลอดเวลา)'; text.style.color = '#64748b'; } });
+    function switchAdminTab(tabId, element) { document.querySelectorAll('.admin-tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active')); document.getElementById(tabId).classList.add('active'); element.classList.add('active'); }
+    function switchStudentTab(tabId, element) { document.querySelectorAll('.student-tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.student-tab-btn').forEach(btn => btn.classList.remove('active')); document.getElementById(tabId).classList.add('active'); element.classList.add('active'); }
 
     function handleLogin() {
         const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim(), btn = document.getElementById('login-btn');
         if (!u || !p) { Swal.fire('ระบบ SIS', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
         btn.innerText = "⏳ กำลังเข้าสู่ระบบ..."; btn.disabled = true;
-        
-        fetch(`${GAS_API_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`)
-            .then(res => res.json()).then(data => {
-                btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false;
-                if (data.status === "success") {
-                    data.userId = u; localStorage.setItem('sis_user', JSON.stringify(data)); localStorage.setItem('sis_last_activity', Date.now());
-                    routeUser(data); setupActivityListeners(); resetIdleTimer();
-                } else Swal.fire('ระบบ SIS', '❌ รหัสผ่านไม่ถูกต้อง', 'error');
-            }).catch((err) => { 
-                btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; 
-                Swal.fire('ระบบ SIS', '❌ เชื่อมต่อล้มเหลว กรุณาเปิดผ่าน Google Chrome', 'error'); 
-            });
+        fetch(`${GAS_API_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`).then(res => res.json()).then(data => { btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; if (data.status === "success") { data.userId = u; localStorage.setItem('sis_user', JSON.stringify(data)); localStorage.setItem('sis_last_activity', Date.now()); routeUser(data); setupActivityListeners(); resetIdleTimer(); } else Swal.fire('ระบบ SIS', '❌ รหัสผ่านไม่ถูกต้อง', 'error'); }).catch((err) => { btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; Swal.fire('ระบบ SIS', '❌ เชื่อมต่อล้มเหลว กรุณาเปิดผ่าน Google Chrome', 'error'); });
     }
 
     function routeUser(data) {
         try {
-            document.getElementById('user-display').innerText = `👤 ${data.name}`;
-            document.getElementById('logout-btn').style.display = 'block';
-            document.getElementById('status-bar').style.display = 'flex';
-            let savedPage = localStorage.getItem('sis_current_page');
-            let role = data.role ? data.role.toString().trim().toLowerCase() : "";
-
+            document.getElementById('user-display').innerText = `👤 ${data.name}`; document.getElementById('logout-btn').style.display = 'block'; document.getElementById('status-bar').style.display = 'flex';
+            let savedPage = localStorage.getItem('sis_current_page'); let role = data.role ? data.role.toString().trim().toLowerCase() : "";
             if (role === "teacher") { 
-                currentTeacher = data.name; currentClass = data.className || ""; 
-                document.getElementById('class-title').innerText = `(${currentClass})`; document.getElementById('bottom-nav').style.display = 'flex';
-                
-                if(savedPage === 'daily-page') switchPage('daily-page', document.querySelectorAll('.nav-item')[1]); 
-                else if(savedPage === 'summary-page') switchPage('summary-page', document.querySelectorAll('.nav-item')[2]); 
-                else switchPage('checklist-page', document.querySelectorAll('.nav-item')[0]);
+                currentTeacher = data.name; currentClass = data.className || ""; document.getElementById('class-title').innerText = `(${currentClass})`; document.getElementById('beh-class-title').innerText = `(${currentClass})`; document.getElementById('bottom-nav').style.display = 'flex';
+                let navItems = document.querySelectorAll('.nav-item');
+                if(savedPage === 'daily-page' && navItems.length > 1) switchPage('daily-page', navItems[1]); 
+                else if(savedPage === 'summary-page' && navItems.length > 2) switchPage('summary-page', navItems[2]); 
+                else if(savedPage === 'behavior-page' && navItems.length > 3) switchPage('behavior-page', navItems[3]); 
+                else switchPage('checklist-page', navItems[0]);
                 
                 fetch(`${GAS_API_URL}?action=get_admin_data`).then(res => res.json()).then(adminData => {
                     if(adminData.status === "success") {
-                        adminHolidays = (adminData.config.holidays || []).filter(h => h.trim() !== ""); adminTermStart = adminData.config.startDate; adminTermEnd = adminData.config.endDate;
-                        timeLimitConfig = { enabled: adminData.config.timeLimitEnabled, start: adminData.config.startTime, end: adminData.config.endTime };
-                        
+                        adminHolidays = (adminData.config.holidays || []).filter(h => h.trim() !== ""); adminTermStart = adminData.config.startDate; adminTermEnd = adminData.config.endDate; timeLimitConfig = { enabled: adminData.config.timeLimitEnabled, start: adminData.config.startTime, end: adminData.config.endTime };
                         let modalText = document.getElementById('modal-time-limit-text');
-                        if (modalText) {
-                            if (timeLimitConfig.enabled) modalText.innerHTML = `<b>2. เวลาบันทึก:</b> กรุณาบันทึกข้อมูลในช่วงเวลา <b style="color:#ef4444; font-size:15px;">${timeLimitConfig.start} - ${timeLimitConfig.end} น.</b> เท่านั้น`;
-                            else modalText.innerHTML = `<b>2. เวลาบันทึก:</b> ปัจจุบันระบบ <b style="color:#10b981;">เปิดให้บันทึกได้ตลอดเวลา</b>`;
-                        }
+                        if (modalText) { if (timeLimitConfig.enabled) modalText.innerHTML = `<b>2. เวลาบันทึก:</b> กรุณาบันทึกข้อมูลในช่วงเวลา <b style="color:#ef4444; font-size:15px;">${timeLimitConfig.start} - ${timeLimitConfig.end} น.</b> เท่านั้น`; else modalText.innerHTML = `<b>2. เวลาบันทึก:</b> ปัจจุบันระบบ <b style="color:#10b981;">เปิดให้บันทึกได้ตลอดเวลา</b>`; }
                         if (!sessionStorage.getItem('teacher_modal_seen')) document.getElementById('teacher-instruction-modal').style.display = 'flex';
                     }
                     if(!savedPage || savedPage === 'checklist-page') fetchStudents(); 
                 }).catch(e => console.log("Admin config fetch error", e));
-                
-            } else if(role === "admin") { 
-                switchPage('admin-page', null); loadAdminData();
-            } else if(role === "executive" || role === "boss") { 
-                switchPage('exec-page', null); fetchFullExecData();
-            } else if(role === "student") { 
-                switchPage('student-page', null); 
-                loadStudentReport(data.userId, false); 
-                renderStudentCalendar(); 
-                if(studentDataTimer) clearInterval(studentDataTimer);
-                studentDataTimer = setInterval(() => { loadStudentReport(data.userId, true); }, 10000); 
-            } else {
-                Swal.fire('ระบบ SIS', '❌ ไม่พบสิทธิ์การเข้าถึงข้อมูล กรุณาติดต่อผู้ดูแลระบบ', 'error');
-            }
-        } catch (err) {
-            Swal.fire('ระบบ SIS', '❌ เกิดข้อผิดพลาดในการโหลดหน้าจอ: ' + err.message, 'error');
-        }
+            } else if(role === "admin") { switchPage('admin-page', null); loadAdminData();
+            } else if(role === "executive" || role === "boss") { switchPage('exec-page', null); fetchFullExecData();
+            } else if(role === "student") { switchPage('student-page', null); loadStudentReport(data.userId, false); renderStudentCalendar(); if(studentDataTimer) clearInterval(studentDataTimer); studentDataTimer = setInterval(() => { loadStudentReport(data.userId, true); }, 10000); 
+            } else { Swal.fire('ระบบ SIS', '❌ ไม่พบสิทธิ์การเข้าถึงข้อมูล กรุณาติดต่อผู้ดูแลระบบ', 'error'); }
+        } catch (err) { Swal.fire('ระบบ SIS', '❌ เกิดข้อผิดพลาดในการโหลดหน้าจอ: ' + err.message, 'error'); }
     }
-
-    function closeTeacherModal() { document.getElementById('teacher-instruction-modal').style.display = 'none'; sessionStorage.setItem('teacher_modal_seen', 'true'); }
 
     function switchPage(pageId, element) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -644,150 +523,94 @@
         localStorage.setItem('sis_current_page', pageId);
         if (pageId === 'daily-page' && currentClass) loadWeeklyData(); 
         if (pageId === 'summary-page' && currentClass) loadSummaryData();
+        // 🌟 ถ้าครูกดแท็บ "พฤติกรรม" ให้ดึงข้อมูลมาแสดง
+        if (pageId === 'behavior-page' && currentClass) loadClassBehaviorData(); 
+    }
+
+    // 🌟 ฟังก์ชันดึงคะแนนพฤติกรรมทั้งห้อง (สำหรับครู)
+    function loadClassBehaviorData() {
+        let tbody = document.getElementById('behavior-body');
+        tbody.innerHTML = `<tr><td colspan='5' style='text-align:center;'>⏳ กำลังดึงข้อมูลคะแนนพฤติกรรม...</td></tr>`;
+
+        fetch(`${GAS_API_URL}?action=get_class_behavior&className=${encodeURIComponent(currentClass)}`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "success") {
+                let html = "";
+                // เรียงตามเลขที่
+                data.data.sort((a,b) => parseInt(a.number) - parseInt(b.number));
+
+                data.data.forEach(std => {
+                    let netColor = std.netScore >= 80 ? '#10b981' : (std.netScore >= 60 ? '#f59e0b' : '#ef4444');
+                    html += `<tr>
+                        <td style="text-align:center;">${std.number}</td>
+                        <td>${cleanName(std.name)}</td>
+                        <td style="text-align:center; color:#ef4444; font-weight:bold;">${std.deduction < 0 ? std.deduction : '-'}</td>
+                        <td style="text-align:center; color:#10b981; font-weight:bold;">${std.bonus > 0 ? '+' + std.bonus : '-'}</td>
+                        <td style="text-align:center; color:${netColor}; font-weight:bold; font-size:14px;">${std.netScore}</td>
+                    </tr>`;
+                });
+                
+                if (data.data.length === 0) {
+                    html = `<tr><td colspan='5' style='text-align:center; color:#ef4444;'>❌ ไม่พบข้อมูลนักเรียน</td></tr>`;
+                }
+                tbody.innerHTML = html;
+            }
+        });
     }
 
     function fetchStudents() {
         let dateInput = document.getElementById('check-date');
-        if(!dateInput.value) {
-            let d = new Date(); let month = '' + (d.getMonth() + 1), day = '' + d.getDate(), year = d.getFullYear();
-            if (month.length < 2) month = '0' + month; if (day.length < 2) day = '0' + day;
-            dateInput.value = [year, month, day].join('-');
-        }
+        if(!dateInput.value) { let d = new Date(); let month = '' + (d.getMonth() + 1), day = '' + d.getDate(), year = d.getFullYear(); if (month.length < 2) month = '0' + month; if (day.length < 2) day = '0' + day; dateInput.value = [year, month, day].join('-'); }
         let selectedDateStr = dateInput.value;
-        
-        let dObj = new Date(selectedDateStr); let isWeekend = (dObj.getDay() === 0 || dObj.getDay() === 6); let isHoliday = adminHolidays.includes(selectedDateStr);
-        let isOutsideTerm = false;
+        let dObj = new Date(selectedDateStr); let isWeekend = (dObj.getDay() === 0 || dObj.getDay() === 6); let isHoliday = adminHolidays.includes(selectedDateStr); let isOutsideTerm = false;
         if (adminTermStart && adminTermEnd) { let sD = new Date(adminTermStart); sD.setHours(0,0,0,0); let eD = new Date(adminTermEnd); eD.setHours(23,59,59,999); if(dObj < sD || dObj > eD) isOutsideTerm = true; }
-
         if (isOutsideTerm) { document.getElementById('student-list-container').innerHTML = `<div style="background:#f1f5f9; padding:20px; text-align:center; border-radius:10px;"><h3>📅 นอกช่วงเปิดเทอม</h3></div>`; document.getElementById('save-btn').style.display = 'none'; return; }
         if (isWeekend || isHoliday) { document.getElementById('student-list-container').innerHTML = `<div style="background:#fee2e2; padding:20px; text-align:center; color:#b91c1c; border-radius:10px;"><h3>⛔ ปิดระบบเช็คชื่อ (วันหยุด)</h3></div>`; document.getElementById('save-btn').style.display = 'none'; return; }
-        
-        if (timeLimitConfig && timeLimitConfig.enabled && timeLimitConfig.start && timeLimitConfig.end) {
-            let nowStr = new Date().toLocaleTimeString('th-TH', { hour12: false, hour: '2-digit', minute: '2-digit' });
-            if (selectedDateStr === new Date().toISOString().split('T')[0]) {
-                if (nowStr < timeLimitConfig.start || nowStr > timeLimitConfig.end) {
-                    document.getElementById('student-list-container').innerHTML = `<div style="background:#fff7ed; padding:20px; text-align:center; color:#c2410c; border-radius:10px;"><h3>⏰ นอกเวลาเช็คชื่อ</h3><p>ระบบเปิดเวลา ${timeLimitConfig.start} - ${timeLimitConfig.end} น.</p></div>`;
-                    document.getElementById('save-btn').style.display = 'none'; return;
-                }
-            }
-        }
+        if (timeLimitConfig && timeLimitConfig.enabled && timeLimitConfig.start && timeLimitConfig.end) { let nowStr = new Date().toLocaleTimeString('th-TH', { hour12: false, hour: '2-digit', minute: '2-digit' }); if (selectedDateStr === new Date().toISOString().split('T')[0]) { if (nowStr < timeLimitConfig.start || nowStr > timeLimitConfig.end) { document.getElementById('student-list-container').innerHTML = `<div style="background:#fff7ed; padding:20px; text-align:center; color:#c2410c; border-radius:10px;"><h3>⏰ นอกเวลาเช็คชื่อ</h3><p>ระบบเปิดเวลา ${timeLimitConfig.start} - ${timeLimitConfig.end} น.</p></div>`; document.getElementById('save-btn').style.display = 'none'; return; } } }
 
         document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px;">⏳ กำลังโหลดรายชื่อ...</div>`; document.getElementById('save-btn').style.display = 'none'; 
         
-        fetch(`${GAS_API_URL}?action=get_students&className=${encodeURIComponent(currentClass)}`)
-        .then(res => res.text())
-        .then(text => {
-            try { return JSON.parse(text); } 
-            catch(e) { throw new Error("ระบบหลังบ้านขัดข้อง กรุณาตรวจสอบว่า Deploy เป็น New Version หรือยัง"); }
-        })
-        .then(data => {
+        fetch(`${GAS_API_URL}?action=get_students&className=${encodeURIComponent(currentClass)}`).then(res => res.text()).then(text => { try { return JSON.parse(text); } catch(e) { throw new Error("ระบบหลังบ้านขัดข้อง กรุณาตรวจสอบว่า Deploy เป็น New Version หรือยัง"); } }).then(data => {
             if(data.status === "success") {
                 students = data.data;
-                if(students.length === 0) {
-                    document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ ไม่พบรายชื่อนักเรียนห้อง ${currentClass} (โปรดตรวจสอบฐานข้อมูลชีต Users กับ Students)</div>`;
-                    return;
-                }
-                
+                if(students.length === 0) { document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ ไม่พบรายชื่อนักเรียนห้อง ${currentClass} (โปรดตรวจสอบฐานข้อมูลชีต Users กับ Students)</div>`; return; }
                 Promise.all([
                     fetch(`${GAS_API_URL}?action=check_existing&className=${encodeURIComponent(currentClass)}&date=${selectedDateStr}`).then(r => r.json()).catch(e => ({status: "not_found"})),
                     fetch(`${GAS_API_URL}?action=get_leaves_for_date&className=${encodeURIComponent(currentClass)}&date=${selectedDateStr}`).then(r => r.json()).catch(e => ({status: "error", data: {}}))
                 ]).then(([check, leaves]) => {
-                    let existingData = check.status === "found" ? check.data : null;
-                    let leaveData = leaves.status === "success" ? leaves.data : {};
-                    renderChecklist(existingData, check.recordedBy, leaveData);
-                    loadQuickAIInsight(); 
-                    
-                    if (!existingData && Object.keys(leaveData).length > 0) {
-                        let leaveListHTML = ""; let count = 0;
-                        students.forEach(std => { if(leaveData[std.id]) { count++; leaveListHTML += `<div style="padding: 5px 0; border-bottom: 1px dashed #eee;"><b>${count}. ${cleanName(std.name)}</b> <span style="color:#ef4444; font-size:12px;">(${leaveData[std.id].type})</span></div>`; } });
-                        if (count > 0) {
-                            Swal.fire({
-                                title: '📢 แจ้งเตือนนักเรียนลาหยุด',
-                                html: `วันนี้มีนักเรียนแจ้งลาผ่านระบบจำนวน <b>${count}</b> คน<br><br><div style="text-align:left; background:#f8fafc; padding:10px; border-radius:8px; max-height:150px; overflow-y:auto; font-size:14px;">${leaveListHTML}</div><br><span style="color:#10b981; font-size:13px; font-weight:bold;">✅ ระบบได้ดึงข้อมูลลงในแบบฟอร์มให้ท่านเรียบร้อยแล้ว</span>`,
-                                icon: 'info', confirmButtonText: 'รับทราบ', confirmButtonColor: '#1e56a0'
-                            });
-                        }
-                    }
-                }).catch(err => {
-                    console.log("Secondary fetch error:", err);
-                    renderChecklist(null, "", {});
-                    loadQuickAIInsight();
-                });
-            } else {
-                document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ เกิดข้อผิดพลาด: ${data.message}</div>`;
-            }
-        }).catch(err => {
-            console.error(err);
-            document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444; font-weight:bold;">❌ ${err.message}</div>`;
-        });
+                    let existingData = check.status === "found" ? check.data : null; let leaveData = leaves.status === "success" ? leaves.data : {}; renderChecklist(existingData, check.recordedBy, leaveData); loadQuickAIInsight(); 
+                    if (!existingData && Object.keys(leaveData).length > 0) { let leaveListHTML = ""; let count = 0; students.forEach(std => { if(leaveData[std.id]) { count++; leaveListHTML += `<div style="padding: 5px 0; border-bottom: 1px dashed #eee;"><b>${count}. ${cleanName(std.name)}</b> <span style="color:#ef4444; font-size:12px;">(${leaveData[std.id].type})</span></div>`; } }); if (count > 0) { Swal.fire({ title: '📢 แจ้งเตือนนักเรียนลาหยุด', html: `วันนี้มีนักเรียนแจ้งลาผ่านระบบจำนวน <b>${count}</b> คน<br><br><div style="text-align:left; background:#f8fafc; padding:10px; border-radius:8px; max-height:150px; overflow-y:auto; font-size:14px;">${leaveListHTML}</div><br><span style="color:#10b981; font-size:13px; font-weight:bold;">✅ ระบบได้ดึงข้อมูลลงในแบบฟอร์มให้ท่านเรียบร้อยแล้ว</span>`, icon: 'info', confirmButtonText: 'รับทราบ', confirmButtonColor: '#1e56a0' }); } }
+                }).catch(err => { console.log("Secondary fetch error:", err); renderChecklist(null, "", {}); loadQuickAIInsight(); });
+            } else { document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ เกิดข้อผิดพลาด: ${data.message}</div>`; }
+        }).catch(err => { document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444; font-weight:bold;">❌ ${err.message}</div>`; });
     }
 
     function renderChecklist(existing, recorder, leaveData) {
         const container = document.getElementById('student-list-container'); container.innerHTML = "";
-        if(existing) {
-            container.innerHTML = `<div style="background:#fff3cd; color:#856404; padding:10px; border-radius:8px; margin-bottom:15px; font-weight:bold; font-size:13px; text-align:center;">⚠️ บันทึกข้อมูลแล้วโดย: ${recorder} <br><span style="font-weight:normal; font-size:12px; color:#666;">(กด "แก้ไข" ด้านหลังเพื่อเปลี่ยนสถานะรายบุคคล)</span></div>`;
-            document.getElementById('save-btn').style.display = 'none'; 
-        } else document.getElementById('save-btn').style.display = 'block'; 
-
+        if(existing) { container.innerHTML = `<div style="background:#fff3cd; color:#856404; padding:10px; border-radius:8px; margin-bottom:15px; font-weight:bold; font-size:13px; text-align:center;">⚠️ บันทึกข้อมูลแล้วโดย: ${recorder} <br><span style="font-weight:normal; font-size:12px; color:#666;">(กด "แก้ไข" ด้านหลังเพื่อเปลี่ยนสถานะรายบุคคล)</span></div>`; document.getElementById('save-btn').style.display = 'none'; } else document.getElementById('save-btn').style.display = 'block'; 
         students.forEach(std => {
             let st = 'มา'; let nt = ''; let hasLeave = false;
-            if (existing && existing[std.id]) { st = existing[std.id].status; nt = existing[std.id].note;
-            } else if (leaveData && leaveData[std.id]) { st = leaveData[std.id].type; nt = "[แจ้งลา] " + leaveData[std.id].reason; hasLeave = true; }
-            
-            attendanceData[std.id] = { status: st, note: nt };
-            const displayName = cleanName(std.name); const imgUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=1e56a0&color=fff&size=128&rounded=true`;
-
+            if (existing && existing[std.id]) { st = existing[std.id].status; nt = existing[std.id].note; } else if (leaveData && leaveData[std.id]) { st = leaveData[std.id].type; nt = "[แจ้งลา] " + leaveData[std.id].reason; hasLeave = true; }
+            attendanceData[std.id] = { status: st, note: nt }; const displayName = cleanName(std.name); const imgUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=1e56a0&color=fff&size=128&rounded=true`;
             let row = document.createElement('div'); row.className = `student-row row-${st}`; row.id = `row-${std.id}`; row.style.flexWrap = "wrap"; 
-            let leaveBadge = hasLeave ? `<br><span style="background:#fef3c7; border:1px solid #f59e0b; color:#ea580c; font-size:10px; padding:2px 6px; border-radius:10px;">แจ้งลาล่วงหน้า</span>` : '';
-            let btnNoteColor = nt ? "background:#f59e0b; color:white; border:none;" : "background:none; border:1px solid #ccc; color:#666;";
-
-            if (existing) {
-                let c = st==='มา'?'#10b981':st==='ขาด'?'#ef4444':st==='สาย'?'#eab308':st==='เรียนนอกโรงเรียน'?'#3b82f6':'#f97316';
-                row.innerHTML = `
-                    <div class="student-number">${std.number}</div><img src="${imgUrl}" class="student-img"><div class="student-name">${displayName}${leaveBadge}</div>
-                    <div id="view-${std.id}" style="display:flex; align-items:center; gap:10px; margin-left:auto;"><div style="text-align:right; font-size:13px; font-weight:bold; color:${c};">${st}</div><button onclick="enableEdit('${std.id}')" style="background:#f1f5f9; border:1px solid #cbd5e1; color:#475569; padding:5px 10px; border-radius:6px; font-size:12px; cursor:pointer;">✏️ แก้ไข</button></div>
-                    <div id="edit-${std.id}" style="display:none; width:100%; margin-top:10px; padding-top:10px; border-top:1px dashed #e2e8f0; flex-direction:column; gap:8px;">
-                        <div style="display:flex; gap:8px; width:100%;">
-                            <select id="sel-${std.id}" class="status-dropdown" style="flex:1;"><option value="มา" ${st==='มา'?'selected':''}>✅ มา</option><option value="สาย" ${st==='สาย'?'selected':''}>⏰ สาย</option><option value="ลากิจ" ${st==='ลากิจ'?'selected':''}>📝 ลากิจ</option><option value="ลาป่วย" ${st==='ลาป่วย'?'selected':''}>🤒 ลาป่วย</option><option value="เรียนนอกโรงเรียน" ${st==='เรียนนอกโรงเรียน'?'selected':''}>🌍 นอกสถานที่</option><option value="ขาด" ${st==='ขาด'?'selected':''}>❌ ขาด</option></select>
-                            <input type="text" id="nt-${std.id}" placeholder="ระบุหมายเหตุ..." value="${nt}" style="flex:2; font-size:13px; padding:6px; border:1px solid #ccc; border-radius:6px;">
-                        </div>
-                        <div style="display:flex; gap:8px; width:100%;">
-                            <button id="btn-save-${std.id}" onclick="saveSingleUpdate('${std.id}')" style="flex:1; background:#10b981; padding:8px; font-size:13px; color:white; border:none; border-radius:6px;">💾 บันทึก</button><button onclick="cancelEdit('${std.id}')" style="flex:1; background:#ef4444; padding:8px; font-size:13px; color:white; border:none; border-radius:6px;">ยกเลิก</button>
-                        </div>
-                    </div>`;
-            } else {
-                row.innerHTML = `
-                    <div class="student-number">${std.number}</div><img src="${imgUrl}" class="student-img"><div class="student-name">${displayName}${leaveBadge}</div>
-                    <select class="status-dropdown" onchange="setStatus('${std.id}', this.value)" style="margin-left:auto;"><option value="มา" ${st==='มา'?'selected':''}>✅ มา</option><option value="สาย" ${st==='สาย'?'selected':''}>⏰ สาย</option><option value="ลากิจ" ${st==='ลากิจ'?'selected':''}>📝 ลากิจ</option><option value="ลาป่วย" ${st==='ลาป่วย'?'selected':''}>🤒 ลาป่วย</option><option value="เรียนนอกโรงเรียน" ${st==='เรียนนอกโรงเรียน'?'selected':''}>🌍 นอกสถานที่</option><option value="ขาด" ${st==='ขาด'?'selected':''}>❌ ขาด</option></select>
-                    <button class="btn-note" style="${btnNoteColor}" onclick="toggleNote('${std.id}')">📝</button>
-                    <div id="note-box-${std.id}" style="display:none; position:absolute; right:10px; top:50px; z-index:100; background:white; padding:10px; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.15); width:220px; border:1px solid #eee;"><textarea class="behavior-note" id="note-${std.id}" placeholder="ระบุหมายเหตุ...">${nt}</textarea><button onclick="toggleNote('${std.id}')" style="width:100%; margin-top:8px; background:var(--primary); font-size:12px; padding:6px; color:white; border:none; border-radius:6px;">ตกลง</button></div>`;
-            }
+            let leaveBadge = hasLeave ? `<br><span style="background:#fef3c7; border:1px solid #f59e0b; color:#ea580c; font-size:10px; padding:2px 6px; border-radius:10px;">แจ้งลาล่วงหน้า</span>` : ''; let btnNoteColor = nt ? "background:#f59e0b; color:white; border:none;" : "background:none; border:1px solid #ccc; color:#666;";
+            if (existing) { let c = st==='มา'?'#10b981':st==='ขาด'?'#ef4444':st==='สาย'?'#eab308':st==='เรียนนอกโรงเรียน'?'#3b82f6':'#f97316'; row.innerHTML = `<div class="student-number">${std.number}</div><img src="${imgUrl}" class="student-img"><div class="student-name">${displayName}${leaveBadge}</div><div id="view-${std.id}" style="display:flex; align-items:center; gap:10px; margin-left:auto;"><div style="text-align:right; font-size:13px; font-weight:bold; color:${c};">${st}</div><button onclick="enableEdit('${std.id}')" style="background:#f1f5f9; border:1px solid #cbd5e1; color:#475569; padding:5px 10px; border-radius:6px; font-size:12px; cursor:pointer;">✏️ แก้ไข</button></div><div id="edit-${std.id}" style="display:none; width:100%; margin-top:10px; padding-top:10px; border-top:1px dashed #e2e8f0; flex-direction:column; gap:8px;"><div style="display:flex; gap:8px; width:100%;"><select id="sel-${std.id}" class="status-dropdown" style="flex:1;"><option value="มา" ${st==='มา'?'selected':''}>✅ มา</option><option value="สาย" ${st==='สาย'?'selected':''}>⏰ สาย</option><option value="ลากิจ" ${st==='ลากิจ'?'selected':''}>📝 ลากิจ</option><option value="ลาป่วย" ${st==='ลาป่วย'?'selected':''}>🤒 ลาป่วย</option><option value="เรียนนอกโรงเรียน" ${st==='เรียนนอกโรงเรียน'?'selected':''}>🌍 นอกสถานที่</option><option value="ขาด" ${st==='ขาด'?'selected':''}>❌ ขาด</option></select><input type="text" id="nt-${std.id}" placeholder="ระบุหมายเหตุ..." value="${nt}" style="flex:2; font-size:13px; padding:6px; border:1px solid #ccc; border-radius:6px;"></div><div style="display:flex; gap:8px; width:100%;"><button id="btn-save-${std.id}" onclick="saveSingleUpdate('${std.id}')" style="flex:1; background:#10b981; padding:8px; font-size:13px; color:white; border:none; border-radius:6px;">💾 บันทึก</button><button onclick="cancelEdit('${std.id}')" style="flex:1; background:#ef4444; padding:8px; font-size:13px; color:white; border:none; border-radius:6px;">ยกเลิก</button></div></div>`; } 
+            else { row.innerHTML = `<div class="student-number">${std.number}</div><img src="${imgUrl}" class="student-img"><div class="student-name">${displayName}${leaveBadge}</div><select class="status-dropdown" onchange="setStatus('${std.id}', this.value)" style="margin-left:auto;"><option value="มา" ${st==='มา'?'selected':''}>✅ มา</option><option value="สาย" ${st==='สาย'?'selected':''}>⏰ สาย</option><option value="ลากิจ" ${st==='ลากิจ'?'selected':''}>📝 ลากิจ</option><option value="ลาป่วย" ${st==='ลาป่วย'?'selected':''}>🤒 ลาป่วย</option><option value="เรียนนอกโรงเรียน" ${st==='เรียนนอกโรงเรียน'?'selected':''}>🌍 นอกสถานที่</option><option value="ขาด" ${st==='ขาด'?'selected':''}>❌ ขาด</option></select><button class="btn-note" style="${btnNoteColor}" onclick="toggleNote('${std.id}')">📝</button><div id="note-box-${std.id}" style="display:none; position:absolute; right:10px; top:50px; z-index:100; background:white; padding:10px; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.15); width:220px; border:1px solid #eee;"><textarea class="behavior-note" id="note-${std.id}" placeholder="ระบุหมายเหตุ...">${nt}</textarea><button onclick="toggleNote('${std.id}')" style="width:100%; margin-top:8px; background:var(--primary); font-size:12px; padding:6px; color:white; border:none; border-radius:6px;">ตกลง</button></div>`; }
             container.appendChild(row);
         });
     }
 
     function enableEdit(id) { document.getElementById(`view-${id}`).style.display = 'none'; document.getElementById(`edit-${id}`).style.display = 'flex'; }
     function cancelEdit(id) { document.getElementById(`view-${id}`).style.display = 'flex'; document.getElementById(`edit-${id}`).style.display = 'none'; }
-    
-    function saveSingleUpdate(id) {
-        let btn = document.getElementById(`btn-save-${id}`); btn.innerText = "⏳..."; btn.disabled = true;
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "update_single", date: document.getElementById('check-date').value, id: id, className: currentClass, status: document.getElementById(`sel-${id}`).value, note: document.getElementById(`nt-${id}`).value, teacherName: currentTeacher }) 
-        }).then(res => res.json()).then(data => { if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ แก้ไขสำเร็จ', 'success'); fetchStudents(); } else { Swal.fire('ระบบ SIS', '❌ ' + data.message, 'error'); btn.innerText = "💾 บันทึก"; btn.disabled = false; } });
-    }
-
+    function saveSingleUpdate(id) { let btn = document.getElementById(`btn-save-${id}`); btn.innerText = "⏳..."; btn.disabled = true; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "update_single", date: document.getElementById('check-date').value, id: id, className: currentClass, status: document.getElementById(`sel-${id}`).value, note: document.getElementById(`nt-${id}`).value, teacherName: currentTeacher }) }).then(res => res.json()).then(data => { if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ แก้ไขสำเร็จ', 'success'); fetchStudents(); } else { Swal.fire('ระบบ SIS', '❌ ' + data.message, 'error'); btn.innerText = "💾 บันทึก"; btn.disabled = false; } }); }
     function setStatus(id, s) { attendanceData[id].status = s; document.getElementById(`row-${id}`).className = `student-row row-${s}`; }
     function toggleNote(id) { let b = document.getElementById(`note-box-${id}`); b.style.display = b.style.display === 'none' ? 'block' : 'none'; }
 
     function saveAttendance() {
         const btn = document.getElementById('save-btn'); btn.innerText = "⏳ ระบบกำลังส่งข้อมูล..."; btn.disabled = true;
-        let records = [];
-        students.forEach(s => records.push({ id: s.id, name: s.name, className: currentClass, status: attendanceData[s.id].status, note: document.getElementById(`note-${s.id}`).value }));
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) })
-        .then(res => res.json()).then(data => {
-            btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false;
-            if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบได้หักคะแนนพฤติกรรมเรียบร้อยแล้ว)', 'success'); fetchStudents(); } 
-            else Swal.fire('ระบบ SIS', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error');
-        });
+        let records = []; students.forEach(s => records.push({ id: s.id, name: s.name, className: currentClass, status: attendanceData[s.id].status, note: document.getElementById(`note-${s.id}`).value }));
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) }).then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false; if(data.status === "success") { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบได้หักคะแนนพฤติกรรมเรียบร้อยแล้ว)', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error'); });
     }
 
     function loadQuickAIInsight() {
@@ -797,87 +620,22 @@
                 if(data.data.length === 0) { document.getElementById('teacher-quick-ai').innerHTML = "เริ่มบันทึกข้อมูลครั้งแรกได้เลยครับ ✌️"; return; }
                 let sumTotal = 0, sumPres = 0, riskList = [];
                 data.data.forEach(d => { let stTotal = d.present + d.personal_leave + d.sick_leave + d.absent + d.late + d.outside; if(stTotal > 0) { sumTotal += stTotal; sumPres += d.present; if((d.present / stTotal) * 100 < 80) riskList.push(cleanName(d.name)); } });
-                let avgPerc = sumTotal > 0 ? ((sumPres / sumTotal) * 100).toFixed(1) : 0; let aiMsg = `📊 <b>อัตรามาเรียนสะสม:</b> <b style="color:${avgPerc>=80?'green':'red'};">${avgPerc}%</b><br>`;
-                aiMsg += riskList.length > 0 ? `⚠️ มีกลุ่มเสี่ยง ${riskList.length} คน: <span style="color:red;">${riskList.slice(0,3).join(', ')}${riskList.length>3?'...':''}</span>` : `🌟 ทุกคนเวลาเรียนผ่านเกณฑ์ 80% ครับ`; document.getElementById('teacher-quick-ai').innerHTML = aiMsg;
+                let avgPerc = sumTotal > 0 ? ((sumPres / sumTotal) * 100).toFixed(1) : 0; let aiMsg = `📊 <b>อัตรามาเรียนสะสม:</b> <b style="color:${avgPerc>=80?'green':'red'};">${avgPerc}%</b><br>`; aiMsg += riskList.length > 0 ? `⚠️ มีกลุ่มเสี่ยง ${riskList.length} คน: <span style="color:red;">${riskList.slice(0,3).join(', ')}${riskList.length>3?'...':''}</span>` : `🌟 ทุกคนเวลาเรียนผ่านเกณฑ์ 80% ครับ`; document.getElementById('teacher-quick-ai').innerHTML = aiMsg;
             }
         });
     }
 
-    function renderStudentCalendar() {
-        let container = document.getElementById('student-leave-calendar-container');
-        let d = new Date(currentStudentCalendarDate.getFullYear(), currentStudentCalendarDate.getMonth(), 1);
-        document.getElementById('student-calendar-month-label').innerText = formatThaiDate(d.toLocaleDateString('en-US'), true).replace(/^[0-9]+\s/, ''); 
-        
-        let html = `<div class="calendar-grid">`;
-        const thDays = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
-        thDays.forEach(day => html += `<div class="calendar-header">${day}</div>`);
-        
-        let firstDay = d.getDay();
-        let daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-        
-        for(let i=0; i<firstDay; i++) html += `<div class="calendar-day blank"></div>`;
-        
-        for(let i=1; i<=daysInMonth; i++) {
-            let dateObj = new Date(d.getFullYear(), d.getMonth(), i);
-            let dStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`;
-            let isWeekend = (dateObj.getDay() === 0 || dateObj.getDay() === 6);
-            let isSelected = studentLeaveDates.includes(dStr);
-            
-            let cssClass = isSelected ? "selected-leave" : "";
-            let bgStyle = isWeekend && !isSelected ? 'style="background:#fee2e2; color:#b91c1c;"' : '';
-            
-            html += `<div class="calendar-day ${cssClass}" ${bgStyle} onclick="toggleStudentLeave('${dStr}', ${isWeekend})">${i}</div>`;
-        }
-        html += `</div>`;
-        container.innerHTML = html;
-        updateSelectedLeaveDisplay();
-    }
-
-    function changeStudentMonth(dir) {
-        currentStudentCalendarDate.setMonth(currentStudentCalendarDate.getMonth() + dir);
-        renderStudentCalendar();
-    }
-
-    function toggleStudentLeave(dateStr, isWeekend) {
-        if(isWeekend) { Swal.fire('แจ้งเตือน', 'ไม่สามารถลาในวันเสาร์-อาทิตย์ได้ครับ', 'info'); return; }
-        let idx = studentLeaveDates.indexOf(dateStr);
-        if(idx > -1) studentLeaveDates.splice(idx, 1);
-        else studentLeaveDates.push(dateStr);
-        studentLeaveDates.sort(); 
-        renderStudentCalendar();
-    }
-    
-    function updateSelectedLeaveDisplay() {
-        let display = document.getElementById('selected-leave-dates-display');
-        if(studentLeaveDates.length === 0) { display.style.display = 'none';
-        } else {
-            display.style.display = 'block';
-            let formattedDates = studentLeaveDates.map(d => formatThaiDate(d, false)).join(', ');
-            display.innerText = `📌 วันที่เลือกลา (${studentLeaveDates.length} วัน): ${formattedDates}`;
-        }
-    }
+    function renderStudentCalendar() { let container = document.getElementById('student-leave-calendar-container'); let d = new Date(currentStudentCalendarDate.getFullYear(), currentStudentCalendarDate.getMonth(), 1); document.getElementById('student-calendar-month-label').innerText = formatThaiDate(d.toLocaleDateString('en-US'), true).replace(/^[0-9]+\s/, ''); let html = `<div class="calendar-grid">`; const thDays = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"]; thDays.forEach(day => html += `<div class="calendar-header">${day}</div>`); let firstDay = d.getDay(); let daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); for(let i=0; i<firstDay; i++) html += `<div class="calendar-day blank"></div>`; for(let i=1; i<=daysInMonth; i++) { let dateObj = new Date(d.getFullYear(), d.getMonth(), i); let dStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`; let isWeekend = (dateObj.getDay() === 0 || dateObj.getDay() === 6); let isSelected = studentLeaveDates.includes(dStr); let cssClass = isSelected ? "selected-leave" : ""; let bgStyle = isWeekend && !isSelected ? 'style="background:#fee2e2; color:#b91c1c;"' : ''; html += `<div class="calendar-day ${cssClass}" ${bgStyle} onclick="toggleStudentLeave('${dStr}', ${isWeekend})">${i}</div>`; } html += `</div>`; container.innerHTML = html; updateSelectedLeaveDisplay(); }
+    function changeStudentMonth(dir) { currentStudentCalendarDate.setMonth(currentStudentCalendarDate.getMonth() + dir); renderStudentCalendar(); }
+    function toggleStudentLeave(dateStr, isWeekend) { if(isWeekend) { Swal.fire('แจ้งเตือน', 'ไม่สามารถลาในวันเสาร์-อาทิตย์ได้ครับ', 'info'); return; } let idx = studentLeaveDates.indexOf(dateStr); if(idx > -1) studentLeaveDates.splice(idx, 1); else studentLeaveDates.push(dateStr); studentLeaveDates.sort(); renderStudentCalendar(); }
+    function updateSelectedLeaveDisplay() { let display = document.getElementById('selected-leave-dates-display'); if(studentLeaveDates.length === 0) { display.style.display = 'none'; } else { display.style.display = 'block'; let formattedDates = studentLeaveDates.map(d => formatThaiDate(d, false)).join(', '); display.innerText = `📌 วันที่เลือกลา (${studentLeaveDates.length} วัน): ${formattedDates}`; } }
 
     function submitLeaveRequest(btn) {
         if(studentLeaveDates.length === 0) { Swal.fire('ระบบ SIS', 'กรุณาคลิกเลือกวันที่ต้องการลาในปฏิทินครับ', 'warning'); return; }
-        let sType = document.getElementById('student-leave-type').value; 
-        let sReason = document.getElementById('student-leave-reason').value;
+        let sType = document.getElementById('student-leave-type').value; let sReason = document.getElementById('student-leave-reason').value;
         if(!sReason) { Swal.fire('ระบบ SIS', 'กรุณาระบุเหตุผลให้ครูทราบด้วยครับ', 'warning'); return; }
-        
-        let uData = JSON.parse(localStorage.getItem('sis_user')); 
-        let originalText = btn.innerText; 
-        btn.innerText = '⏳ กำลังส่งข้อมูล...'; btn.disabled = true;
-
-        fetch(GAS_API_URL, { 
-            method: "POST", 
-            body: JSON.stringify({ action: "submit_leave", dates: studentLeaveDates, studentId: uData.userId, studentName: uData.name, className: uData.className, leaveType: sType, reason: sReason })
-        }).then(res => res.json()).then(data => { 
-            btn.innerText = originalText; btn.disabled = false; 
-            if(data.status === 'success') { 
-                Swal.fire('ระบบ SIS', 'ส่งคำร้องแจ้งลาเรียบร้อยแล้ว ครูประจำชั้นจะเห็นข้อมูลของท่านโดยอัตโนมัติ', 'success'); 
-                document.getElementById('student-leave-reason').value = ""; 
-                studentLeaveDates = []; renderStudentCalendar();
-            }
-        }).catch(err => { btn.innerText = originalText; btn.disabled = false; Swal.fire('ระบบ SIS', 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่', 'error'); });
+        let uData = JSON.parse(localStorage.getItem('sis_user')); let originalText = btn.innerText; btn.innerText = '⏳ กำลังส่งข้อมูล...'; btn.disabled = true;
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submit_leave", dates: studentLeaveDates, studentId: uData.userId, studentName: uData.name, className: uData.className, leaveType: sType, reason: sReason }) }).then(res => res.json()).then(data => { btn.innerText = originalText; btn.disabled = false; if(data.status === 'success') { Swal.fire('ระบบ SIS', 'ส่งคำร้องแจ้งลาเรียบร้อยแล้ว ครูประจำชั้นจะเห็นข้อมูลของท่านโดยอัตโนมัติ', 'success'); document.getElementById('student-leave-reason').value = ""; studentLeaveDates = []; renderStudentCalendar(); } }).catch(err => { btn.innerText = originalText; btn.disabled = false; Swal.fire('ระบบ SIS', 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่', 'error'); });
     }
 
     function loadWeeklyData() {
@@ -885,9 +643,7 @@
         let curr = new Date(); let day = curr.getDay(); let diffToMon = curr.getDate() - day + (day === 0 ? -6 : 1); let monDate = new Date(curr.setDate(diffToMon)); monDate.setHours(0,0,0,0);
         let weekDates = []; let thElements = ['th-mon', 'th-tue', 'th-wed', 'th-thu', 'th-fri']; let dayNames = ['จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.'];
         for(let i=0; i<5; i++) { let d = new Date(monDate); d.setDate(monDate.getDate() + i); let yyyy = d.getFullYear(); let mm = String(d.getMonth() + 1).padStart(2, '0'); let dd = String(d.getDate()).padStart(2, '0'); weekDates.push(`${yyyy}-${mm}-${dd}`); document.getElementById(thElements[i]).innerHTML = `${dayNames[i]}<br><span style="font-size:10px; font-weight:normal;">${dd}/${mm}</span>`; }
-        
         document.getElementById('weekly-date-range').innerText = `${formatThaiDate(weekDates[0], true)} - ${formatThaiDate(weekDates[4], true)}`;
-        
         let fetches = weekDates.map(dateStr => fetch(`${GAS_API_URL}?action=get_daily&className=${encodeURIComponent(currentClass)}&date=${dateStr}`).then(res => res.json()).catch(e => ({ status: 'error' })));
         Promise.all(fetches).then(results => {
             let weeklyData = {}; if(students && students.length > 0) students.forEach(std => { weeklyData[std.id] = { name: std.name, status: ['-', '-', '-', '-', '-'] }; }); let totalAbs = 0;
@@ -956,11 +712,7 @@
     async function fetchPublicHolidays() {
         let startVal = document.getElementById('admin-start').value; if(!startVal) { Swal.fire('ระบบ SIS', 'กำหนดวันเปิดเทอมก่อนครับ', 'warning'); return; }
         let year = startVal.split('-')[0]; let btn = document.getElementById('fetch-holidays-btn'); btn.innerText = '⏳ โหลด...'; btn.disabled = true;
-        try {
-            let res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`); let holidays = await res.json(); let addedCount = 0;
-            holidays.forEach(h => { if(!adminHolidays.includes(h.date)) { adminHolidays.push(h.date); addedCount++; } });
-            renderAdminCalendar(); btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false; Swal.fire('ระบบ SIS', `✅ เพิ่มวันหยุด ${addedCount} วัน`, 'success');
-        } catch(e) { btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false; Swal.fire('ระบบ SIS', '❌ ล้มเหลว', 'error'); }
+        try { let res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`); let holidays = await res.json(); let addedCount = 0; holidays.forEach(h => { if(!adminHolidays.includes(h.date)) { adminHolidays.push(h.date); addedCount++; } }); renderAdminCalendar(); btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false; Swal.fire('ระบบ SIS', `✅ เพิ่มวันหยุด ${addedCount} วัน`, 'success'); } catch(e) { btn.innerText = '🇹🇭 ดึงวันหยุดปฏิทินไทย'; btn.disabled = false; Swal.fire('ระบบ SIS', '❌ ล้มเหลว', 'error'); }
     }
     
     function updateClassDropdown() { let f = document.getElementById('admin-class-filter'); let s = new Set(); allAdminStudentsData.forEach(x => s.add(x[3])); f.innerHTML = '<option value="all">ทุกห้อง</option>'; [...s].sort().forEach(c => f.innerHTML += `<option value="${c}">${c}</option>`); }
@@ -1001,60 +753,24 @@
     }
 
     function loadStudentReport(id, isSilent = false) {
-        if(!isSilent) {
-            document.getElementById('hdr-name').innerText = "กำลังโหลดข้อมูล...";
-        }
-
+        if(!isSilent) { document.getElementById('hdr-name').innerText = "กำลังโหลดข้อมูล..."; }
         fetch(`${GAS_API_URL}?action=get_student_report&studentId=${id}`).then(res=>res.json()).then(data => {
-            
             if(data.info) {
-                document.getElementById('id-card-id').innerText = data.info.id;
-                document.getElementById('id-card-class').innerText = data.info.className;
-                document.getElementById('id-card-number').innerText = data.info.number;
-                if(data.info.name) {
-                    document.getElementById('id-card-name').innerText = data.info.name;
-                    document.getElementById('hdr-name').innerText = data.info.name;
-                }
-                document.getElementById('id-card-barcode').innerText = `*${data.info.id}*`;
-                document.getElementById('hdr-id').innerText = data.info.id;
-                document.getElementById('hdr-num').innerText = data.info.number;
-                document.getElementById('hdr-class').innerText = data.info.className;
+                document.getElementById('id-card-id').innerText = data.info.id; document.getElementById('id-card-class').innerText = data.info.className; document.getElementById('id-card-number').innerText = data.info.number;
+                if(data.info.name) { document.getElementById('id-card-name').innerText = data.info.name; document.getElementById('hdr-name').innerText = data.info.name; }
+                document.getElementById('id-card-barcode').innerText = `*${data.info.id}*`; document.getElementById('hdr-id').innerText = data.info.id; document.getElementById('hdr-num').innerText = data.info.number; document.getElementById('hdr-class').innerText = data.info.className;
             }
-
-            document.getElementById('st-stat-present').innerText = data.stats.present; 
-            document.getElementById('st-stat-absent').innerText = data.stats.absent; 
-            document.getElementById('st-stat-leave').innerText = data.stats.personal_leave + data.stats.sick_leave;
-            
-            let p = data.stats.total > 0 ? (data.stats.present / data.stats.total * 100).toFixed(1) : 0; 
-            document.getElementById('ai-assessment-text').innerHTML = p >= 80 ? `🌟 <b>ชื่นชม:</b> รักษามาตรฐานนี้นะครับ!` : `⚠️ <b>ระวัง:</b> ต่ำกว่าเกณฑ์ (${p}%) เสี่ยงหมดสิทธิ์สอบ`;
-            
-            let hHTML = ""; 
-            data.history.reverse().forEach(x => hHTML += `<tr><td>${formatThaiDate(x.date)}</td><td>${x.status}</td><td>${x.note||'-'}</td></tr>`);
-            document.getElementById('student-history-body').innerHTML = hHTML;
+            document.getElementById('st-stat-present').innerText = data.stats.present; document.getElementById('st-stat-absent').innerText = data.stats.absent; document.getElementById('st-stat-leave').innerText = data.stats.personal_leave + data.stats.sick_leave;
+            let p = data.stats.total > 0 ? (data.stats.present / data.stats.total * 100).toFixed(1) : 0; document.getElementById('ai-assessment-text').innerHTML = p >= 80 ? `🌟 <b>ชื่นชม:</b> รักษามาตรฐานนี้นะครับ!` : `⚠️ <b>ระวัง:</b> ต่ำกว่าเกณฑ์ (${p}%) เสี่ยงหมดสิทธิ์สอบ`;
+            let hHTML = ""; data.history.reverse().forEach(x => hHTML += `<tr><td>${formatThaiDate(x.date)}</td><td>${x.status}</td><td>${x.note||'-'}</td></tr>`); document.getElementById('student-history-body').innerHTML = hHTML;
 
             if(data.currentScore !== undefined) {
-                let scoreText = document.getElementById('behavior-score-text');
-                let scoreBox = document.getElementById('behavior-score-box');
-                scoreText.innerText = data.currentScore;
-                
-                if(data.currentScore >= 80) {
-                    scoreText.style.color = '#059669'; scoreBox.style.background = '#ecfdf5'; scoreBox.style.borderColor = '#34d399';
-                } else if(data.currentScore >= 60) {
-                    scoreText.style.color = '#d97706'; scoreBox.style.background = '#fffbeb'; scoreBox.style.borderColor = '#fbbf24';
-                } else {
-                    scoreText.style.color = '#dc2626'; scoreBox.style.background = '#fef2f2'; scoreBox.style.borderColor = '#f87171';
-                }
-
+                let scoreText = document.getElementById('behavior-score-text'); let scoreBox = document.getElementById('behavior-score-box'); scoreText.innerText = data.currentScore;
+                if(data.currentScore >= 80) { scoreText.style.color = '#059669'; scoreBox.style.background = '#ecfdf5'; scoreBox.style.borderColor = '#34d399'; } else if(data.currentScore >= 60) { scoreText.style.color = '#d97706'; scoreBox.style.background = '#fffbeb'; scoreBox.style.borderColor = '#fbbf24'; } else { scoreText.style.color = '#dc2626'; scoreBox.style.background = '#fef2f2'; scoreBox.style.borderColor = '#f87171'; }
                 let behHTML = "";
                 if(data.behaviorHistory && data.behaviorHistory.length > 0) {
-                    data.behaviorHistory.reverse().forEach(h => {
-                        let ptsColor = h.points < 0 ? '#ef4444' : '#10b981';
-                        let ptsSign = h.points > 0 ? '+' : '';
-                        behHTML += `<tr><td style="border-bottom:1px solid #eee; padding:8px 5px;">${formatThaiDate(h.date)}</td><td style="border-bottom:1px solid #eee; padding:8px 5px;">${h.action}<br><span style="font-size:10px; color:#94a3b8;">${h.teacher}</span></td><td style="border-bottom:1px solid #eee; padding:8px 5px; font-weight:bold; color:${ptsColor};">${ptsSign}${h.points}</td></tr>`;
-                    });
-                } else {
-                    behHTML = `<tr><td colspan='3' style='text-align:center; padding:15px; color:#64748b;'>ไม่มีประวัติการถูกหักคะแนน ยอดเยี่ยมมาก!</td></tr>`;
-                }
+                    data.behaviorHistory.reverse().forEach(h => { let ptsColor = h.points < 0 ? '#ef4444' : '#10b981'; let ptsSign = h.points > 0 ? '+' : ''; behHTML += `<tr><td style="border-bottom:1px solid #eee; padding:8px 5px;">${formatThaiDate(h.date)}</td><td style="border-bottom:1px solid #eee; padding:8px 5px;">${h.action}<br><span style="font-size:10px; color:#94a3b8;">${h.teacher}</span></td><td style="border-bottom:1px solid #eee; padding:8px 5px; font-weight:bold; color:${ptsColor};">${ptsSign}${h.points}</td></tr>`; });
+                } else { behHTML = `<tr><td colspan='3' style='text-align:center; padding:15px; color:#64748b;'>ไม่มีประวัติการถูกหักคะแนน ยอดเยี่ยมมาก!</td></tr>`; }
                 document.getElementById('student-behavior-history-body').innerHTML = behHTML;
             }
         });
