@@ -76,7 +76,7 @@
         .calendar-day { padding: 8px 0; border-radius: 6px; font-size: 12px; cursor: pointer; background: #f1f5f9; border: 1px solid #e2e8f0; transition: 0.2s; }
         .calendar-day:hover:not(.blank) { background: #cbd5e1; }
         .calendar-day.holiday { background: #ef4444; color: white; border-color: #ef4444; font-weight: bold; box-shadow: 0 2px 5px rgba(239,68,68,0.3);}
-        .calendar-day.selected-leave { background: #f59e0b; color: white; border-color: #d97706; font-weight: bold; box-shadow: 0 2px 5px rgba(245,158,11,0.3);} /* 🌟 สีปฏิทินตอนขอลา */
+        .calendar-day.selected-leave { background: #f59e0b; color: white; border-color: #d97706; font-weight: bold; box-shadow: 0 2px 5px rgba(245,158,11,0.3);}
         .calendar-day.blank { background: transparent; border: none; cursor: default; color: #cbd5e1; }
 
         .switch { position: relative; display: inline-block; width: 42px; height: 24px; }
@@ -86,11 +86,11 @@
         input:checked + .slider { background-color: #10b981; }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        .admin-tabs { display: flex; overflow-x: auto; gap: 5px; margin-bottom: 0; }
-        .admin-tab-btn { flex: 1; min-width: 110px; padding: 12px 10px; text-align: center; background: #e2e8f0; color: #475569; border-radius: 12px 12px 0 0; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; white-space: nowrap;}
-        .admin-tab-btn.active { background: #1e56a0; color: white; }
-        .admin-tab-content { display: none; background: #fff; border-radius: 0 12px 12px 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .admin-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        .admin-tabs, .student-tabs { display: flex; overflow-x: auto; gap: 5px; margin-bottom: 0; }
+        .admin-tab-btn, .student-tab-btn { flex: 1; min-width: 100px; padding: 12px 5px; text-align: center; background: #e2e8f0; color: #475569; border-radius: 12px 12px 0 0; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; white-space: nowrap;}
+        .admin-tab-btn.active, .student-tab-btn.active { background: #1e56a0; color: white; }
+        .admin-tab-content, .student-tab-content { display: none; background: #fff; border-radius: 0 12px 12px 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .admin-tab-content.active, .student-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
         .footer-credit { text-align: center; padding: 25px; margin-top: 40px; color: #64748b; font-size: 13px; border-top: 1px dashed #ddd; line-height: 1.8; }
         .swal2-title, .swal2-html-container, .swal2-confirm, .swal2-cancel { font-family: 'Prompt', sans-serif !important; }
@@ -119,9 +119,7 @@
 
     <div id="login-page" class="page active">
         <div class="card" style="text-align: center; max-width: 400px; margin: 40px auto;">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgb1oewS_bG2frmr1y3aOrwykh-wBZiipEUv9BbTxGSQh2d-Ergv_Ez4MWoO4AO8_wdCG19Nrravj8iJCc33arzt3ZXi2lmQ2v1hKGvEIBcLdjcCkZdfdZF-p8DWehYl3lzSWhWSOI4NKeNhWRzWkUHRJnMs1KFVMW_BwwUq83DafDaQpwu3-hOs-Ieix0/s225/304789124_573612801071886_7852363760169451884_n.png" 
-                 alt="โลโก้โรงเรียน" 
-                 style="width: 120px; height: auto; margin-bottom: 15px;">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgb1oewS_bG2frmr1y3aOrwykh-wBZiipEUv9BbTxGSQh2d-Ergv_Ez4MWoO4AO8_wdCG19Nrravj8iJCc33arzt3ZXi2lmQ2v1hKGvEIBcLdjcCkZdfdZF-p8DWehYl3lzSWhWSOI4NKeNhWRzWkUHRJnMs1KFVMW_BwwUq83DafDaQpwu3-hOs-Ieix0/s225/304789124_573612801071886_7852363760169451884_n.png" alt="โลโก้โรงเรียน" style="width: 120px; height: auto; margin-bottom: 15px;">
             <p id="login-clock" style="font-size:14px; font-weight:bold; color:#475569; margin-bottom:20px;"></p>
             <input type="text" id="username" placeholder="รหัสผู้ใช้งาน">
             <input type="password" id="password" placeholder="รหัสผ่าน">
@@ -212,7 +210,6 @@
             <div class="admin-tab-btn" onclick="switchAdminTab('tab-users', this)">👥 ผู้ใช้งาน</div>
             <div class="admin-tab-btn" onclick="switchAdminTab('tab-students', this)">🎓 นักเรียน</div>
         </div>
-
         <div id="tab-settings" class="admin-tab-content active">
             <h3 style="color:#ef4444; margin-top:0;">⏰ จำกัดเวลาเช็คชื่อประจำวัน</h3>
             <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
@@ -223,17 +220,14 @@
                 <div style="flex:1"><label style="font-size:12px; font-weight:bold; color:#166534;">เวลาเริ่ม (น.)</label><input type="time" id="admin-start-time" value="07:30" style="margin-bottom:0;"></div>
                 <div style="flex:1"><label style="font-size:12px; font-weight:bold; color:#166534;">เวลาสิ้นสุด (น.)</label><input type="time" id="admin-end-time" value="08:30" style="margin-bottom:0;"></div>
             </div>
-
             <h3 style="margin-top:20px;">📅 กำหนดปีการศึกษา & วันหยุด</h3>
             <div style="display:flex; gap:10px;">
                 <div style="flex:1"><label style="font-size:12px; font-weight:bold;">วันเปิดเทอม</label><input type="date" id="admin-start" onchange="renderAdminCalendar()"></div>
                 <div style="flex:1"><label style="font-size:12px; font-weight:bold;">วันปิดเทอม</label><input type="date" id="admin-end" onchange="renderAdminCalendar()"></div>
             </div>
-            
             <div id="school-days-count" style="margin-top: 15px; font-weight: bold; color: #1e56a0; background: #e0f2fe; padding: 12px; border-radius: 8px; border-left: 5px solid #1e56a0; display: flex; justify-content: space-between; align-items: center;">
                 <div>🎓 จำนวนวันเรียนจริง: <span id="working-days-text" style="font-size:18px; color:#ef4444;">0</span> วัน</div>
             </div>
-
             <div style="margin-top: 15px; border-top: 1px dashed #ddd; padding-top:15px;">
                 <label style="font-weight:bold; color:#ef4444; display:block; margin-bottom:10px;">⛔ กำหนดวันหยุด (คลิกเลือกในปฏิทิน)</label>
                 <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px; font-size:12px; flex-wrap: wrap;">
@@ -245,7 +239,6 @@
             </div>
             <button class="btn-save-admin" onclick="saveAdminData(this)" style="width:100%; padding:15px; font-size:16px; margin-top:20px;">💾 บันทึกการตั้งค่าระบบ</button>
         </div>
-
         <div id="tab-users" class="admin-tab-content">
             <h3 style="margin-top:0;">👥 จัดการบัญชีผู้ใช้</h3>
             <div style="overflow-x: auto;">
@@ -257,7 +250,6 @@
             <button onclick="addUserRow()" style="background:#28a745; margin-top:10px;">+ เพิ่มผู้ใช้</button>
             <button class="btn-save-admin" onclick="saveAdminData(this)" style="width:100%; padding:15px; font-size:16px; margin-top:20px;">💾 บันทึกข้อมูลผู้ใช้งาน</button>
         </div>
-
         <div id="tab-students" class="admin-tab-content">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h3 style="margin:0;">🎓 ฐานข้อมูลนักเรียน</h3>
@@ -277,41 +269,27 @@
     <div id="exec-page" class="page">
         <h2 style="color: #1e56a0; margin-bottom: 5px;">📊 แดชบอร์ดผู้บริหาร (Executive)</h2>
         <button onclick="fetchFullExecData()" style="width:100%; margin-bottom:15px; background:#17a2b8;">🔄 อัปเดตข้อมูลล่าสุด</button>
-        
         <div class="exec-filters">
             <div><label>📌 ระดับข้อมูล</label><select id="exec-view-type" onchange="updateExecViewDropdown()"><option value="school">ภาพรวมทั้งโรงเรียน</option><option value="grade">ระดับชั้น</option><option value="class">รายห้อง</option><option value="student">รายบุคคล</option></select></div>
             <div id="exec-sub-filter-container" style="display:none;"><label>🔍 เลือกเป้าหมาย</label><select id="exec-sub-filter" onchange="processExecData()"></select><input type="text" id="exec-sub-input" placeholder="รหัสนักเรียน" style="display:none;" onkeyup="if(event.keyCode===13) processExecData()"></div>
             <div><label>📅 ช่วงวันที่</label><div style="display:flex; gap:5px;"><input type="date" id="exec-date-start" onchange="processExecData()"><input type="date" id="exec-date-end" onchange="processExecData()"></div></div>
         </div>
-
         <div class="ai-exec-box">
             <h3>🤖 สรุปวิเคราะห์ข้อมูลเชิงบริหาร (Executive Summary)</h3>
-            <div id="exec-ai-insight">
-                <p style="text-align:center; color:#64748b;">กำลังประมวลผลฐานข้อมูลมหาศาล กรุณารอสักครู่...</p>
-            </div>
+            <div id="exec-ai-insight"><p style="text-align:center; color:#64748b;">กำลังประมวลผลฐานข้อมูลมหาศาล กรุณารอสักครู่...</p></div>
         </div>
-
         <div class="stat-grid" style="margin-bottom: 10px;">
             <div class="stat-card stat-blue"><h3>เช็คชื่อรวม (ข้อมูล)</h3><h2 id="exec-total">0</h2></div>
             <div class="stat-card stat-green"><h3>อัตราการมาเรียนเฉลี่ย</h3><h2 id="exec-present-perc">0%</h2></div>
         </div>
-
         <div class="card" style="height: 350px;"><canvas id="execChart"></canvas></div>
-
         <div class="card">
             <h3 style="margin-top:0; color:#1e56a0;">📋 ตารางข้อมูลสถิติเชิงลึก (Detail Data)</h3>
             <div style="overflow-x: auto; max-height: 400px;">
                 <table style="white-space: nowrap;">
                     <thead id="exec-detail-head">
                         <tr>
-                            <th>กลุ่ม/บุคคล</th>
-                            <th style="color:#10b981;">มา</th>
-                            <th style="color:#eab308;">สาย</th>
-                            <th style="color:#f97316;">ลากิจ</th>
-                            <th style="color:#f43f5e;">ลาป่วย</th>
-                            <th style="color:#991b1b;">ขาด</th>
-                            <th style="color:#3b82f6;">นอก ร.ร.</th>
-                            <th>อัตรามาเรียน</th>
+                            <th>กลุ่ม/บุคคล</th><th style="color:#10b981;">มา</th><th style="color:#eab308;">สาย</th><th style="color:#f97316;">ลากิจ</th><th style="color:#f43f5e;">ลาป่วย</th><th style="color:#991b1b;">ขาด</th><th style="color:#3b82f6;">นอก ร.ร.</th><th>อัตรามาเรียน</th>
                         </tr>
                     </thead>
                     <tbody id="exec-detail-body">
@@ -323,13 +301,41 @@
     </div>
 
     <div id="student-page" class="page">
-        <h2 style="color: #1e56a0;">🎓 ข้อมูลนักเรียน</h2>
+        <h2 style="color: #1e56a0; margin-bottom: 10px;">🎓 ข้อมูลนักเรียน</h2>
         
-        <div class="card" style="background:#fffbeb; border:1px solid #fcd34d;">
+        <div class="card stat-blue" style="margin-bottom: 15px; padding-bottom: 20px;">
+            <h3 id="st-name-display" style="margin:0; font-size: 18px;">ชื่อนักเรียน</h3>
+            <div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; margin-top: 12px; font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; border: 1px solid rgba(255,255,255,0.3);">
+                <span>🏷️ รหัส: <b id="st-info-id" style="font-size: 14px;">-</b></span>
+                <span>🎓 ชั้น: <b id="st-info-class" style="font-size: 14px;">-</b></span>
+                <span>🔢 เลขที่: <b id="st-info-number" style="font-size: 14px;">-</b></span>
+            </div>
+        </div>
+
+        <div class="student-tabs">
+            <div class="student-tab-btn active" onclick="switchStudentTab('tab-std-attendance', this)">📅 เช็คชื่อ</div>
+            <div class="student-tab-btn" onclick="switchStudentTab('tab-std-leave', this)">📝 แจ้งลา</div>
+            <div class="student-tab-btn" onclick="switchStudentTab('tab-std-behavior', this)">💯 พฤติกรรม</div>
+        </div>
+
+        <div id="tab-std-attendance" class="student-tab-content active">
+            <div class="stat-grid">
+                <div class="stat-card stat-green"><h3>มา</h3><h2 id="st-stat-present">0</h2></div>
+                <div class="stat-card stat-red"><h3>ขาด</h3><h2 id="st-stat-absent">0</h2></div>
+                <div class="stat-card" style="background:#f59e0b;"><h3>ลาอื่นๆ</h3><h2 id="st-stat-leave">0</h2></div>
+            </div>
+            <div class="ai-box" style="margin-bottom: 15px;"><p id="ai-assessment-text" style="font-size:13px; margin:0;"></p></div>
+            
+            <h3 style="margin-top:0; color:#1e56a0; border-bottom:1px solid #eee; padding-bottom:8px;">📅 ประวัติย้อนหลัง</h3>
+            <div style="overflow-x: auto;">
+                <table><thead><tr><th>วันที่</th><th>สถานะ</th><th>หมายเหตุ</th></tr></thead><tbody id="student-history-body"></tbody></table>
+            </div>
+        </div>
+
+        <div id="tab-std-leave" class="student-tab-content" style="background:#fffbeb; border:1px solid #fcd34d;">
             <h3 style="margin-top:0; color:#b45309; display:flex; align-items:center; gap:8px;">📝 แจ้งขออนุญาตลาหยุด</h3>
             
             <label style="font-size:12px; font-weight:bold; color:#92400e;">เลือกวันที่ขอลา (กดคลิกเลือกได้หลายวัน)</label>
-            
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                 <button onclick="changeStudentMonth(-1)" style="padding:5px 10px; background:#f59e0b; font-size:12px;">◀ ก่อนหน้า</button>
                 <b id="student-calendar-month-label" style="color:#b45309; font-size:14px;">เดือน ปี</b>
@@ -342,29 +348,23 @@
             </div>
 
             <label style="font-size:12px; font-weight:bold; color:#92400e;">ประเภทการลา</label>
-            <select id="student-leave-type">
+            <select id="student-leave-type" style="border-color:#fcd34d;">
                 <option value="ลากิจ">ลากิจ (มีธุระจำเป็น)</option>
                 <option value="ลาป่วย">ลาป่วย (ไม่สบาย/พบแพทย์)</option>
             </select>
             <label style="font-size:12px; font-weight:bold; color:#92400e;">เหตุผล (อธิบายให้ครูทราบ)</label>
-            <textarea id="student-leave-reason" placeholder="เช่น ไปทำธุระต่างจังหวัด หรือ มีไข้สูง..." rows="2"></textarea>
+            <textarea id="student-leave-reason" placeholder="เช่น ไปทำธุระต่างจังหวัด หรือ มีไข้สูง..." rows="2" style="border-color:#fcd34d;"></textarea>
             <button onclick="submitLeaveRequest(this)" style="width:100%; background:#f59e0b; font-size:14px;">📤 ส่งคำร้องให้ครูประจำชั้น</button>
         </div>
 
-        <div class="card stat-blue">
-            <h3 id="st-name-display" style="margin:0; font-size: 18px;">ชื่อนักเรียน</h3>
-            <p id="st-id-display" style="margin:5px 0 0 0; font-size:13px;"></p>
-        </div>
-        <div class="stat-grid">
-            <div class="stat-card stat-green"><h3>มา</h3><h2 id="st-stat-present">0</h2></div>
-            <div class="stat-card stat-red"><h3>ขาด</h3><h2 id="st-stat-absent">0</h2></div>
-            <div class="stat-card" style="background:#f59e0b;"><h3>ลาอื่นๆ</h3><h2 id="st-stat-leave">0</h2></div>
-        </div>
-        <div class="ai-box"><p id="ai-assessment-text" style="font-size:13px; margin:0;"></p></div>
-        <div class="card">
-            <h3>📅 ประวัติย้อนหลัง</h3>
-            <div style="overflow-x: auto;">
-                <table><thead><tr><th>วันที่</th><th>สถานะ</th><th>หมายเหตุ</th></tr></thead><tbody id="student-history-body"></tbody></table>
+        <div id="tab-std-behavior" class="student-tab-content">
+            <h3 style="margin-top:0; color:#059669; display:flex; align-items:center; gap:8px;">💯 คะแนนพฤติกรรม</h3>
+            <div style="text-align:center; padding: 30px 20px; background: #ecfdf5; border-radius: 12px; border: 2px dashed #34d399; margin-bottom: 15px;">
+                <h1 style="font-size: 48px; color: #059669; margin: 0;">100</h1>
+                <p style="margin: 5px 0 0 0; color: #047857; font-weight: bold;">คะแนนเริ่มต้น</p>
+            </div>
+            <div style="background:#f8fafc; padding:15px; border-radius:8px; font-size:13px; color:#475569; line-height: 1.6;">
+                <b style="color:#334155;">📌 หมายเหตุ:</b> <br>หน้านี้เป็นการเตรียมความพร้อมสำหรับระบบฐานข้อมูลใหม่ โดยระบบจะทำการหักคะแนนพฤติกรรมอัตโนมัติหากนักเรียนมีสถานะ <b>"ขาด"</b> หรือ <b>"สาย"</b> ในอนาคตครับ
             </div>
         </div>
     </div>
@@ -425,27 +425,17 @@
         }
     }
 
-   // --- ⏰ อัปเดตนาฬิกาให้เดินแบบ Real-time (มีวินาที) ---
     function updateClock() {
         const now = new Date();
         const dateStr = now.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        
-        // 🌟 บังคับให้แสดง ชั่วโมง:นาที:วินาที แบบ 2 หลักเสมอ
         const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
         
         if(document.getElementById('login-clock')) {
-            // ทำให้ตัวเลขเวลาในหน้าล็อกอินใหญ่และโดดเด่นขึ้น
             document.getElementById('login-clock').innerHTML = `${dateStr}<br><span style="font-size: 1.3em; color: #1e56a0; letter-spacing: 1px;">${timeStr} น.</span>`;
         }
-        if(document.getElementById('display-date')) {
-            document.getElementById('display-date').innerText = dateStr;
-        }
-        if(document.getElementById('display-clock')) {
-            // นาฬิกาตรงมุมขวาบนของแถบสถานะ
-            document.getElementById('display-clock').innerText = `🕒 ${timeStr} น.`;
-        }
+        if(document.getElementById('display-date')) document.getElementById('display-date').innerText = dateStr;
+        if(document.getElementById('display-clock')) document.getElementById('display-clock').innerText = `🕒 ${timeStr} น.`;
     }
-    // ตัวสั่งการให้ฟังก์ชันข้างบนทำงานซ้ำทุกๆ 1 วินาที (1000 มิลลิวินาที)
     setInterval(updateClock, 1000);
 
     function cleanName(fullName) { return fullName ? fullName.replace(/^(เด็กชาย|เด็กหญิง|นาย|นางสาว|ด\.ช\.|ด\.ญ\.)\s*/g, "").trim() : ""; }
@@ -455,7 +445,6 @@
     let timeLimitConfig = { enabled: false, start: "", end: "" }; 
     let execFullAttendance = [], execFullStudents = [], execChartInstance = null;
 
-    // 🌟 ตัวแปรสำหรับปฏิทินของนักเรียน
     let studentLeaveDates = [];
     let currentStudentCalendarDate = new Date();
 
@@ -469,6 +458,14 @@
         document.querySelectorAll('.admin-tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById(tabId).classList.add('active'); element.classList.add('active');
+    }
+
+    // 🌟 ฟังก์ชันสลับแท็บหน้าของนักเรียน
+    function switchStudentTab(tabId, element) {
+        document.querySelectorAll('.student-tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.student-tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active'); 
+        element.classList.add('active');
     }
 
     function handleLogin() {
@@ -528,7 +525,7 @@
                 switchPage('student-page', null); 
                 document.getElementById('st-name-display').innerText = data.name; 
                 loadStudentReport(data.userId); 
-                renderStudentCalendar(); // 🌟 โหลดปฏิทินนักเรียนเมื่อล็อกอิน
+                renderStudentCalendar(); 
             } else {
                 Swal.fire('ระบบ SIS', '❌ ไม่พบสิทธิ์การเข้าถึงข้อมูล กรุณาติดต่อผู้ดูแลระบบ', 'error');
             }
@@ -548,8 +545,6 @@
         if (pageId === 'summary-page' && currentClass) loadSummaryData();
     }
 
-// 🌟 ระบบดึงนักเรียน + ตรวจสอบการลา (เพิ่มระบบดักจับ Error กันหน้าจอค้าง)
-   // 🌟 ระบบดึงนักเรียน + ตรวจสอบการลา (พร้อมระบบป้องกันโค้ดพัง)
     function fetchStudents() {
         let dateInput = document.getElementById('check-date');
         if(!dateInput.value) {
@@ -579,7 +574,7 @@
         document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px;">⏳ กำลังโหลดรายชื่อ...</div>`; document.getElementById('save-btn').style.display = 'none'; 
         
         fetch(`${GAS_API_URL}?action=get_students&className=${encodeURIComponent(currentClass)}`)
-        .then(res => res.text()) // แปลงเป็น Text ก่อนเพื่อดักจับ Error
+        .then(res => res.text()) 
         .then(text => {
             try { return JSON.parse(text); } 
             catch(e) { throw new Error("ระบบหลังบ้านขัดข้อง ไม่สามารถอ่านข้อมูล JSON ได้"); }
@@ -613,7 +608,9 @@
                         }
                     }
                 }).catch(err => {
-                    renderChecklist(null, "", {}); loadQuickAIInsight();
+                    console.log("Secondary fetch error, rendering empty check:", err);
+                    renderChecklist(null, "", {});
+                    loadQuickAIInsight();
                 });
             } else {
                 document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ เกิดข้อผิดพลาด: ${data.message}</div>`;
@@ -622,6 +619,7 @@
             document.getElementById('student-list-container').innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444; font-weight:bold;">❌ ${err.message}</div>`;
         });
     }
+
     function renderChecklist(existing, recorder, leaveData) {
         const container = document.getElementById('student-list-container'); container.innerHTML = "";
         if(existing) {
@@ -702,7 +700,6 @@
         });
     }
 
-    // 🌟 ฟังก์ชันจัดการปฏิทินนักเรียน (ระบบขอลา)
     function renderStudentCalendar() {
         let container = document.getElementById('student-leave-calendar-container');
         let d = new Date(currentStudentCalendarDate.getFullYear(), currentStudentCalendarDate.getMonth(), 1);
@@ -774,7 +771,7 @@
             method: "POST", 
             body: JSON.stringify({ 
                 action: "submit_leave", 
-                dates: studentLeaveDates, // 🌟 ส่งข้อมูลเป็น Array หลายวัน
+                dates: studentLeaveDates,
                 studentId: uData.userId, 
                 studentName: uData.name, 
                 className: uData.className, 
@@ -786,7 +783,7 @@
             if(data.status === 'success') { 
                 Swal.fire('ระบบ SIS', 'ส่งคำร้องแจ้งลาเรียบร้อยแล้ว ครูประจำชั้นจะเห็นข้อมูลของท่านโดยอัตโนมัติ', 'success'); 
                 document.getElementById('student-leave-reason').value = ""; 
-                studentLeaveDates = []; // รีเซ็ตปฏิทิน
+                studentLeaveDates = [];
                 renderStudentCalendar();
             }
         }).catch(err => { btn.innerText = originalText; btn.disabled = false; Swal.fire('ระบบ SIS', 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่', 'error'); });
@@ -940,7 +937,3 @@
 
 </body>
 </html>
-
-
-
-
