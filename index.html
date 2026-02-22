@@ -7,9 +7,7 @@
     
     <script>
         // 🔗 วางลิงก์ Web App ที่ทำ New version แล้ว ตรงนี้ครับ!
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxAOND9wcpAyclUb8tGDN9Ye7HAYRbMZl8wxBAju7-QqNgoVnVOEIXWqhIGYhLToj9M/exec"; 
-        
-        // เวลาที่จะให้ระบบ Logout อัตโนมัติเมื่อไม่มีการเคลื่อนไหว (ตั้งไว้ 5 นาที)
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzNZYdEdJ7eAyaxKpe_vnBiYnfgtPtWb4UjKrS6yO6p5BHjFJVQU2vLqcquy2BQMoBQ/exec"; 
         const IDLE_TIMEOUT = 5 * 60 * 1000; 
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -20,6 +18,11 @@
         :root { --primary: #1e56a0; --bg: #f3f5f9; }
         body { font-family: 'Prompt', sans-serif; background-color: var(--bg); margin: 0; padding: 0; padding-bottom: 80px; }
         .navbar { background: var(--primary); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
+        
+        /* 📢 CSS ประกาศข่าวสารแบบวิ่ง */
+        .announcement-banner { background: #fef2f2; color: #b91c1c; padding: 8px 15px; font-size: 13px; font-weight: bold; overflow: hidden; white-space: nowrap; border-bottom: 1px solid #fecaca; display: none; }
+        .announcement-banner marquee { margin-bottom: -3px; }
+
         .container { max-width: 900px; margin: 15px auto; padding: 0 10px; min-height: 80vh;}
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
@@ -96,9 +99,9 @@
         input:checked + .slider { background-color: #10b981; }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        .admin-tabs, .student-tabs { display: flex; overflow-x: auto; gap: 5px; margin-bottom: 0; }
-        .admin-tab-btn, .student-tab-btn { flex: 1; min-width: 90px; padding: 12px 5px; text-align: center; background: #e2e8f0; color: #475569; border-radius: 12px 12px 0 0; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; white-space: nowrap;}
-        .admin-tab-btn.active, .student-tab-btn.active { background: #1e56a0; color: white; }
+        .admin-tabs, .student-tabs, .exec-tabs { display: flex; overflow-x: auto; gap: 5px; margin-bottom: 0; }
+        .admin-tab-btn, .student-tab-btn, .exec-tab-btn { flex: 1; min-width: 90px; padding: 12px 5px; text-align: center; background: #e2e8f0; color: #475569; border-radius: 12px 12px 0 0; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; white-space: nowrap;}
+        .admin-tab-btn.active, .student-tab-btn.active, .exec-tab-btn.active { background: #1e56a0; color: white; }
         .admin-tab-content, .student-tab-content, .exec-tab-content { display: none; background: #fff; border-radius: 0 12px 12px 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .admin-tab-content.active, .student-tab-content.active, .exec-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
@@ -111,8 +114,6 @@
         .id-card-photo { width: 90px; height: 120px; background: #e2e8f0; border: 2px solid #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 11px; text-align: center; object-fit: cover; flex-shrink: 0; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);}
         .id-card-info { flex: 1; font-size: 13px; color: #334155; line-height: 1.8; }
         .id-card-info b { color: #0f172a; display: inline-block; width: 60px;}
-        
-        /* เปลี่ยนแปลงส่วนท้ายของบัตร (ลายเซ็นผู้อำนวยการ) */
         .id-card-footer { margin-top: 15px; text-align: center; padding-top: 12px; border-top: 1px dashed #cbd5e1; line-height: 1.4; }
         .director-name { font-size: 15px; font-weight: bold; color: #1e56a0; margin-bottom: 2px;}
         .director-title { font-size: 12px; color: #64748b; }
@@ -127,10 +128,6 @@
         .ai-help-btn { display: block; width: 100%; text-align: left; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; font-family: 'Prompt'; font-size: 13px; color: #1e56a0; transition: 0.2s; font-weight: 500;}
         .ai-help-btn:hover { background: #e0f2fe; border-color: #38bdf8; }
 
-        .exec-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
-        .exec-tab-btn { flex: 1; text-align: center; padding: 12px; background: #e2e8f0; color: #475569; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .exec-tab-btn.active { background: #1e56a0; color: white; }
-        
         .leaderboard-row { display: flex; align-items: center; background: #fff; padding: 10px 12px; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; transition: transform 0.2s; gap: 10px;}
         .leaderboard-row:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
         .rank-badge { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; font-size: 14px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -143,6 +140,21 @@
         .std-lb-class { font-size: 11px; color: #64748b; }
         .std-lb-score { font-size: 18px; font-weight: 900; color: #059669; }
         .std-lb-merit { font-size: 12px; color: #f59e0b; background: #fffbeb; padding: 2px 6px; border-radius: 10px; border: 1px solid #fde68a;}
+
+        /* 🖨️ CSS สำหรับการพิมพ์รายงาน (Print Media Query) */
+        .print-signature { display: none; }
+        @media print {
+            body { padding: 0 !important; background: white !important; font-size: 12pt; }
+            .navbar, .nav-menu, #ai-mascot-container, .btn-logout, button, .ai-box, .ai-exec-box, .exec-filters, .exec-tabs, .admin-tabs, .student-tabs, .live-status-bar, .toolbar { display: none !important; }
+            .container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            .card { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; }
+            .print-signature { display: flex !important; justify-content: space-around; text-align: center; margin-top: 50px; page-break-inside: avoid; }
+            table { width: 100%; border-collapse: collapse; font-size: 12pt; }
+            th, td { border: 1px solid #000 !important; padding: 6px !important; }
+            th { background-color: #e2e8f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .stat-grid { display: flex; gap: 10px; margin-bottom: 20px; }
+            .stat-card { border: 1px solid #000; padding: 10px; color: #000 !important; background: transparent !important; }
+        }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -157,6 +169,10 @@
         <span id="user-display" style="font-size: 12px; font-weight: normal;"></span>
         <button id="logout-btn" class="btn-logout" onclick="logout()" style="display: none;">ออกจากระบบ</button>
     </div>
+</div>
+
+<div id="sys-announcement" class="announcement-banner">
+    <marquee id="sys-announcement-text"></marquee>
 </div>
 
 <div class="container">
@@ -179,9 +195,12 @@
         <div id="checklist-page" class="page active">
             <div class="toolbar">
                 <h2 style="margin: 0; font-size: 18px;">📝 เช็คชื่อ <span id="class-title" style="color:var(--primary);"></span></h2>
-                <input type="date" id="check-date" class="date-picker" style="padding: 6px; font-size: 14px;" onchange="fetchStudents()">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <input type="date" id="check-date" class="date-picker" style="padding: 6px; font-size: 14px; margin-bottom:0; width:auto;" onchange="fetchStudents()">
+                    <button onclick="markAllPresent()" style="background:#10b981; padding:6px 12px; font-size:12px;">✅ มาเรียนทุกคน</button>
+                </div>
             </div>
-            <div class="ai-box">
+            <div class="ai-box" style="margin-top:10px;">
                 <h3>🤖 AI ผู้ช่วยครูประจำชั้น</h3>
                 <p id="teacher-quick-ai" style="font-size:13px; margin:0; line-height:1.5; color:#333;">กำลังเตรียมข้อมูลห้องเรียน...</p>
             </div>
@@ -209,6 +228,7 @@
         </div>
 
         <div id="summary-page" class="page">
+            <button onclick="window.print()" style="width:100%; margin-bottom:15px; background:#10b981; font-size:14px;">🖨️ สั่งพิมพ์รายงานสถิติ</button>
             <h2 style="color: #1e56a0; margin-bottom: 10px; margin-top:0;">📊 สถิติการเข้าแถว (รายห้อง)</h2>
             <div class="stat-grid" id="teacher-stat-grid" style="display:none;">
                 <div class="stat-card stat-blue"><h3>นร. ทั้งหมด</h3><h2 id="tc-total-std">0</h2></div>
@@ -226,6 +246,10 @@
                         <tbody id="summary-body"></tbody>
                     </table>
                 </div>
+            </div>
+            <div class="print-signature">
+                <div>ลงชื่อ.........................................................ครูประจำชั้น<br>(.........................................................)</div>
+                <div>ลงชื่อ.........................................................หัวหน้าระดับ<br>(.........................................................)</div>
             </div>
         </div>
 
@@ -264,13 +288,16 @@
     <div id="admin-pages" style="display:none;">
         <h2 style="color: #1e56a0; margin-bottom: 15px;">⚙️ ระบบผู้ดูแล (Admin)</h2>
         <div class="admin-tabs">
-            <div class="admin-tab-btn active" onclick="switchAdminTab('tab-settings', this)">⚙️ ตั้งค่าระบบ</div>
-            <div class="admin-tab-btn" onclick="switchAdminTab('tab-users', this)">👥 ผู้ใช้งาน</div>
-            <div class="admin-tab-btn" onclick="switchAdminTab('tab-students', this)">🎓 นักเรียน</div>
+            <div class="admin-tab-btn active" onclick="switchTabMobile('admin-pages', 'tab-settings', this)">⚙️ ตั้งค่า</div>
+            <div class="admin-tab-btn" onclick="switchTabMobile('admin-pages', 'tab-users', this)">👥 ผู้ใช้งาน</div>
+            <div class="admin-tab-btn" onclick="switchTabMobile('admin-pages', 'tab-students', this)">🎓 นักเรียน</div>
         </div>
         
         <div id="tab-settings" class="admin-tab-content active">
-            <h3 style="color:#ef4444; margin-top:0;">⏰ จำกัดเวลาเช็คชื่อประจำวัน</h3>
+            <h3 style="margin-top:0; color:#b91c1c;">📢 ประกาศข่าวสาร (ข้อความวิ่ง)</h3>
+            <input type="text" id="admin-announcement" placeholder="พิมพ์ประกาศที่นี่... (ลบออกเพื่อปิดข้อความวิ่ง)" style="border-color:#fecaca; background:#fff5f5;">
+
+            <h3 style="color:#ef4444; border-top: 1px dashed #ddd; padding-top:15px; margin-top:15px;">⏰ จำกัดเวลาเช็คชื่อประจำวัน</h3>
             <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
                 <label class="switch"><input type="checkbox" id="admin-time-limit-toggle"><span class="slider"></span></label>
                 <span id="time-limit-status-text" style="font-size:13px; font-weight:bold; color:#64748b;">ปิดใช้งาน</span>
@@ -356,11 +383,12 @@
         </div>
 
         <div class="exec-tabs">
-            <div class="exec-tab-btn active" id="btn-exec-tab-att" onclick="switchExecTab('exec-tab-attendance', this)">📊 การเข้าเรียน</div>
-            <div class="exec-tab-btn" id="btn-exec-tab-beh" onclick="switchExecTab('exec-tab-behavior', this)">🏆 พฤติกรรม</div>
+            <div class="exec-tab-btn active" onclick="switchTabMobile('exec-pages', 'exec-tab-attendance', this)">📊 การเข้าเรียน</div>
+            <div class="exec-tab-btn" onclick="switchTabMobile('exec-pages', 'exec-tab-behavior', this)">🏆 พฤติกรรม</div>
         </div>
 
         <div id="exec-tab-attendance" class="exec-tab-content active">
+            <button onclick="window.print()" style="margin-bottom:15px; background:#10b981; width:100%; font-size:14px;">🖨️ พิมพ์รายงานสถิติ</button>
             <div class="ai-exec-box">
                 <h3>🤖 สรุปวิเคราะห์สถิติการมาเรียน</h3>
                 <div id="exec-ai-insight"><p style="text-align:center; color:#64748b;">กำลังประมวลผลข้อมูลการเข้าเรียน...</p></div>
@@ -381,6 +409,10 @@
                     </table>
                 </div>
             </div>
+            <div class="print-signature">
+                <div>ลงชื่อ.........................................................ผู้รายงาน<br>(.........................................................)</div>
+                <div>ลงชื่อ.........................................................ผู้อำนวยการ<br>(นายกฤษกร  ภาดี)</div>
+            </div>
         </div>
 
         <div id="exec-tab-behavior" class="exec-tab-content">
@@ -388,13 +420,11 @@
                 <h3 style="color:#059669;">🤖 สรุปภาพรวมพฤติกรรม</h3>
                 <div id="exec-ai-behavior-insight"><p style="text-align:center; color:#64748b;">กำลังประมวลผลคะแนนความดีและพฤติกรรม...</p></div>
             </div>
-            
             <div class="card" style="background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%); border: 2px solid #a7f3d0;">
                 <h3 style="margin-top:0; color:#059669; text-align:center;">🏆 TOP 10 นักเรียนพฤติกรรมดีเด่น</h3>
                 <p style="text-align:center; font-size:12px; color:#64748b; margin-top:-5px; margin-bottom:15px; font-weight:bold;" id="exec-leaderboard-subtitle">ภาพรวมทั้งโรงเรียน</p>
                 <div id="exec-leaderboard-container"></div>
             </div>
-            
             <div class="card" style="background: linear-gradient(180deg, #ffffff 0%, #fef2f2 100%); border: 2px solid #fecaca; margin-top:15px;">
                 <h3 style="margin-top:0; color:#dc2626; text-align:center;">⚠️ กลุ่มเสี่ยง (คะแนนต่ำสุด 10 อันดับ)</h3>
                 <div id="exec-risk-container"></div>
@@ -463,7 +493,15 @@
             <select id="student-leave-type" style="border-color:#fcd34d;"><option value="ลากิจ">ลากิจ (มีธุระจำเป็น)</option><option value="ลาป่วย">ลาป่วย (ไม่สบาย/พบแพทย์)</option></select>
             <label style="font-size:12px; font-weight:bold; color:#92400e;">เหตุผล (อธิบายให้ครูทราบ)</label>
             <textarea id="student-leave-reason" placeholder="เช่น ไปทำธุระต่างจังหวัด หรือ มีไข้สูง..." rows="2" style="border-color:#fcd34d;"></textarea>
-            <button onclick="submitLeaveRequest(this)" style="width:100%; background:#f59e0b; font-size:14px;">📤 ส่งคำร้อง</button>
+            <button onclick="submitLeaveRequest(this)" style="width:100%; background:#f59e0b; font-size:14px; margin-bottom:20px;">📤 ส่งคำร้อง</button>
+
+            <h3 style="margin-top:0; font-size:14px; color:#92400e; border-bottom:1px dashed #fcd34d; padding-bottom:8px;">🗂️ ประวัติการแจ้งลาของฉัน</h3>
+            <div style="overflow-x: auto;">
+                <table style="width:100%; border-collapse: collapse; font-size:12px; background:white;">
+                    <thead><tr><th style="background:#fef3c7;">วันที่ลา</th><th style="background:#fef3c7;">ประเภท</th><th style="background:#fef3c7;">เหตุผล</th></tr></thead>
+                    <tbody id="student-leave-history-body"><tr><td colspan='3' style='text-align:center;'>⏳ กำลังโหลดข้อมูล...</td></tr></tbody>
+                </table>
+            </div>
         </div>
 
         <div id="tab-std-behavior" class="student-tab-content">
@@ -544,14 +582,26 @@
 </div>
 
 <script>
+    // 🌟 ฟังก์ชันแสดงข้อความวิ่ง
+    function showAnnouncement(msg) {
+        let b = document.getElementById('sys-announcement');
+        let m = document.getElementById('sys-announcement-text');
+        if(msg && msg.trim() !== "") {
+            m.innerText = "📢 ประกาศจากโรงเรียน: " + msg;
+            b.style.display = 'block';
+        } else {
+            b.style.display = 'none';
+        }
+    }
+
     function toggleAiPopup() { let popup = document.getElementById('ai-help-popup'); if(popup) { if (popup.style.display === 'none' || popup.style.display === '') popup.style.display = 'block'; else popup.style.display = 'none'; } }
     function showAiHelp(topic) {
         toggleAiPopup(); 
         let title = ""; let text = ""; let icon = 'info';
-        if (topic === 'attendance') { title = "📝 วิธีบันทึกการเข้าเรียน"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>สำหรับคุณครูประจำชั้น:</b><br>1. เข้าเมนู 'เช็คชื่อ'<br>2. วันที่ระบบจะตั้งเป็นวันนี้ให้อัตโนมัติ<br>3. กดเลือกสถานะ (มา, สาย, ขาด, ลา)<br>4. กดปุ่ม <b>'💾 บันทึกข้อมูล'</b> จบครับ!</div>"; } 
+        if (topic === 'attendance') { title = "📝 วิธีบันทึกการเข้าเรียน"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>สำหรับคุณครูประจำชั้น:</b><br>1. เข้าเมนู 'เช็คชื่อ'<br>2. วันที่ระบบจะตั้งเป็นวันนี้ให้อัตโนมัติ<br>3. กดเลือกสถานะ (มา, สาย, ขาด, ลา)<br>4. หรือกด <b>✅ มาเรียนทุกคน</b><br>5. กดปุ่ม <b>'💾 บันทึกข้อมูล'</b> จบครับ!</div>"; } 
         else if (topic === 'leave') { title = "📨 การแจ้งขออนุญาตลาหยุด"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>ฝั่งนักเรียน:</b> เข้าเมนู 'แจ้งลา' > เลือกวันที่ในปฏิทิน > กดส่งคำร้อง<br><br><b>ฝั่งครู:</b> ระบบจะดึงข้อมูลเด็กที่แจ้งลา มาใส่ในหน้าฟอร์มให้อัตโนมัติ และแสดงรายการในแท็บ 'แจ้งลา' ครับ</div>"; } 
         else if (topic === 'behavior') { title = "💯 ระบบคะแนนพฤติกรรม"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'>คะแนนพฤติกรรมเริ่ม 100 และมีคะแนนความดีแยกสะสมครับ<br>🔴 <b>'ขาด':</b> หัก 5 คะแนน<br>🟡 <b>'สาย':</b> หัก 2 คะแนน<br>🌟 ครูสามารถกด <b>'จัดการ'</b> ในแท็บพฤติกรรม เพื่อเพิ่มคะแนนความดี หรือหักคะแนนพฤติกรรมเด็กรายบุคคลได้เลยครับ</div>"; } 
-        else if (topic === 'admin') { title = "⚙️ สำหรับผู้ดูแลระบบ"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>แอดมินทำได้:</b><br>1. ปิด-เปิดระบบล็อกเวลาเช็คชื่อ<br>2. กำหนดวันหยุดนักขัตฤกษ์<br>3. จัดการรายชื่อครูและนักเรียน<br>4. ดู Dashboard วิเคราะห์ข้อมูลระดับบริหาร</div>"; }
+        else if (topic === 'admin') { title = "⚙️ สำหรับผู้ดูแลระบบ"; text = "<div style='text-align:left; font-size:14px; line-height:1.6;'><b>แอดมินทำได้:</b><br>1. ตั้งข้อความวิ่งประกาศหน้าเว็บ<br>2. ปิด-เปิดระบบล็อกเวลาเช็คชื่อ<br>3. กำหนดวันหยุดนักขัตฤกษ์<br>4. จัดการรายชื่อครูและนักเรียน</div>"; }
         Swal.fire({ title: title, html: text, icon: icon, confirmButtonText: 'เข้าใจแล้ว', confirmButtonColor: '#f59e0b' });
     }
 
@@ -579,7 +629,10 @@
             if (Date.now() - parseInt(lastActivity) > IDLE_TIMEOUT) { 
                 localStorage.removeItem('sis_user'); localStorage.removeItem('sis_last_activity'); localStorage.removeItem('sis_current_page'); 
             } else { 
-                let data = JSON.parse(userData); routeUser(data); setupActivityListeners(); resetIdleTimer(); 
+                let data = JSON.parse(userData); 
+                routeUser(data); 
+                if(data.announcement) showAnnouncement(data.announcement); // แสดงประกาศตอนใช้เซสชั่น
+                setupActivityListeners(); resetIdleTimer(); 
             } 
         } 
     }
@@ -640,7 +693,6 @@
         if (pageId === 'notifications-page' && currentClass) loadLeaveNotifications(); 
     }
 
-    // 🌟 ระบบล็อกอินแบบใหม่ที่อุดรอยรั่วการเด้ง Error 
     function handleLogin() {
         const u = document.getElementById('username').value.trim();
         const p = document.getElementById('password').value.trim();
@@ -662,7 +714,6 @@
                 try {
                     data = JSON.parse(text);
                 } catch(e) {
-                    console.error("Parse Error:", text);
                     Swal.fire('ระบบ SIS', '❌ การเชื่อมต่อผิดพลาด กรุณาลองใหม่อีกครั้ง', 'error');
                     return;
                 }
@@ -671,6 +722,9 @@
                     data.userId = u;
                     localStorage.setItem('sis_user', JSON.stringify(data));
                     localStorage.setItem('sis_last_activity', Date.now());
+                    
+                    showAnnouncement(data.announcement); // แสดงประกาศตอนล็อกอิน
+                    
                     routeUser(data);
                     setupActivityListeners();
                     resetIdleTimer();
@@ -682,7 +736,6 @@
                 btn.innerText = "เข้าสู่ระบบ"; 
                 btn.disabled = false;
                 if(document.getElementById('login-page').classList.contains('active') === false) return; 
-                console.error("Login Fetch Error:", err);
                 Swal.fire('ระบบ SIS', `❌ เชื่อมต่อล้มเหลว กรุณาตรวจสอบอินเทอร์เน็ต`, 'error');
             });
     }
@@ -870,6 +923,16 @@
         }
     }
 
+    // ⚡ ปุ่มฟังก์ชันมาเรียนทุกคน
+    function markAllPresent() {
+        students.forEach(std => {
+            if(!document.getElementById(`view-${std.id}`)) { // ถ้ายังไม่เคยบันทึก
+                document.querySelector(`#row-${std.id} select`).value = "มา";
+                setStatus(std.id, "มา");
+            }
+        });
+    }
+
     function fetchStudents() {
         let dateInput = document.getElementById('check-date');
         if(!dateInput.value) { let d = new Date(); let month = '' + (d.getMonth() + 1), day = '' + d.getDate(), year = d.getFullYear(); if (month.length < 2) month = '0' + month; if (day.length < 2) day = '0' + day; dateInput.value = [year, month, day].join('-'); }
@@ -954,7 +1017,7 @@
         let sType = document.getElementById('student-leave-type').value; let sReason = document.getElementById('student-leave-reason').value;
         if(!sReason) { Swal.fire('ระบบ SIS', 'กรุณาระบุเหตุผลให้ครูทราบด้วยครับ', 'warning'); return; }
         let uData = JSON.parse(localStorage.getItem('sis_user')); let originalText = btn.innerText; btn.innerText = '⏳ กำลังส่งข้อมูล...'; btn.disabled = true;
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submit_leave", dates: studentLeaveDates, studentId: uData.userId, studentName: uData.name, className: uData.className, leaveType: sType, reason: sReason }) }).then(res => res.json()).then(data => { btn.innerText = originalText; btn.disabled = false; if(data.status === 'success') { Swal.fire('ระบบ SIS', 'ส่งคำร้องแจ้งลาเรียบร้อยแล้ว ครูประจำชั้นจะเห็นข้อมูลของท่านโดยอัตโนมัติ', 'success'); document.getElementById('student-leave-reason').value = ""; studentLeaveDates = []; renderStudentCalendar(); } }).catch(err => { btn.innerText = originalText; btn.disabled = false; Swal.fire('ระบบ SIS', 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่', 'error'); });
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submit_leave", dates: studentLeaveDates, studentId: uData.userId, studentName: uData.name, className: uData.className, leaveType: sType, reason: sReason }) }).then(res => res.json()).then(data => { btn.innerText = originalText; btn.disabled = false; if(data.status === 'success') { Swal.fire('ระบบ SIS', 'ส่งคำร้องแจ้งลาเรียบร้อยแล้ว ครูประจำชั้นจะเห็นข้อมูลของท่านโดยอัตโนมัติ', 'success'); document.getElementById('student-leave-reason').value = ""; studentLeaveDates = []; renderStudentCalendar(); loadStudentReport(uData.userId, true); } }).catch(err => { btn.innerText = originalText; btn.disabled = false; Swal.fire('ระบบ SIS', 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่', 'error'); });
     }
 
     function loadWeeklyData() {
@@ -997,11 +1060,15 @@
     }
 
     function loadAdminData() {
+        let elAnn = document.getElementById('admin-announcement');
         fetch(`${GAS_API_URL}?action=get_admin_data`).then(res => res.json()).then(data => {
             if(data.status === "success") {
                 function toFormatDate(dStr) { if (!dStr) return ""; let d = new Date(dStr); if (isNaN(d)) return dStr; return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
                 document.getElementById('admin-time-limit-toggle').checked = data.config.timeLimitEnabled; document.getElementById('admin-start-time').value = data.config.startTime || "07:30"; document.getElementById('admin-end-time').value = data.config.endTime || "08:30"; document.getElementById('admin-time-limit-toggle').dispatchEvent(new Event('change'));
                 document.getElementById('admin-start').value = toFormatDate(data.config.startDate); document.getElementById('admin-end').value = toFormatDate(data.config.endDate); adminHolidays = (data.config.holidays || []).filter(h => h.trim() !== ""); renderAdminCalendar(); 
+                
+                if(elAnn && data.config.announcement) elAnn.value = data.config.announcement;
+
                 let uBody = document.getElementById('admin-users-body'); uBody.innerHTML = "";
                 data.users.forEach((u, i) => { uBody.innerHTML += `<tr><td><input type="text" value="${u[0]}"></td><td><input type="text" value="${u[1]}"></td><td><select><option value="teacher" ${u[2]=='teacher'?'selected':''}>ครู (Teacher)</option><option value="admin" ${u[2]=='admin'?'selected':''}>ผู้ดูแลระบบ (Admin)</option><option value="executive" ${u[2]=='executive'?'selected':''}>ผู้บริหาร (Executive)</option><option value="student" ${u[2]=='student'?'selected':''}>นักเรียน (Student)</option></select></td><td><input type="text" value="${u[3]}"></td><td><input type="text" value="${u[4]||''}"></td><td><button style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.parentElement.parentElement.remove()">ลบ</button></td></tr>`; });
                 allAdminStudentsData = data.students; updateClassDropdown(); renderAdminStudents();
@@ -1050,8 +1117,12 @@
     
     function saveAdminData(btn) {
         let originalText = btn.innerText; btn.innerText = "⏳ กำลังบันทึก..."; btn.disabled = true; let u = []; document.querySelectorAll('#admin-users-body tr').forEach(tr => { let i = tr.querySelectorAll('input, select'); u.push([i[0].value, i[1].value, i[2].value, i[3].value, i[4].value]); });
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "admin_update", settings: { startDate: document.getElementById('admin-start').value, endDate: document.getElementById('admin-end').value, holidays: adminHolidays, timeLimitEnabled: document.getElementById('admin-time-limit-toggle').checked, startTime: document.getElementById('admin-start-time').value, endTime: document.getElementById('admin-end-time').value }, users: u, students: allAdminStudentsData }) })
-        .then(res => res.json()).then(data => { btn.innerText = originalText; btn.disabled = false; if(data.status === "success") Swal.fire('ระบบ SIS', '✅ บันทึกสำเร็จ', 'success'); }).catch(err => { btn.innerText = originalText; btn.disabled = false; Swal.fire('ระบบ SIS', '❌ ล้มเหลว', 'error'); });
+        
+        let elAnn = document.getElementById('admin-announcement');
+        let txtAnn = elAnn ? elAnn.value : "";
+        
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "admin_update", settings: { startDate: document.getElementById('admin-start').value, endDate: document.getElementById('admin-end').value, holidays: adminHolidays, timeLimitEnabled: document.getElementById('admin-time-limit-toggle').checked, startTime: document.getElementById('admin-start-time').value, endTime: document.getElementById('admin-end-time').value, announcement: txtAnn }, users: u, students: allAdminStudentsData }) })
+        .then(res => res.json()).then(data => { btn.innerText = originalText; btn.disabled = false; if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ บันทึกสำเร็จ', 'success'); showAnnouncement(txtAnn); } }).catch(err => { btn.innerText = originalText; btn.disabled = false; Swal.fire('ระบบ SIS', '❌ ล้มเหลว', 'error'); });
     }
 
     function fetchFullExecData() { document.getElementById('exec-ai-insight').innerHTML = "<p style='text-align:center;'>⏳ กำลังดาวน์โหลดฐานข้อมูล...</p>"; fetch(`${GAS_API_URL}?action=get_full_exec_data`).then(res=>res.json()).then(data=>{execFullAttendance=data.attendance; execFullStudents=data.students; execFullBehavior=data.behavior || []; updateExecViewDropdown();}); }
@@ -1172,6 +1243,15 @@
             
             let hHTML = ""; data.history.reverse().forEach(x => hHTML += `<tr><td>${formatThaiDate(x.date)}</td><td>${x.status}</td><td>${x.note||'-'}</td></tr>`); 
             let stdHist = document.getElementById('student-history-body'); if(stdHist) stdHist.innerHTML = hHTML;
+
+            // 🌟 อัปเดตตารางประวัติการลาให้ผู้เรียน
+            let lHTML = ""; 
+            if(data.leaveHistory && data.leaveHistory.length > 0) {
+                data.leaveHistory.reverse().forEach(x => lHTML += `<tr><td style="border-bottom:1px solid #eee; padding:8px 5px;">${formatThaiDate(x.date, true)}</td><td style="border-bottom:1px solid #eee; padding:8px 5px;">${x.type}</td><td style="border-bottom:1px solid #eee; padding:8px 5px; color:#475569;">${x.reason}</td></tr>`);
+            } else {
+                lHTML = `<tr><td colspan='3' style='text-align:center; padding:15px; color:#64748b;'>ไม่พบประวัติการแจ้งลา</td></tr>`;
+            }
+            let stdLeaveHist = document.getElementById('student-leave-history-body'); if(stdLeaveHist) stdLeaveHist.innerHTML = lHTML;
 
             if(data.behaviorScore !== undefined) {
                 let behText = document.getElementById('behavior-score-text'); 
