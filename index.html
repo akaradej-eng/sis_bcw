@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIS BCW - ระบบโรงเรียนบ้านเชียงวิทยา</title>
+    
+    <script>
+        // 🔗 วางลิงก์ Web App ที่ทำ New version แล้ว ตรงนี้ครับ!
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyn_sFhEidU_U9nH1N_xrRroRwydBzT0qmxgx2fBn9aKy2GfdkMZ4yFyKTD3gUpvK2R/exec"; 
+        
+        // เวลาที่จะให้ระบบ Logout อัตโนมัติ (ปัจจุบันตั้งไว้ 5 นาที)
+        const IDLE_TIMEOUT = 5 * 60 * 1000; 
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -18,7 +26,6 @@
         .page.active { display: block; }
         .card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
         
-        /* 🌟 CSS แถบเมนูด้านล่างแบบแอปมือถือ */
         .nav-menu { position: fixed; bottom: 0; width: 100%; background: white; display: none; justify-content: space-around; padding: 10px 0 15px 0; border-top: 1px solid #ddd; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}
         .nav-item { text-align: center; font-size: 12px; color: #64748b; cursor: pointer; flex: 1; transition: 0.3s; padding: 5px 0; border-radius: 8px;}
         .nav-item.active { color: var(--primary); font-weight: bold; }
@@ -90,11 +97,12 @@
         input:checked + .slider { background-color: #10b981; }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        /* 🌟 CSS เนื้อหาแต่ละแท็บ */
-        .admin-tab-content, .student-tab-content, .exec-tab-content { display: none; background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .admin-tabs, .student-tabs { display: flex; overflow-x: auto; gap: 5px; margin-bottom: 0; }
+        .admin-tab-btn, .student-tab-btn { flex: 1; min-width: 90px; padding: 12px 5px; text-align: center; background: #e2e8f0; color: #475569; border-radius: 12px 12px 0 0; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; white-space: nowrap;}
+        .admin-tab-btn.active, .student-tab-btn.active { background: #1e56a0; color: white; }
+        .admin-tab-content, .student-tab-content, .exec-tab-content { display: none; background: #fff; border-radius: 0 12px 12px 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .admin-tab-content.active, .student-tab-content.active, .exec-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
-        /* 🌟 CSS บัตรนักเรียนดิจิทัล */
         .id-card-container { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #e2e8f0; border-radius: 12px; padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); max-width: 400px; margin: 0 auto 20px auto; position: relative; overflow: hidden; }
         .id-card-header { display: flex; align-items: center; border-bottom: 3px solid #1e56a0; padding-bottom: 10px; margin-bottom: 15px; justify-content: center; }
         .id-card-logo { width: 45px; height: auto; margin-right: 10px; }
@@ -105,7 +113,7 @@
         .id-card-info b { color: #0f172a; display: inline-block; width: 60px;}
         .id-card-footer { margin-top: 15px; text-align: center; font-family: 'Libre Barcode 39', cursive; font-size: 40px; color: #1e293b; padding-top: 10px; border-top: 1px dashed #cbd5e1;}
 
-        .footer-credit { text-align: center; padding: 25px; margin-top: 40px; color: #64748b; font-size: 13px; border-top: 1px dashed #ddd; line-height: 1.8; }
+        .footer-credit { text-align: center; padding: 25px; margin-top: 30px; color: #64748b; font-size: 12px; border-top: 1px dashed #ddd; line-height: 1.8; background: #f8fafc; border-radius: 12px; }
         .swal2-title, .swal2-html-container, .swal2-confirm, .swal2-cancel { font-family: 'Prompt', sans-serif !important; }
 
         .live-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; display: inline-block; animation: pulseLive 1.5s infinite; }
@@ -115,7 +123,10 @@
         .ai-help-btn { display: block; width: 100%; text-align: left; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; font-family: 'Prompt'; font-size: 13px; color: #1e56a0; transition: 0.2s; font-weight: 500;}
         .ai-help-btn:hover { background: #e0f2fe; border-color: #38bdf8; }
 
-        /* 🌟 CSS Leaderboard */
+        .exec-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .exec-tab-btn { flex: 1; text-align: center; padding: 12px; background: #e2e8f0; color: #475569; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .exec-tab-btn.active { background: #1e56a0; color: white; }
+        
         .leaderboard-row { display: flex; align-items: center; background: #fff; padding: 10px 12px; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; transition: transform 0.2s; gap: 10px;}
         .leaderboard-row:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
         .rank-badge { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; font-size: 14px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -219,8 +230,19 @@
             <div class="card" style="padding-top:10px;">
                 <div style="overflow-x:auto;">
                     <table style="margin-top:0; border: 1px solid #eee; white-space: nowrap;">
-                        <thead><tr><th style="width: 30px;">ที่</th><th>ชื่อ-นามสกุล</th><th style="color:#ef4444;">🔴 โดนหัก</th><th style="color:#10b981;">🌟 ความดี</th><th style="color:#1e56a0;">🏆 คงเหลือ</th><th style="width: 60px;">จัดการ</th></tr></thead>
-                        <tbody id="behavior-body"><tr><td colspan='6' style='text-align:center;'>⏳ กำลังดึงข้อมูลคะแนนพฤติกรรม...</td></tr></tbody>
+                        <thead>
+                            <tr>
+                                <th style="width: 30px;">ที่</th>
+                                <th>ชื่อ-นามสกุล</th>
+                                <th style="color:#ef4444;">🔴 โดนหัก</th>
+                                <th style="color:#10b981;">🌟 ความดี</th>
+                                <th style="color:#1e56a0;">🏆 คงเหลือ</th>
+                                <th style="width: 60px;">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="behavior-body">
+                            <tr><td colspan='6' style='text-align:center;'>⏳ กำลังดึงข้อมูลคะแนนพฤติกรรม...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -451,7 +473,11 @@
         </div>
     </div>
 
-    <div class="footer-credit">จัดทำโดย<br><b>นายอัครเดช โพธิญาณ์</b><br>รองผู้อำนวยการสถานศึกษา โรงเรียนบ้านเชียงวิทยา</div>
+    <div class="footer-credit">
+        ระบบสารสนเทศนักเรียน โรงเรียนบ้านเชียงวิทยา (SIS บ้านเชียงวิทยา V.01)<br>
+        พัฒนาโดย <b>นายอัครเดช โพธิญาณ์</b><br>
+        รองผู้อำนวยการโรงเรียนบ้านเชียงวิทยา สำนักงานเขตพื้นที่การศึกษามัธยมศึกษาอุดรธานี
+    </div>
 </div>
 
 <div id="ai-mascot-container" style="position: fixed; bottom: 85px; right: 15px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end;">
@@ -500,12 +526,6 @@
 </div>
 
 <script>
-    // 🔗 วางลิงก์ Web App ที่ทำ New version แล้ว ตรงนี้ครับ!
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyn_sFhEidU_U9nH1N_xrRroRwydBzT0qmxgx2fBn9aKy2GfdkMZ4yFyKTD3gUpvK2R/exec"; 
-    
-    const IDLE_TIMEOUT = 5 * 60 * 1000; 
-    let idleTimer = null;
-
     function toggleAiPopup() { let popup = document.getElementById('ai-help-popup'); if(popup) { if (popup.style.display === 'none' || popup.style.display === '') popup.style.display = 'block'; else popup.style.display = 'none'; } }
     function showAiHelp(topic) {
         toggleAiPopup(); 
@@ -571,7 +591,6 @@
         });
     }
 
-    // 🌟 ระบบสลับหน้าสำหรับผู้ที่ไม่ใช่ครู (Student, Admin, Exec)
     function switchTabMobile(parentId, tabId, element) {
         let parent = document.getElementById(parentId);
         if(parent) {
@@ -840,7 +859,7 @@
     function saveAttendance() {
         const btn = document.getElementById('save-btn'); btn.innerText = "⏳ ระบบกำลังส่งข้อมูล..."; btn.disabled = true;
         let records = []; students.forEach(s => records.push({ id: s.id, name: s.name, className: currentClass, status: attendanceData[s.id].status, note: document.getElementById(`note-${s.id}`).value }));
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) }).then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false; if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบหักคะแนนอัตโนมัติแล้ว)', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error'); });
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) }).then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false; if(data.status === "success") { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบหักคะแนนอัตโนมัติแล้ว)', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error'); });
     }
 
     function loadQuickAIInsight() {
