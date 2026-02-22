@@ -18,9 +18,12 @@
         .page.active { display: block; }
         .card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
         
-        .nav-menu { position: fixed; bottom: 0; width: 100%; background: white; display: none; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; z-index: 1000;}
-        .nav-item { text-align: center; font-size: 13px; color: #64748b; cursor: pointer; flex: 1; padding: 5px 0;}
+        /* 🌟 CSS แถบเมนูด้านล่างแบบแอปมือถือ */
+        .nav-menu { position: fixed; bottom: 0; width: 100%; background: white; display: none; justify-content: space-around; padding: 10px 0 15px 0; border-top: 1px solid #ddd; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}
+        .nav-item { text-align: center; font-size: 12px; color: #64748b; cursor: pointer; flex: 1; transition: 0.3s; padding: 5px 0; border-radius: 8px;}
         .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-item span { font-size: 20px; display: block; margin-bottom: 2px;}
+        .nav-item.active span { transform: scale(1.1); }
         
         input, select, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Prompt'; width: 100%; box-sizing: border-box; margin-bottom: 10px;}
         button { padding: 10px 15px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: bold;}
@@ -87,11 +90,9 @@
         input:checked + .slider { background-color: #10b981; }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        .admin-tabs, .student-tabs { display: flex; overflow-x: auto; gap: 5px; margin-bottom: 0; }
-        .admin-tab-btn, .student-tab-btn { flex: 1; min-width: 90px; padding: 12px 5px; text-align: center; background: #e2e8f0; color: #475569; border-radius: 12px 12px 0 0; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; white-space: nowrap;}
-        .admin-tab-btn.active, .student-tab-btn.active { background: #1e56a0; color: white; }
-        .admin-tab-content, .student-tab-content { display: none; background: #fff; border-radius: 0 12px 12px 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .admin-tab-content.active, .student-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        /* 🌟 CSS เนื้อหาแต่ละแท็บ */
+        .admin-tab-content, .student-tab-content, .exec-tab-content { display: none; background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .admin-tab-content.active, .student-tab-content.active, .exec-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
         /* 🌟 CSS บัตรนักเรียนดิจิทัล */
         .id-card-container { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #e2e8f0; border-radius: 12px; padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); max-width: 400px; margin: 0 auto 20px auto; position: relative; overflow: hidden; }
@@ -114,13 +115,7 @@
         .ai-help-btn { display: block; width: 100%; text-align: left; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; font-family: 'Prompt'; font-size: 13px; color: #1e56a0; transition: 0.2s; font-weight: 500;}
         .ai-help-btn:hover { background: #e0f2fe; border-color: #38bdf8; }
 
-        /* 🌟 CSS แดชบอร์ดผู้บริหาร (Leaderboard) */
-        .exec-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
-        .exec-tab-btn { flex: 1; text-align: center; padding: 12px; background: #e2e8f0; color: #475569; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .exec-tab-btn.active { background: #1e56a0; color: white; }
-        .exec-tab-content { display: none; animation: fadeIn 0.3s ease; }
-        .exec-tab-content.active { display: block; }
-        
+        /* 🌟 CSS Leaderboard */
         .leaderboard-row { display: flex; align-items: center; background: #fff; padding: 10px 12px; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; transition: transform 0.2s; gap: 10px;}
         .leaderboard-row:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
         .rank-badge { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; font-size: 14px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -165,100 +160,83 @@
         </div>
     </div>
 
-    <div id="checklist-page" class="page">
-        <div class="toolbar">
-            <h2 style="margin: 0; font-size: 18px;">📝 เช็คชื่อ <span id="class-title" style="color:var(--primary);"></span></h2>
-            <input type="date" id="check-date" class="date-picker" style="padding: 6px; font-size: 14px;" onchange="fetchStudents()">
+    <div id="teacher-pages" style="display:none;">
+        <div id="checklist-page" class="page active">
+            <div class="toolbar">
+                <h2 style="margin: 0; font-size: 18px;">📝 เช็คชื่อ <span id="class-title" style="color:var(--primary);"></span></h2>
+                <input type="date" id="check-date" class="date-picker" style="padding: 6px; font-size: 14px;" onchange="fetchStudents()">
+            </div>
+            <div class="ai-box">
+                <h3>🤖 AI ผู้ช่วยครูประจำชั้น</h3>
+                <p id="teacher-quick-ai" style="font-size:13px; margin:0; line-height:1.5; color:#333;">กำลังเตรียมข้อมูลห้องเรียน...</p>
+            </div>
+            <div id="student-list-container"></div>
+            <button class="save-btn" id="save-btn" onclick="saveAttendance()" style="width:100%; padding:15px; font-size: 16px; margin-top: 10px; display:none;">💾 บันทึกข้อมูล</button>
         </div>
-        <div class="ai-box">
-            <h3>🤖 AI ผู้ช่วยครูประจำชั้น</h3>
-            <p id="teacher-quick-ai" style="font-size:13px; margin:0; line-height:1.5; color:#333;">กำลังเตรียมข้อมูลห้องเรียน...</p>
-        </div>
-        <div id="student-list-container"></div>
-        <button class="save-btn" id="save-btn" onclick="saveAttendance()" style="width:100%; padding:15px; font-size: 16px; margin-top: 10px; display:none;">💾 บันทึกข้อมูล</button>
-    </div>
 
-    <div id="daily-page" class="page">
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                <h2 style="margin:0; font-size: 18px; color: #1e56a0;">📅 สัปดาห์ปัจจุบัน</h2>
-                <span id="weekly-date-range" style="font-size:12px; font-weight:bold; background:#e0f2fe; color:#0369a1; padding:5px 10px; border-radius:6px;">กำลังโหลด...</span>
-            </div>
-            <div class="ai-box" style="margin-bottom:10px; padding:10px;">
-                <h3 style="font-size:14px;">🤖 AI สรุปประจำสัปดาห์</h3>
-                <p id="teacher-daily-ai" style="font-size:13px; margin:0;">รอการโหลดข้อมูล...</p>
-            </div>
-            <div style="overflow-x:auto;">
-                <table style="margin-top:0;">
-                    <thead><tr><th style="width:30px;">ที่</th><th>ชื่อ-สกุล</th><th id="th-mon" style="width:40px;">จ.</th><th id="th-tue" style="width:40px;">อ.</th><th id="th-wed" style="width:40px;">พ.</th><th id="th-thu" style="width:40px;">พฤ.</th><th id="th-fri" style="width:40px;">ศ.</th></tr></thead>
-                    <tbody id="daily-body"></tbody>
-                </table>
+        <div id="daily-page" class="page">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                    <h2 style="margin:0; font-size: 18px; color: #1e56a0;">📅 สัปดาห์ปัจจุบัน</h2>
+                    <span id="weekly-date-range" style="font-size:12px; font-weight:bold; background:#e0f2fe; color:#0369a1; padding:5px 10px; border-radius:6px;">กำลังโหลด...</span>
+                </div>
+                <div class="ai-box" style="margin-bottom:10px; padding:10px;">
+                    <h3 style="font-size:14px;">🤖 AI สรุปประจำสัปดาห์</h3>
+                    <p id="teacher-daily-ai" style="font-size:13px; margin:0;">รอการโหลดข้อมูล...</p>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table style="margin-top:0;">
+                        <thead><tr><th style="width:30px;">ที่</th><th>ชื่อ-สกุล</th><th id="th-mon" style="width:40px;">จ.</th><th id="th-tue" style="width:40px;">อ.</th><th id="th-wed" style="width:40px;">พ.</th><th id="th-thu" style="width:40px;">พฤ.</th><th id="th-fri" style="width:40px;">ศ.</th></tr></thead>
+                        <tbody id="daily-body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="summary-page" class="page">
-        <h2 style="color: #1e56a0; margin-bottom: 10px; margin-top:0;">📊 สถิติการเข้าแถว (รายห้อง)</h2>
-        <div class="stat-grid" id="teacher-stat-grid" style="display:none;">
-            <div class="stat-card stat-blue"><h3>นร. ทั้งหมด</h3><h2 id="tc-total-std">0</h2></div>
-            <div class="stat-card stat-green"><h3>มาเรียนเฉลี่ย</h3><h2 id="tc-avg-perc">0%</h2></div>
-            <div class="stat-card stat-red"><h3>เสี่ยง (<80%)</h3><h2 id="tc-risk-std">0</h2></div>
-        </div>
-        <div class="card" style="padding-top:10px;">
-            <div class="ai-box" style="margin-bottom:10px; padding:10px;">
-                <h3 style="font-size:14px;">🤖 AI ประเมินภาพรวม</h3>
-                <p id="teacher-summary-ai" style="font-size:13px; margin:0;">กำลังประมวลผลสถิติ...</p>
+        <div id="summary-page" class="page">
+            <h2 style="color: #1e56a0; margin-bottom: 10px; margin-top:0;">📊 สถิติการเข้าแถว (รายห้อง)</h2>
+            <div class="stat-grid" id="teacher-stat-grid" style="display:none;">
+                <div class="stat-card stat-blue"><h3>นร. ทั้งหมด</h3><h2 id="tc-total-std">0</h2></div>
+                <div class="stat-card stat-green"><h3>มาเรียนเฉลี่ย</h3><h2 id="tc-avg-perc">0%</h2></div>
+                <div class="stat-card stat-red"><h3>เสี่ยง (<80%)</h3><h2 id="tc-risk-std">0</h2></div>
             </div>
-            <div style="overflow-x:auto;">
-                <table style="margin-top:0; border: 1px solid #eee; white-space: nowrap;">
-                    <thead><tr><th style="width: 30px;">ที่</th><th>ชื่อ-นามสกุล</th><th style="color:#10b981;">มา</th><th style="color:#eab308;">สาย</th><th style="color:#f97316;">ลากิจ</th><th style="color:#f43f5e;">ป่วย</th><th style="color:#991b1b;">ขาด</th><th style="color:#3b82f6;">นอกร.ร.</th><th>%</th></tr></thead>
-                    <tbody id="summary-body"></tbody>
-                </table>
+            <div class="card" style="padding-top:10px;">
+                <div class="ai-box" style="margin-bottom:10px; padding:10px;">
+                    <h3 style="font-size:14px;">🤖 AI ประเมินภาพรวม</h3>
+                    <p id="teacher-summary-ai" style="font-size:13px; margin:0;">กำลังประมวลผลสถิติ...</p>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table style="margin-top:0; border: 1px solid #eee; white-space: nowrap;">
+                        <thead><tr><th style="width: 30px;">ที่</th><th>ชื่อ-นามสกุล</th><th style="color:#10b981;">มา</th><th style="color:#eab308;">สาย</th><th style="color:#f97316;">ลากิจ</th><th style="color:#f43f5e;">ป่วย</th><th style="color:#991b1b;">ขาด</th><th style="color:#3b82f6;">นอกร.ร.</th><th>%</th></tr></thead>
+                        <tbody id="summary-body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="behavior-page" class="page">
-        <h2 style="color: #1e56a0; margin-bottom: 10px; margin-top:0;">💯 จัดการคะแนนพฤติกรรม <span id="beh-class-title" style="color:var(--primary);"></span></h2>
-        <div class="card" style="padding-top:10px;">
-            <div style="overflow-x:auto;">
-                <table style="margin-top:0; border: 1px solid #eee; white-space: nowrap;">
-                    <thead>
-                        <tr>
-                            <th style="width: 30px;">ที่</th>
-                            <th>ชื่อ-นามสกุล</th>
-                            <th style="color:#ef4444;">🔴 โดนหัก</th>
-                            <th style="color:#10b981;">🌟 ความดี</th>
-                            <th style="color:#1e56a0;">🏆 คงเหลือ</th>
-                            <th style="width: 60px;">จัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="behavior-body">
-                        <tr><td colspan='6' style='text-align:center;'>⏳ กำลังดึงข้อมูลคะแนนพฤติกรรม...</td></tr>
-                    </tbody>
-                </table>
+        <div id="behavior-page" class="page">
+            <h2 style="color: #1e56a0; margin-bottom: 10px; margin-top:0;">💯 จัดการคะแนนพฤติกรรม <span id="beh-class-title" style="color:var(--primary);"></span></h2>
+            <div class="card" style="padding-top:10px;">
+                <div style="overflow-x:auto;">
+                    <table style="margin-top:0; border: 1px solid #eee; white-space: nowrap;">
+                        <thead><tr><th style="width: 30px;">ที่</th><th>ชื่อ-นามสกุล</th><th style="color:#ef4444;">🔴 โดนหัก</th><th style="color:#10b981;">🌟 ความดี</th><th style="color:#1e56a0;">🏆 คงเหลือ</th><th style="width: 60px;">จัดการ</th></tr></thead>
+                        <tbody id="behavior-body"><tr><td colspan='6' style='text-align:center;'>⏳ กำลังดึงข้อมูลคะแนนพฤติกรรม...</td></tr></tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="notifications-page" class="page">
-        <h2 style="color: #1e56a0; margin-bottom: 10px; margin-top:0;">🔔 รายการแจ้งลาหยุด <span id="notif-class-title" style="color:var(--primary);"></span></h2>
-        <div class="card" style="background: #fffbeb; border: 1px solid #fcd34d;">
-            <h3 style="margin-top:0; color: #b45309; display:flex; align-items:center; gap:8px;">📨 ข้อมูลการแจ้งลาของนักเรียนในห้อง</h3>
-            <div id="leave-notifications-container">
-                <div style="text-align:center; padding:20px;">⏳ กำลังโหลดข้อมูล...</div>
+        <div id="notifications-page" class="page">
+            <h2 style="color: #1e56a0; margin-bottom: 10px; margin-top:0;">🔔 รายการแจ้งลาหยุด <span id="notif-class-title" style="color:var(--primary);"></span></h2>
+            <div class="card" style="background: #fffbeb; border: 1px solid #fcd34d;">
+                <h3 style="margin-top:0; color: #b45309; display:flex; align-items:center; gap:8px;">📨 ข้อมูลการแจ้งลาของนักเรียนในห้อง</h3>
+                <div id="leave-notifications-container"><div style="text-align:center; padding:20px;">⏳ กำลังโหลดข้อมูล...</div></div>
             </div>
         </div>
     </div>
 
-    <div id="admin-page" class="page">
+    <div id="admin-pages" style="display:none;">
         <h2 style="color: #1e56a0; margin-bottom: 15px;">⚙️ ระบบผู้ดูแล (Admin)</h2>
-        <div class="admin-tabs">
-            <div class="admin-tab-btn active" onclick="switchAdminTab('tab-settings', this)">⚙️ ตั้งค่าระบบ</div>
-            <div class="admin-tab-btn" onclick="switchAdminTab('tab-users', this)">👥 ผู้ใช้งาน</div>
-            <div class="admin-tab-btn" onclick="switchAdminTab('tab-students', this)">🎓 นักเรียน</div>
-        </div>
-        
         <div id="tab-settings" class="admin-tab-content active">
             <h3 style="color:#ef4444; margin-top:0;">⏰ จำกัดเวลาเช็คชื่อประจำวัน</h3>
             <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
@@ -317,7 +295,7 @@
         </div>
     </div>
 
-    <div id="exec-page" class="page">
+    <div id="exec-pages" style="display:none;">
         <h2 style="color: #1e56a0; margin-bottom: 5px;">📊 แดชบอร์ดผู้บริหาร (Executive)</h2>
         <button onclick="fetchFullExecData()" style="width:100%; margin-bottom:15px; background:#17a2b8; display:flex; justify-content:center; align-items:center; gap:5px; border-radius:8px;">🔄 อัปเดตข้อมูลล่าสุด</button>
         
@@ -345,11 +323,6 @@
             </div>
         </div>
 
-        <div class="exec-tabs">
-            <div class="exec-tab-btn active" id="btn-exec-tab-att" onclick="switchExecTab('exec-tab-attendance', this)">📊 การเข้าเรียน</div>
-            <div class="exec-tab-btn" id="btn-exec-tab-beh" onclick="switchExecTab('exec-tab-behavior', this)">🏆 พฤติกรรม</div>
-        </div>
-
         <div id="exec-tab-attendance" class="exec-tab-content active">
             <div class="ai-exec-box">
                 <h3>🤖 สรุปวิเคราะห์สถิติการมาเรียน</h3>
@@ -367,9 +340,7 @@
                         <thead id="exec-detail-head">
                             <tr><th>กลุ่ม/บุคคล</th><th style="color:#10b981;">มา</th><th style="color:#eab308;">สาย</th><th style="color:#f97316;">ลากิจ</th><th style="color:#f43f5e;">ลาป่วย</th><th style="color:#991b1b;">ขาด</th><th style="color:#3b82f6;">นอก ร.ร.</th><th>อัตรามาเรียน</th></tr>
                         </thead>
-                        <tbody id="exec-detail-body">
-                            <tr><td colspan='8' style='text-align:center;'>กำลังประมวลผล...</td></tr>
-                        </tbody>
+                        <tbody id="exec-detail-body"><tr><td colspan='8' style='text-align:center;'>กำลังประมวลผล...</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -394,7 +365,7 @@
         </div>
     </div>
 
-    <div id="student-page" class="page">
+    <div id="student-pages" style="display:none;">
         <div style="background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 5px solid #1e56a0;">
             <div style="font-size: 14px; color: #475569; margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 10px;">
                 <span><b>เลขที่:</b> <span id="hdr-num" style="color:#ef4444;">-</span></span>
@@ -404,13 +375,6 @@
                 <span><b>ชั้น:</b> <span id="hdr-class" style="color:#f59e0b;">-</span></span>
             </div>
             <div id="hdr-name" style="font-size: 18px; font-weight: bold; color: #0f172a;">กำลังโหลดข้อมูล...</div>
-        </div>
-
-        <div class="student-tabs">
-            <div class="student-tab-btn active" onclick="switchStudentTab('tab-std-card', this)">🪪 บัตรนักเรียน</div>
-            <div class="student-tab-btn" onclick="switchStudentTab('tab-std-attendance', this)">📅 มาเรียน</div>
-            <div class="student-tab-btn" onclick="switchStudentTab('tab-std-leave', this)">📝 แจ้งลา</div>
-            <div class="student-tab-btn" onclick="switchStudentTab('tab-std-behavior', this)">💯 พฤติกรรม</div>
         </div>
 
         <div id="tab-std-card" class="student-tab-content active">
@@ -464,7 +428,7 @@
 
         <div id="tab-std-behavior" class="student-tab-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="margin:0; color:#059669; display:flex; align-items:center; gap:8px;">💯 คะแนนพฤติกรรม</h3>
+                <h3 style="margin:0; color:#059669; display:flex; align-items:center; gap:8px;">💯 คะแนนพฤติกรรมและความดี</h3>
                 <span style="font-size: 11px; color: #10b981; background: #d1fae5; padding: 4px 10px; border-radius: 12px; font-weight:bold; display:flex; align-items:center; gap:4px; box-shadow: 0 2px 4px rgba(16,185,129,0.2);"><span class="live-dot"></span> สด</span>
             </div>
             <div style="display:flex; gap:10px; margin-bottom:15px;">
@@ -474,7 +438,7 @@
                 </div>
                 <div style="flex:1; text-align:center; padding: 20px 10px; background: #fffbeb; border-radius: 12px; border: 2px solid #fcd34d;">
                     <h1 id="merit-score-text" style="font-size: 40px; color: #d97706; margin: 0; line-height: 1;">0</h1>
-                    <p style="margin: 5px 0 0 0; color: #b45309; font-weight: bold; font-size:13px;">🌟 ความดี</p>
+                    <p style="margin: 5px 0 0 0; color: #b45309; font-weight: bold; font-size:13px;">🌟 ความดีสะสม</p>
                 </div>
             </div>
             <h3 style="margin-top:20px; font-size:14px; color:#475569; border-bottom:1px solid #eee; padding-bottom:8px;">📋 ประวัติคะแนน</h3>
@@ -509,12 +473,30 @@
     </div>
 </div>
 
-<div class="nav-menu" id="bottom-nav">
-    <div class="nav-item active" onclick="switchPage('checklist-page', this)"><span>📝</span><br>เช็คชื่อ</div>
-    <div class="nav-item" onclick="switchPage('daily-page', this)"><span>📅</span><br>สัปดาห์</div>
-    <div class="nav-item" onclick="switchPage('summary-page', this)"><span>📊</span><br>สถิติ</div>
-    <div class="nav-item" onclick="switchPage('behavior-page', this)"><span>💯</span><br>พฤติกรรม</div>
-    <div class="nav-item" onclick="switchPage('notifications-page', this)"><span>🔔</span><br>แจ้งลา</div>
+<div class="nav-menu" id="bottom-nav-teacher">
+    <div class="nav-item active" onclick="switchPage('checklist-page', this)"><span>📝</span>เช็คชื่อ</div>
+    <div class="nav-item" onclick="switchPage('daily-page', this)"><span>📅</span>สัปดาห์</div>
+    <div class="nav-item" onclick="switchPage('summary-page', this)"><span>📊</span>สถิติ</div>
+    <div class="nav-item" onclick="switchPage('behavior-page', this)"><span>💯</span>พฤติกรรม</div>
+    <div class="nav-item" onclick="switchPage('notifications-page', this)"><span>🔔</span>แจ้งลา</div>
+</div>
+
+<div class="nav-menu" id="bottom-nav-student">
+    <div class="nav-item active" onclick="switchTabMobile('student-pages', 'tab-std-card', this)"><span>🪪</span>บัตร</div>
+    <div class="nav-item" onclick="switchTabMobile('student-pages', 'tab-std-attendance', this)"><span>📅</span>มาเรียน</div>
+    <div class="nav-item" onclick="switchTabMobile('student-pages', 'tab-std-leave', this)"><span>📝</span>แจ้งลา</div>
+    <div class="nav-item" onclick="switchTabMobile('student-pages', 'tab-std-behavior', this)"><span>💯</span>พฤติกรรม</div>
+</div>
+
+<div class="nav-menu" id="bottom-nav-admin">
+    <div class="nav-item active" onclick="switchTabMobile('admin-pages', 'tab-settings', this)"><span>⚙️</span>ตั้งค่า</div>
+    <div class="nav-item" onclick="switchTabMobile('admin-pages', 'tab-users', this)"><span>👥</span>ผู้ใช้</div>
+    <div class="nav-item" onclick="switchTabMobile('admin-pages', 'tab-students', this)"><span>🎓</span>นักเรียน</div>
+</div>
+
+<div class="nav-menu" id="bottom-nav-exec">
+    <div class="nav-item active" onclick="switchTabMobile('exec-pages', 'exec-tab-attendance', this)"><span>📊</span>การเข้าเรียน</div>
+    <div class="nav-item" onclick="switchTabMobile('exec-pages', 'exec-tab-behavior', this)"><span>🏆</span>พฤติกรรม</div>
 </div>
 
 <script>
@@ -589,13 +571,36 @@
         });
     }
 
-    function switchAdminTab(tabId, element) { document.querySelectorAll('.admin-tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active')); let tab = document.getElementById(tabId); if(tab) tab.classList.add('active'); if(element) element.classList.add('active'); }
-    function switchStudentTab(tabId, element) { document.querySelectorAll('.student-tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.student-tab-btn').forEach(btn => btn.classList.remove('active')); let tab = document.getElementById(tabId); if(tab) tab.classList.add('active'); if(element) element.classList.add('active'); }
-    function switchExecTab(tabId, element) {
-        document.querySelectorAll('.exec-tab-content').forEach(t => t.style.display = 'none');
-        document.querySelectorAll('.exec-tab-btn').forEach(btn => { btn.style.background = '#e2e8f0'; btn.style.color = '#475569'; });
-        document.getElementById(tabId).style.display = 'block';
-        if(element) { element.style.background = '#1e56a0'; element.style.color = 'white'; }
+    // 🌟 ระบบสลับหน้าสำหรับผู้ที่ไม่ใช่ครู (Student, Admin, Exec)
+    function switchTabMobile(parentId, tabId, element) {
+        let parent = document.getElementById(parentId);
+        if(parent) {
+            parent.querySelectorAll('.admin-tab-content, .student-tab-content, .exec-tab-content').forEach(t => t.classList.remove('active'));
+            let tab = document.getElementById(tabId);
+            if(tab) tab.classList.add('active');
+        }
+        if(element) {
+            let siblings = element.parentElement.children;
+            for(let i=0; i<siblings.length; i++) siblings[i].classList.remove('active');
+            element.classList.add('active');
+        }
+    }
+
+    function switchPage(pageId, element) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        if(element) { 
+            let siblings = element.parentElement.children;
+            for(let i=0; i<siblings.length; i++) siblings[i].classList.remove('active');
+            element.classList.add('active'); 
+        }
+        let pEl = document.getElementById(pageId);
+        if(pEl) pEl.classList.add('active');
+        localStorage.setItem('sis_current_page', pageId);
+        
+        if (pageId === 'daily-page' && currentClass) loadWeeklyData(); 
+        if (pageId === 'summary-page' && currentClass) loadSummaryData();
+        if (pageId === 'behavior-page' && currentClass) loadClassBehaviorData(); 
+        if (pageId === 'notifications-page' && currentClass) loadLeaveNotifications(); 
     }
 
     function handleLogin() {
@@ -607,11 +612,14 @@
 
     function routeUser(data) {
         try {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-menu').forEach(nav => nav.style.display = 'none');
+            document.getElementById('login-page').classList.remove('active');
+
             let uDisplay = document.getElementById('user-display'); if(uDisplay) uDisplay.innerText = `👤 ${data.name}`; 
             let logBtn = document.getElementById('logout-btn'); if(logBtn) logBtn.style.display = 'block'; 
             let statBar = document.getElementById('status-bar'); if(statBar) statBar.style.display = 'flex';
             
-            let savedPage = localStorage.getItem('sis_current_page'); 
             let role = data.role ? data.role.toString().trim().toLowerCase() : "";
 
             if (role === "teacher") { 
@@ -619,15 +627,10 @@
                 let cTitle = document.getElementById('class-title'); if(cTitle) cTitle.innerText = `(${currentClass})`; 
                 let bTitle = document.getElementById('beh-class-title'); if(bTitle) bTitle.innerText = `(${currentClass})`; 
                 let nTitle = document.getElementById('notif-class-title'); if(nTitle) nTitle.innerText = `(${currentClass})`; 
-                let bNav = document.getElementById('bottom-nav'); if(bNav) bNav.style.display = 'flex';
                 
-                let navItems = document.querySelectorAll('.nav-item');
-                if(savedPage === 'daily-page' && navItems.length > 1) switchPage('daily-page', navItems[1]); 
-                else if(savedPage === 'summary-page' && navItems.length > 2) switchPage('summary-page', navItems[2]); 
-                else if(savedPage === 'behavior-page' && navItems.length > 3) switchPage('behavior-page', navItems[3]); 
-                else if(savedPage === 'notifications-page' && navItems.length > 4) switchPage('notifications-page', navItems[4]); 
-                else if(navItems.length > 0) switchPage('checklist-page', navItems[0]);
-                else switchPage('checklist-page', null);
+                document.getElementById('teacher-pages').style.display = 'block';
+                document.getElementById('bottom-nav-teacher').style.display = 'flex';
+                switchPage('checklist-page', document.getElementById('bottom-nav-teacher').children[0]);
                 
                 fetch(`${GAS_API_URL}?action=get_admin_data`).then(res => res.json()).then(adminData => {
                     if(adminData.status === "success") {
@@ -637,19 +640,31 @@
                         let tModal = document.getElementById('teacher-instruction-modal');
                         if (tModal && !sessionStorage.getItem('teacher_modal_seen')) tModal.style.display = 'flex';
                     }
-                    if(!savedPage || savedPage === 'checklist-page') fetchStudents(); 
+                    fetchStudents(); 
                 }).catch(e => console.log("Admin config fetch error", e));
                 
             } else if(role === "admin") { 
-                switchPage('admin-page', null); loadAdminData();
+                document.getElementById('admin-pages').style.display = 'block';
+                document.getElementById('bottom-nav-admin').style.display = 'flex';
+                switchTabMobile('admin-pages', 'tab-settings', document.getElementById('bottom-nav-admin').children[0]);
+                loadAdminData();
+
             } else if(role === "executive" || role === "boss") { 
-                switchPage('exec-page', null); fetchFullExecData();
+                document.getElementById('exec-pages').style.display = 'block';
+                document.getElementById('bottom-nav-exec').style.display = 'flex';
+                switchTabMobile('exec-pages', 'exec-tab-attendance', document.getElementById('bottom-nav-exec').children[0]);
+                fetchFullExecData();
+
             } else if(role === "student") { 
-                switchPage('student-page', null); 
+                document.getElementById('student-pages').style.display = 'block';
+                document.getElementById('bottom-nav-student').style.display = 'flex';
+                switchTabMobile('student-pages', 'tab-std-card', document.getElementById('bottom-nav-student').children[0]);
+
                 loadStudentReport(data.userId, false); 
                 renderStudentCalendar(); 
                 if(studentDataTimer) clearInterval(studentDataTimer); 
                 studentDataTimer = setInterval(() => { loadStudentReport(data.userId, true); }, 10000); 
+
             } else { 
                 Swal.fire('ระบบ SIS', '❌ ไม่พบสิทธิ์การเข้าถึงข้อมูล', 'error'); 
             }
@@ -658,20 +673,6 @@
         }
     }
 
-    function switchPage(pageId, element) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        if(element) { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); element.classList.add('active'); }
-        let pEl = document.getElementById(pageId);
-        if(pEl) pEl.classList.add('active');
-        localStorage.setItem('sis_current_page', pageId);
-        
-        if (pageId === 'daily-page' && currentClass) loadWeeklyData(); 
-        if (pageId === 'summary-page' && currentClass) loadSummaryData();
-        if (pageId === 'behavior-page' && currentClass) loadClassBehaviorData(); 
-        if (pageId === 'notifications-page' && currentClass) loadLeaveNotifications(); // 🌟 โหลดข้อมูลเมื่อกดแท็บแจ้งลา
-    }
-
-    // 🌟 ฟังก์ชันดึงข้อมูลการแจ้งลาของห้องนี้
     function loadLeaveNotifications() {
         let container = document.getElementById('leave-notifications-container');
         if(!container) return;
@@ -685,15 +686,11 @@
                     container.innerHTML = `<div style="text-align:center; padding:20px; color:#64748b;">✅ ไม่มีข้อมูลการแจ้งลาในขณะนี้</div>`;
                     return;
                 }
-
-                // เรียงจากใหม่ไปเก่า (อิงจาก Timestamp)
                 data.data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
                 let html = "";
                 data.data.forEach(leave => {
                     let badgeColor = leave.leaveType.includes("ป่วย") ? "#f43f5e" : "#f59e0b";
                     let badgeBg = leave.leaveType.includes("ป่วย") ? "#fff1f2" : "#fffbeb";
-                    
                     html += `
                     <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
@@ -713,12 +710,8 @@
                     </div>`;
                 });
                 container.innerHTML = html;
-            } else {
-                container.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ โหลดข้อมูลไม่สำเร็จ</div>`;
-            }
-        }).catch(err => {
-            container.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้</div>`;
-        });
+            } else { container.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ โหลดข้อมูลไม่สำเร็จ</div>`; }
+        }).catch(err => { container.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้</div>`; });
     }
 
     function loadClassBehaviorData() {
@@ -847,7 +840,7 @@
     function saveAttendance() {
         const btn = document.getElementById('save-btn'); btn.innerText = "⏳ ระบบกำลังส่งข้อมูล..."; btn.disabled = true;
         let records = []; students.forEach(s => records.push({ id: s.id, name: s.name, className: currentClass, status: attendanceData[s.id].status, note: document.getElementById(`note-${s.id}`).value }));
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) }).then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false; if(data.status === "success") { Swal.fire('ระบบ SIS บ้านเชียงวิทยา', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบหักคะแนนอัตโนมัติแล้ว)', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS บ้านเชียงวิทยา', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error'); });
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "save_bulk", date: document.getElementById('check-date').value, teacherName: currentTeacher, records: records }) }).then(res => res.json()).then(data => { btn.innerText = "💾 บันทึกข้อมูล"; btn.disabled = false; if(data.status === "success") { Swal.fire('ระบบ SIS', '✅ บันทึกข้อมูลสำเร็จ!\n(หากมีขาด/สาย ระบบหักคะแนนอัตโนมัติแล้ว)', 'success'); fetchStudents(); } else Swal.fire('ระบบ SIS', "❌ บันทึกไม่สำเร็จ: " + data.message, 'error'); });
     }
 
     function loadQuickAIInsight() {
