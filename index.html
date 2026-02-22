@@ -9,7 +9,7 @@
         // 🔗 วางลิงก์ Web App ที่ทำ New version แล้ว ตรงนี้ครับ!
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyn_sFhEidU_U9nH1N_xrRroRwydBzT0qmxgx2fBn9aKy2GfdkMZ4yFyKTD3gUpvK2R/exec"; 
         
-        // เวลาที่จะให้ระบบ Logout อัตโนมัติ (ปัจจุบันตั้งไว้ 5 นาที)
+        // เวลาที่จะให้ระบบ Logout อัตโนมัติ (ตั้งไว้ 5 นาที = 5 * 60 * 1000 มิลลิวินาที)
         const IDLE_TIMEOUT = 5 * 60 * 1000; 
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -521,7 +521,7 @@
 </div>
 
 <div class="nav-menu" id="bottom-nav-exec">
-    <div class="nav-item active" onclick="switchTabMobile('exec-pages', 'exec-tab-attendance', this)"><span>📊</span>การเข้าเรียน</div>
+    <div class="nav-item active" onclick="switchTabMobile('exec-pages', 'exec-tab-attendance', this)"><span>📊</span>เข้าเรียน</div>
     <div class="nav-item" onclick="switchTabMobile('exec-pages', 'exec-tab-behavior', this)"><span>🏆</span>พฤติกรรม</div>
 </div>
 
@@ -622,11 +622,48 @@
         if (pageId === 'notifications-page' && currentClass) loadLeaveNotifications(); 
     }
 
+    // 🌟 ระบบล็อกอินแบบใหม่ที่อุดรอยรั่วการเด้ง Error แล้ว
     function handleLogin() {
-        const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim(), btn = document.getElementById('login-btn');
+        const u = document.getElementById('username').value.trim();
+        const p = document.getElementById('password').value.trim();
+        const btn = document.getElementById('login-btn');
         if (!u || !p) { Swal.fire('ระบบ SIS', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
-        btn.innerText = "⏳ กำลังเข้าสู่ระบบ..."; btn.disabled = true;
-        fetch(`${GAS_API_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`).then(res => res.json()).then(data => { btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; if (data.status === "success") { data.userId = u; localStorage.setItem('sis_user', JSON.stringify(data)); localStorage.setItem('sis_last_activity', Date.now()); routeUser(data); setupActivityListeners(); resetIdleTimer(); } else Swal.fire('ระบบ SIS', '❌ รหัสผ่านไม่ถูกต้อง', 'error'); }).catch((err) => { btn.innerText = "เข้าสู่ระบบ"; btn.disabled = false; Swal.fire('ระบบ SIS', '❌ เชื่อมต่อล้มเหลว กรุณาเปิดผ่าน Google Chrome', 'error'); });
+        
+        btn.innerText = "⏳ กำลังเข้าสู่ระบบ..."; 
+        btn.disabled = true;
+        
+        let url = GAS_API_URL.trim() + `?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`;
+        
+        fetch(url)
+            .then(res => res.text()) 
+            .then(text => {
+                btn.innerText = "เข้าสู่ระบบ"; 
+                btn.disabled = false;
+                try {
+                    let data = JSON.parse(text);
+                    if (data.status === "success") {
+                        data.userId = u;
+                        localStorage.setItem('sis_user', JSON.stringify(data));
+                        localStorage.setItem('sis_last_activity', Date.now());
+                        routeUser(data);
+                        setupActivityListeners();
+                        resetIdleTimer();
+                    } else {
+                        Swal.fire('ระบบ SIS', '❌ รหัสผ่านไม่ถูกต้อง', 'error');
+                    }
+                } catch(e) {
+                    console.error("Login Parse Error:", text);
+                    Swal.fire('ระบบ SIS', '❌ ข้อมูลตอบกลับผิดพลาด (ตรวจสอบลิงก์หลังบ้าน)', 'error');
+                }
+            })
+            .catch((err) => {
+                btn.innerText = "เข้าสู่ระบบ"; 
+                btn.disabled = false;
+                // ถ้าสลับหน้าไปแล้ว ไม่ต้องแจ้งเตือนซ้ำ
+                if(document.getElementById('login-page').classList.contains('active') === false) return; 
+                console.error("Login Fetch Error:", err);
+                Swal.fire('ระบบ SIS', `❌ เชื่อมต่อล้มเหลว (${err.message})`, 'error');
+            });
     }
 
     function routeUser(data) {
@@ -649,7 +686,17 @@
                 
                 document.getElementById('teacher-pages').style.display = 'block';
                 document.getElementById('bottom-nav-teacher').style.display = 'flex';
-                switchPage('checklist-page', document.getElementById('bottom-nav-teacher').children[0]);
+                
+                let savedPage = localStorage.getItem('sis_current_page'); 
+                let navMenu = document.getElementById('bottom-nav-teacher');
+                let navItems = navMenu ? navMenu.querySelectorAll('.nav-item') : [];
+                
+                if(savedPage === 'daily-page' && navItems.length > 1) switchPage('daily-page', navItems[1]); 
+                else if(savedPage === 'summary-page' && navItems.length > 2) switchPage('summary-page', navItems[2]); 
+                else if(savedPage === 'behavior-page' && navItems.length > 3) switchPage('behavior-page', navItems[3]); 
+                else if(savedPage === 'notifications-page' && navItems.length > 4) switchPage('notifications-page', navItems[4]); 
+                else if(navItems.length > 0) switchPage('checklist-page', navItems[0]);
+                else switchPage('checklist-page', null);
                 
                 fetch(`${GAS_API_URL}?action=get_admin_data`).then(res => res.json()).then(adminData => {
                     if(adminData.status === "success") {
@@ -659,7 +706,7 @@
                         let tModal = document.getElementById('teacher-instruction-modal');
                         if (tModal && !sessionStorage.getItem('teacher_modal_seen')) tModal.style.display = 'flex';
                     }
-                    fetchStudents(); 
+                    if(!savedPage || savedPage === 'checklist-page') fetchStudents(); 
                 }).catch(e => console.log("Admin config fetch error", e));
                 
             } else if(role === "admin") { 
