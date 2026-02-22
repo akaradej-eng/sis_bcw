@@ -6,10 +6,10 @@
     <title>SIS BCW - ระบบโรงเรียนบ้านเชียงวิทยา</title>
     
     <script>
-        // 🔗 วางลิงก์ Web App ที่ทำ New version แล้ว ตรงนี้ครับ!
+        // 🔗 ลิงก์ API เชื่อมต่อกับ Google Sheets
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwGNPtXNf-0orktZZIWLYyWvNaNg0BXs9BdQOHQNPLxviJ01VLrZFo1re6r2IYkYr2O/exec"; 
         
-        // เวลาที่จะให้ระบบ Logout อัตโนมัติ (ตั้งไว้ 5 นาที = 5 * 60 * 1000 มิลลิวินาที)
+        // เวลาที่จะให้ระบบ Logout อัตโนมัติเมื่อไม่มีการเคลื่อนไหว (ตั้งไว้ 5 นาที)
         const IDLE_TIMEOUT = 5 * 60 * 1000; 
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -103,6 +103,7 @@
         .admin-tab-content, .student-tab-content, .exec-tab-content { display: none; background: #fff; border-radius: 0 12px 12px 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .admin-tab-content.active, .student-tab-content.active, .exec-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
+        /* 🌟 CSS บัตรนักเรียนดิจิทัล */
         .id-card-container { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #e2e8f0; border-radius: 12px; padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); max-width: 400px; margin: 0 auto 20px auto; position: relative; overflow: hidden; }
         .id-card-header { display: flex; align-items: center; border-bottom: 3px solid #1e56a0; padding-bottom: 10px; margin-bottom: 15px; justify-content: center; }
         .id-card-logo { width: 45px; height: auto; margin-right: 10px; }
@@ -259,6 +260,12 @@
 
     <div id="admin-pages" style="display:none;">
         <h2 style="color: #1e56a0; margin-bottom: 15px;">⚙️ ระบบผู้ดูแล (Admin)</h2>
+        <div class="admin-tabs">
+            <div class="admin-tab-btn active" onclick="switchAdminTab('tab-settings', this)">⚙️ ตั้งค่าระบบ</div>
+            <div class="admin-tab-btn" onclick="switchAdminTab('tab-users', this)">👥 ผู้ใช้งาน</div>
+            <div class="admin-tab-btn" onclick="switchAdminTab('tab-students', this)">🎓 นักเรียน</div>
+        </div>
+        
         <div id="tab-settings" class="admin-tab-content active">
             <h3 style="color:#ef4444; margin-top:0;">⏰ จำกัดเวลาเช็คชื่อประจำวัน</h3>
             <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
@@ -521,7 +528,7 @@
 </div>
 
 <div class="nav-menu" id="bottom-nav-exec">
-    <div class="nav-item active" onclick="switchTabMobile('exec-pages', 'exec-tab-attendance', this)"><span>📊</span>เข้าเรียน</div>
+    <div class="nav-item active" onclick="switchTabMobile('exec-pages', 'exec-tab-attendance', this)"><span>📊</span>การเข้าเรียน</div>
     <div class="nav-item" onclick="switchTabMobile('exec-pages', 'exec-tab-behavior', this)"><span>🏆</span>พฤติกรรม</div>
 </div>
 
@@ -622,7 +629,7 @@
         if (pageId === 'notifications-page' && currentClass) loadLeaveNotifications(); 
     }
 
-    // 🌟 ระบบล็อกอินแบบใหม่ที่อุดรอยรั่วการเด้ง Error แล้ว
+    // 🌟 ระบบล็อกอินแบบใหม่ที่อุดรอยรั่วการเด้ง Error 
     function handleLogin() {
         const u = document.getElementById('username').value.trim();
         const p = document.getElementById('password').value.trim();
@@ -659,7 +666,6 @@
             .catch((err) => {
                 btn.innerText = "เข้าสู่ระบบ"; 
                 btn.disabled = false;
-                // ถ้าสลับหน้าไปแล้ว ไม่ต้องแจ้งเตือนซ้ำ
                 if(document.getElementById('login-page').classList.contains('active') === false) return; 
                 console.error("Login Fetch Error:", err);
                 Swal.fire('ระบบ SIS', `❌ เชื่อมต่อล้มเหลว (${err.message})`, 'error');
@@ -1188,4 +1194,3 @@
 
 </body>
 </html>
-
