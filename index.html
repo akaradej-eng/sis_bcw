@@ -183,7 +183,7 @@
                 <p id="teacher-quick-ai" style="font-size:13px; margin:0; line-height:1.5; color:#333;">กำลังเตรียมข้อมูลห้องเรียน...</p>
             </div>
             <div id="student-list-container"></div>
-            <button class="save-btn" id="save-btn" onclick="saveAttendance()" style="width:100%; padding:15px; font-size: 16px; margin-top: 10px; display:none;">💾 บันทึกข้อมูล</button>
+            <button class="save-btn" id="save-btn" onclick="saveAttendance()" style="width:100%; padding:15px; font-size:16px; margin-top: 10px; display:none;">💾 บันทึกข้อมูล</button>
         </div>
 
         <div id="daily-page" class="page">
@@ -350,6 +350,11 @@
                     <input type="date" id="exec-date-end" onchange="processExecData()" style="margin-bottom:0; background:white;">
                 </div>
             </div>
+        </div>
+
+        <div class="exec-tabs">
+            <div class="exec-tab-btn active" id="btn-exec-tab-att" onclick="switchExecTab('exec-tab-attendance', this)">📊 การเข้าเรียน</div>
+            <div class="exec-tab-btn" id="btn-exec-tab-beh" onclick="switchExecTab('exec-tab-behavior', this)">🏆 พฤติกรรม</div>
         </div>
 
         <div id="exec-tab-attendance" class="exec-tab-content active">
@@ -629,7 +634,7 @@
         if (pageId === 'notifications-page' && currentClass) loadLeaveNotifications(); 
     }
 
-    // 🌟 ระบบล็อกอินแบบใหม่ที่อุดรอยรั่วการเด้ง Error 
+    // 🌟 ระบบล็อกอินแบบใหม่
     function handleLogin() {
         const u = document.getElementById('username').value.trim();
         const p = document.getElementById('password').value.trim();
@@ -646,21 +651,25 @@
             .then(text => {
                 btn.innerText = "เข้าสู่ระบบ"; 
                 btn.disabled = false;
+                
+                let data;
                 try {
-                    let data = JSON.parse(text);
-                    if (data.status === "success") {
-                        data.userId = u;
-                        localStorage.setItem('sis_user', JSON.stringify(data));
-                        localStorage.setItem('sis_last_activity', Date.now());
-                        routeUser(data);
-                        setupActivityListeners();
-                        resetIdleTimer();
-                    } else {
-                        Swal.fire('ระบบ SIS', '❌ รหัสผ่านไม่ถูกต้อง', 'error');
-                    }
+                    data = JSON.parse(text);
                 } catch(e) {
-                    console.error("Login Parse Error:", text);
-                    Swal.fire('ระบบ SIS', '❌ ข้อมูลตอบกลับผิดพลาด (ตรวจสอบลิงก์หลังบ้าน)', 'error');
+                    console.error("Parse Error:", text);
+                    Swal.fire('ระบบ SIS', '❌ การเชื่อมต่อผิดพลาด กรุณาลองใหม่อีกครั้ง', 'error');
+                    return;
+                }
+                
+                if (data.status === "success") {
+                    data.userId = u;
+                    localStorage.setItem('sis_user', JSON.stringify(data));
+                    localStorage.setItem('sis_last_activity', Date.now());
+                    routeUser(data);
+                    setupActivityListeners();
+                    resetIdleTimer();
+                } else {
+                    Swal.fire('ระบบ SIS', '❌ รหัสผ่านไม่ถูกต้อง', 'error');
                 }
             })
             .catch((err) => {
@@ -668,7 +677,7 @@
                 btn.disabled = false;
                 if(document.getElementById('login-page').classList.contains('active') === false) return; 
                 console.error("Login Fetch Error:", err);
-                Swal.fire('ระบบ SIS', `❌ เชื่อมต่อล้มเหลว (${err.message})`, 'error');
+                Swal.fire('ระบบ SIS', `❌ เชื่อมต่อล้มเหลว กรุณาตรวจสอบอินเทอร์เน็ต`, 'error');
             });
     }
 
@@ -1194,4 +1203,3 @@
 
 </body>
 </html>
-
